@@ -187,6 +187,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         configs = _selected_configs(load_live_source_configs(settings.LIVE_JOB_SOURCES_JSON), args)
         service = _service(configs)
+        service.include_discovered = not (args.source or args.family)
     except (LiveSourceConfigurationError, ValueError) as exc:
         print(f"Configuration error: {exc}")
         return 2

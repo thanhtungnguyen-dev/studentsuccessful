@@ -12,6 +12,7 @@ from uuid import UUID
 from sqlalchemy import delete, select
 
 from backend.app.core.config import settings
+from backend.app.ingestion.normalization import resolve_location
 from backend.app.models.job import (
     JobEducationRequirement,
     JobEligibilityRequirement,
@@ -64,12 +65,21 @@ def canonical_url_fingerprint(value: str) -> str:
         for key, item in parse_qsl(parsed.query, keep_blank_values=True)
         if not key.casefold().startswith("utm_") and key.casefold() not in _TRACKING_QUERY_KEYS
     ]
+    path = parsed.path.rstrip("/")
+    if (
+        hostname in {"jobs.lever.co", "jobs.eu.lever.co"}
+        and len(path.split("/")) == 4
+        and path.endswith("/apply")
+    ):
+        path = path[:-6]
+    if hostname.endswith(".recruitee.com") and path.startswith("/o/") and path.endswith("/c/new"):
+        path = path[:-6]
     canonical = urlunsplit(
         (
             parsed.scheme.casefold(),
             hostname,
-            parsed.path.rstrip("/"),
-            urlencode(pairs, doseq=True),
+            path,
+            urlencode(sorted(pairs), doseq=True),
             "",
         )
     )
@@ -220,6 +230,7 @@ class CanonicalJobService:
                 application_fingerprint=application_fingerprint,
                 exact_fingerprint=exact_fingerprint,
                 repository=repository,
+                incoming_url=item.dto.application_url,
             )
             if canonical_job is None:
                 canonical_created = True
@@ -365,6 +376,7 @@ class CanonicalJobService:
         application_fingerprint: str,
         exact_fingerprint: str | None,
         repository: JobIngestionRepository,
+        incoming_url: str | None = None,
     ) -> NormalizedJob | None:
         scores: dict[object, int] = {}
         for candidate in candidates:
@@ -377,7 +389,22 @@ class CanonicalJobService:
                 exact_fingerprint is not None
                 and candidate.company_title_location_fingerprint == exact_fingerprint
             ):
-                score = max(score, 100)
+                # Distinct direct ATS requisitions must not merge on generic titles.
+                from backend.app.ingestion.source_detection import detect_source
+
+                try:
+                    left = detect_source(candidate.application_url, "Identity")
+                    right = detect_source(incoming_url, "Identity") if incoming_url else None
+                except ValueError:
+                    left = right = None
+                distinct = (
+                    left
+                    and right
+                    and canonical_url_fingerprint(candidate.application_url)
+                    != application_fingerprint
+                )
+                if not distinct:
+                    score = max(score, 100)
             if score:
                 scores[candidate.canonical_job_id] = max(
                     score, scores.get(candidate.canonical_job_id, 0)
@@ -400,6 +427,39 @@ class CanonicalJobService:
         exact_fingerprint: str | None,
         now: datetime,
     ) -> None:
+        from sqlalchemy.dialects.postgresql import insert
+
+        from backend.app.models.intelligence import JobChangeEvent
+
+        previous = observation.current_payload_hash_sha256
+        changes = [
+            field
+            for field in ("title", "description", "employment_type", "work_mode", "application_url")
+            if getattr(observation, field) != getattr(item.dto, field)
+        ]
+        if observation.fact_projection != _projection(item):
+            changes.append("requirements_or_locations")
+        if observation.explicitly_closed != (item.dto.source_status == "CLOSED"):
+            changes.append("closure_or_reopening")
+        if previous and changes:
+            key = hashlib.sha256(
+                f"{observation.id}:{previous}:{item.payload_hash}:{observation.updated_at}".encode()
+            ).hexdigest()
+            from sqlalchemy.orm import object_session
+
+            object_session(observation).execute(
+                insert(JobChangeEvent)
+                .values(
+                    event_key=key,
+                    job_id=observation.canonical_job_id,
+                    observation_id=observation.id,
+                    previous_hash=previous,
+                    current_hash=item.payload_hash,
+                    changed_fields=changes,
+                    observed_at=now,
+                )
+                .on_conflict_do_nothing()
+            )
         observation.source_authority = item.source_authority
         observation.source_url = item.dto.source_url
         observation.application_url = item.dto.application_url
@@ -442,12 +502,14 @@ class CanonicalJobService:
             ),
         )
         projection_source = next(
-            (observation for observation in observations if observation.fact_projection is not None),
+            (
+                observation
+                for observation in observations
+                if observation.fact_projection is not None
+            ),
             None,
         )
-        projection = (
-            projection_source.fact_projection if projection_source is not None else None
-        )
+        projection = projection_source.fact_projection if projection_source is not None else None
         desired_locations = _projection_values(projection, "locations")
         desired_skills = _projection_values(projection, "skills")
         desired_education = _projection_values(projection, "education")
@@ -455,9 +517,9 @@ class CanonicalJobService:
         desired_industries = _projection_values(projection, "industry_ids")
 
         description = _first_known(observations, "description")
-        employment_type = _first_known(
-            observations, "employment_type", unknown=_UNKNOWN
-        ) or _UNKNOWN
+        employment_type = (
+            _first_known(observations, "employment_type", unknown=_UNKNOWN) or _UNKNOWN
+        )
         career_level = _first_known(observations, "career_level", unknown=_UNKNOWN) or _UNKNOWN
         work_mode = _first_known(observations, "work_mode", unknown=_UNKNOWN) or _UNKNOWN
         posted_at = _first_known(observations, "posted_at")
@@ -482,6 +544,21 @@ class CanonicalJobService:
             projection=projection,
             session=session,
         )
+        provenance = {
+            "title": str(primary.id),
+            "company": str(primary.id),
+            "role": str(primary.id),
+            "application_url": str(application_source.id),
+        }
+        for field in ("description", "employment_type", "career_level", "work_mode", "posted_at"):
+            owner = next(
+                (obs for obs in observations if getattr(obs, field) not in {None, _UNKNOWN}), None
+            )
+            if owner:
+                provenance[field] = str(owner.id)
+        if projection_source:
+            provenance["requirements_and_locations"] = str(projection_source.id)
+        canonical_job.field_provenance = provenance
         canonical_job.company_id = primary.company_id
         canonical_job.role_id = primary.role_id
         canonical_job.title = primary.title
@@ -681,14 +758,22 @@ class CanonicalJobService:
         session.execute(delete(JobIndustry).where(JobIndustry.job_id == job_id))
         session.execute(delete(JobLocation).where(JobLocation.job_id == job_id))
         session.execute(delete(JobSkillRequirement).where(JobSkillRequirement.job_id == job_id))
-        session.execute(delete(JobEducationRequirement).where(JobEducationRequirement.job_id == job_id))
-        session.execute(delete(JobEligibilityRequirement).where(JobEligibilityRequirement.job_id == job_id))
+        session.execute(
+            delete(JobEducationRequirement).where(JobEducationRequirement.job_id == job_id)
+        )
+        session.execute(
+            delete(JobEligibilityRequirement).where(JobEligibilityRequirement.job_id == job_id)
+        )
         session.add_all(
             JobIndustry(job_id=job_id, industry_id=UUID(str(industry_id)))
             for industry_id in industry_ids
         )
         session.add_all(
-            JobLocation(job_id=job_id, location_raw=str(location))
+            JobLocation(
+                job_id=job_id,
+                location_raw=str(location),
+                location_id=resolve_location(session, str(location)),
+            )
             for location in locations
         )
         session.add_all(
@@ -704,9 +789,7 @@ class CanonicalJobService:
             JobEducationRequirement(
                 job_id=job_id,
                 degree_level=education_item["degree_level"],
-                target_grad_start=CanonicalJobService._date(
-                    education_item["target_grad_start"]
-                ),
+                target_grad_start=CanonicalJobService._date(education_item["target_grad_start"]),
                 target_grad_end=CanonicalJobService._date(education_item["target_grad_end"]),
             )
             for education_item in education

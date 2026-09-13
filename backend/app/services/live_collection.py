@@ -34,6 +34,9 @@ DEFAULT_POLL_INTERVAL_SECONDS = {
     "ashby": 900,
     "smartrecruiters": 900,
     "rss": 1800,
+    "recruitee": 900,
+    "personio": 1800,
+    "jsonld": 3600,
 }
 INITIAL_BACKOFF_SECONDS = 60
 MAX_RETRY_AFTER_SECONDS = 86_400
@@ -138,12 +141,15 @@ class LiveCollectionService:
         *,
         default_timeout_seconds: float,
         max_concurrency: int = 3,
+        include_discovered: bool = True,
         max_backoff_seconds: int = 3_600,
         uow_factory: Callable[[], UnitOfWork] = UnitOfWork,
         now: Callable[[], datetime] = utc_now,
         jitter: Callable[[str, int, int], int] = deterministic_jitter_seconds,
     ) -> None:
-        self.configs = tuple(configs)
+        self.include_discovered = include_discovered
+        self.seeds = tuple(configs)
+        self.configs = self.seeds
         self.default_timeout_seconds = default_timeout_seconds
         self.max_concurrency = max_concurrency
         self.max_backoff_seconds = max_backoff_seconds
@@ -156,6 +162,18 @@ class LiveCollectionService:
             raise ValueError("max_concurrency must be between 1 and 16")
         if not INITIAL_BACKOFF_SECONDS <= max_backoff_seconds <= MAX_RETRY_AFTER_SECONDS:
             raise ValueError("max_backoff_seconds must be between 60 and 86400")
+
+    def _discover(self):
+        from backend.app.core.config import settings
+        from backend.app.services.source_intelligence import process_discovery
+
+        if settings.LIVE_SOURCE_DISCOVERY_ENABLED and self.include_discovered:
+            try:
+                process_discovery(uow_factory=self._uow_factory, now=self._now)
+            except Exception:
+                import logging
+
+                logging.getLogger("studentsuccessful.discovery").warning("discovery_cycle_failed")
 
     def normal_poll_interval_seconds(self, config: LiveJobSourceConfig) -> int:
         if config.poll_interval_seconds is not None:
@@ -174,7 +192,14 @@ class LiveCollectionService:
 
     def synchronize(self, now: datetime | None = None) -> None:
         now = self._utc(now or self._now())
-        intervals = {config.key: self.normal_poll_interval_seconds(config) for config in self.configs}
+        from backend.app.services.source_intelligence import effective_sources
+
+        self.configs = effective_sources(
+            self.seeds, self._uow_factory, include_discovered=self.include_discovered
+        )
+        intervals = {
+            config.key: self.normal_poll_interval_seconds(config) for config in self.configs
+        }
         with self._uow_factory() as uow:
             repository = LiveSourceStateRepository(uow.session)
             repository.synchronize_configurations(self.configs, intervals, now)
@@ -188,6 +213,7 @@ class LiveCollectionService:
         self.synchronize(now)
         claims = self._claim_due(now, force=force)
         if not claims:
+            self._discover()
             return LiveCollectionCycle(())
 
         adapters = tuple(
@@ -217,6 +243,7 @@ class LiveCollectionService:
                     outcome = future.result()
                     self._record_outcome(claim, outcome, self._utc(self._now()))
                     outcomes.append(outcome)
+        self._discover()
         return LiveCollectionCycle(tuple(sorted(outcomes, key=lambda outcome: outcome.source_key)))
 
     def run_forever(self, stop_event: threading.Event | None = None) -> None:
@@ -266,7 +293,9 @@ class LiveCollectionService:
         if not isinstance(adapter, LiveSourceAdapter):
             raise ValueError("configured collector adapter is invalid")
         fetched = adapter.fetch_with_metadata(etag=claim.etag, last_modified=claim.last_modified)
-        result = LiveJobIngestionService.ingest_adapter(adapter, registry, fetch_result=fetched)
+        result = LiveJobIngestionService.ingest_adapter(
+            adapter, registry, fetch_result=fetched, uow_factory=self._uow_factory
+        )
         return LiveCollectionOutcome(
             source_key=claim.config.key,
             family=claim.config.family,
@@ -337,6 +366,7 @@ class LiveCollectionService:
         completed_at: datetime,
     ) -> None:
         prior_seen = state.last_jobs_seen
+        previous_failures = state.consecutive_failures
         state.total_collection_attempts += 1
         state.total_jobs_observed += result.parsed
         state.total_jobs_ingested += result.ingested
@@ -384,9 +414,22 @@ class LiveCollectionService:
                 state.etag = result.etag
             if result.last_modified is not None:
                 state.last_modified = result.last_modified
-        interval = state.normal_poll_interval_seconds
+        from backend.app.services.source_quality import adaptive_interval
+
+        changed = bool(result.content_hash and result.content_hash != state.last_content_hash)
+        state.unchanged_successes = 0 if changed else (state.unchanged_successes or 0) + 1
+        if changed:
+            state.last_change_at = completed_at
+            state.last_content_hash = result.content_hash
+        interval = adaptive_interval(
+            state.normal_poll_interval_seconds,
+            changed=changed,
+            new_jobs=result.new_canonical_jobs,
+            unchanged=state.unchanged_successes,
+            recovering=bool(previous_failures),
+        )
         state.next_poll_at = completed_at + timedelta(
-            seconds=interval + self._jitter_delay(state.source_key, interval, 0)
+            seconds=min(86400, interval + self._jitter_delay(state.source_key, interval, 0))
         )
         state.lease_token = None
         state.lease_expires_at = None

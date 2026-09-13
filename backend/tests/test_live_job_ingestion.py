@@ -175,7 +175,7 @@ def test_public_adapters_parse_representative_provider_records(
     assert record.company == "Acme"
     assert record.application_url == expected_apply
     assert record.work_mode == expected_work_mode
-    assert record.role == "Unspecified"
+    assert record.role == ("Software Engineer" if family == "lever" else "Unspecified")
 
 
 def test_adapter_keeps_known_source_timestamps_and_leaves_missing_optional_data_unknown():
@@ -183,6 +183,7 @@ def test_adapter_keeps_known_source_timestamps_and_leaves_missing_optional_data_
         source_config("greenhouse"),
         greenhouse_payload(
             greenhouse_job(
+                title="Open position",
                 content=None,
                 location=None,
                 offices=None,

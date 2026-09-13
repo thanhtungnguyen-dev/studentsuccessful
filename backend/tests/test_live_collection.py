@@ -209,7 +209,7 @@ def test_timeout_does_not_block_another_source_and_failure_is_isolated(
     isolated_database, monkeypatch
 ):
     failed = source_config(key="greenhouse.failed")
-    healthy = source_config(key="greenhouse.healthy")
+    healthy = source_config(key="greenhouse.healthy").model_copy(update={"board_token": "healthy"})
     clock = Clock()
     _, clients = install_mock_adapters(
         monkeypatch,

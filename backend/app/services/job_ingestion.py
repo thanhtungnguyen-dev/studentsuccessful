@@ -88,7 +88,7 @@ def _safe_url(value: str, field: str) -> str:
 def normalize_company_identity(value: str) -> str:
     normalized = _plain_text(value, "company", max_length=150, required=True)
     assert normalized is not None
-    normalized = _COMPANY_SUFFIXES.sub("", normalized).strip(" ,.")
+    normalized = _COMPANY_SUFFIXES.sub("", normalized.rstrip(".")).strip(" ,.")
     if not normalized:
         raise JobIngestionValidationError("company must contain a canonical name")
     return normalized

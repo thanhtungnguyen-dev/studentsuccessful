@@ -32,6 +32,7 @@ class LiveSourceIngestionResult:
     duplicate_contributions: int = 0
     internship_or_coop_contributions: int = 0
     official_apply_urls: int = 0
+    content_hash: str | None = None
 
 
 class LiveJobIngestionService:
@@ -52,11 +53,33 @@ class LiveJobIngestionService:
     ) -> LiveSourceIngestionResult:
         fetched = fetch_result or adapter.fetch_with_metadata()
         records = fetched.records
+        from backend.app.core.config import settings
+        from backend.app.services.source_intelligence import enqueue_urls, preserve_fetch
+
+        preserve_fetch(adapter, uow_factory)
+        import hashlib
+        import json
+
+        content_hash = (
+            None
+            if fetched.not_modified
+            else hashlib.sha256(
+                json.dumps(
+                    sorted(
+                        (record.model_dump(mode="json") for record in records),
+                        key=lambda row: row["external_id"],
+                    ),
+                    sort_keys=True,
+                    separators=(",", ":"),
+                ).encode()
+            ).hexdigest()
+        )
         if records:
             with uow_factory() as uow:
-                LiveJobIngestionRepository(uow.session).ensure_configured_catalog(
-                    adapter.config.company, adapter.config.role
-                )
+                for role in sorted({record.role for record in records}):
+                    LiveJobIngestionRepository(uow.session).ensure_configured_catalog(
+                        adapter.config.company, role
+                    )
                 uow.commit()
 
         ingested = 0
@@ -82,6 +105,13 @@ class LiveJobIngestionService:
             except JobIngestionValidationError:
                 rejected += 1
 
+        if settings.LIVE_SOURCE_DISCOVERY_ENABLED:
+            try:
+                enqueue_urls(records, adapter.key, uow_factory)
+            except Exception:
+                import logging
+
+                logging.getLogger("studentsuccessful.discovery").warning("discovery_enqueue_failed")
         return LiveSourceIngestionResult(
             source_key=adapter.key,
             family=adapter.family,
@@ -101,6 +131,7 @@ class LiveJobIngestionService:
             duplicate_contributions=duplicate_contributions,
             internship_or_coop_contributions=internship_or_coop_contributions,
             official_apply_urls=official_apply_urls,
+            content_hash=content_hash,
         )
 
 

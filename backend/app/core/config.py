@@ -52,6 +52,7 @@ class Settings(BaseSettings):
     # A JSON array of public, credential-free ATS board configurations. It is
     # parsed only by the manual live-ingestion command, so a bad operational
     # configuration cannot stop the web application from starting.
+    LIVE_SOURCE_DISCOVERY_ENABLED: bool = False
     LIVE_JOB_SOURCES_JSON: str = "[]"
     LIVE_JOB_HTTP_TIMEOUT_SECONDS: float = 10.0
     LIVE_COLLECTOR_CONCURRENCY: int = 3

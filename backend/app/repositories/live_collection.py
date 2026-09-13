@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
-from sqlalchemy import select
+from sqlalchemy import select, text
 
 from backend.app.models.job import LiveSourceHealth, LiveSourceState
 
@@ -42,6 +42,7 @@ class LiveSourceStateRepository:
         configs = tuple(configs)
         if not configs:
             return
+        self.session.execute(text("SELECT pg_advisory_xact_lock(260004)"))
         states = {
             state.source_key: state
             for state in self.session.scalars(
@@ -115,6 +116,7 @@ class LiveSourceStateRepository:
         configs = tuple(sorted(configs, key=lambda config: config.key))
         if not configs:
             return ()
+        self.session.execute(text("SELECT pg_advisory_xact_lock(260004)"))
         states = {
             state.source_key: state
             for state in self.session.scalars(

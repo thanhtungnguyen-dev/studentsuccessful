@@ -15,7 +15,7 @@ from sqlalchemy.exc import IntegrityError
 from backend.app.models import Base
 
 INTEGRITY_HEAD = "e7d1b9f4a2c3"
-CURRENT_HEAD = "b25c6d4e8f10"
+CURRENT_HEAD = "c26d7e9f102a"
 PREVIOUS = "f3d9a7b1c5e2"
 CHECKS = {
     "job_source_records": {
