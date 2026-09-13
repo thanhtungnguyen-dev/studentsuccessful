@@ -85,99 +85,68 @@ def _print_health(service: LiveCollectionService) -> None:
         )
 
 
-def _run_once(service: LiveCollectionService) -> int:
-    cycle = service.run_cycle(force=True)
-    if not cycle.outcomes:
-        print("No configured live sources selected.")
-        return 0
-    states = {state.source_key: state for state in service.health_snapshots()}
-    for outcome in cycle.outcomes:
-        state = states[outcome.source_key]
-        if outcome.succeeded:
-            assert outcome.result is not None
-            result = outcome.result
-            print(
-                f"source={outcome.source_key} family={outcome.family} health={state.health} "
-                f"fetched={result.fetched} parsed={result.parsed} ingested={result.ingested} "
-                f"malformed={result.malformed} rejected={result.rejected} "
-                f"new_canonical={result.new_canonical_jobs} "
-                f"duplicates={result.duplicate_contributions} "
-                f"not_modified={str(result.not_modified).lower()}"
-            )
-        else:
-            print(
-                f"source={outcome.source_key} family={outcome.family} health={state.health} "
-                f"status=failed category={outcome.error_category} "
-                f"next_poll={state.next_poll_at}"
-            )
-    return 1 if cycle.failed else 0
+def _run_forever(service: LiveCollectionService, *, once=False, stop_event=None, runtime=None) -> int:
+    stop_event = stop_event or threading.Event()
+    runtime = runtime or WorkerRuntime("collector")
+    failures = 0
+    previous_handlers = {}
 
-
-def _run_forever(service: LiveCollectionService) -> int:
-    stop_event = threading.Event()
-
-    def request_stop(signum, frame) -> None:
-        del signum, frame
+    def request_stop(signum, frame):
         stop_event.set()
 
-    signal.signal(signal.SIGINT, request_stop)
-    signal.signal(signal.SIGTERM, request_stop)
-    runtime = WorkerRuntime("collector")
-    standby_logged = False
-    print("Live collector started. Press Ctrl+C to stop.")
+    if threading.current_thread() is threading.main_thread():
+        for signum in (signal.SIGINT, signal.SIGTERM):
+            previous_handlers[signum] = signal.signal(signum, request_stop)
     try:
         while not stop_event.is_set():
-            if not runtime.owns_lease:
-                if not runtime.claim():
-                    if not standby_logged:
-                        logger.info(
-                            "worker_lease_held",
-                            extra={"event": "worker_lease_held", "worker": "collector"},
-                        )
-                        standby_logged = True
+            cycle_stop = threading.Event()
+
+            def tick():
+                if stop_event.is_set():
+                    cycle_stop.set()
+                if not runtime.heartbeat():
+                    raise RuntimeError("Collector worker lease lost")
+
+            try:
+                if not runtime.owns_lease and not runtime.claim():
+                    logger.info("worker_lease_held", extra={"worker": "collector"})
+                    if once:
+                        return 1
                     stop_event.wait(5)
                     continue
-                standby_logged = False
+                tick()
+                started = time.perf_counter()
+                cycle = service.run_cycle(force=False, stop_event=cycle_stop, on_tick=tick)
+                if not runtime.heartbeat(completed=True):
+                    raise RuntimeError("Collector worker lease lost")
                 logger.info(
-                    "worker_started",
-                    extra={"event": "worker_started", "worker": "collector"},
+                    "collector_cycle_completed",
+                    extra={"event": "collector_cycle_completed", "worker": "collector",
+                           "attempted": cycle.attempted, "failed": cycle.failed,
+                           "duration_ms": round((time.perf_counter() - started) * 1000)},
                 )
-
-            if not runtime.heartbeat():
-                logger.warning(
-                    "worker_lease_lost",
-                    extra={"event": "worker_lease_lost", "worker": "collector"},
-                )
-                continue
-            started = time.perf_counter()
-            try:
-                cycle = service.run_cycle(force=False)
+                if once:
+                    return 1 if cycle.failed else 0
+                delay = min(20, service.seconds_until_next_poll(), runtime.lease_seconds // 3)
+                failures = 0
+                stop_event.wait(max(1, delay))
             except Exception:
-                logger.exception(
-                    "collector_cycle_failed",
-                    extra={"event": "collector_cycle_failed", "worker": "collector"},
-                )
-                return 1
-            if not runtime.heartbeat(completed=True):
-                logger.warning(
-                    "worker_lease_lost",
-                    extra={"event": "worker_lease_lost", "worker": "collector"},
-                )
-                continue
-            logger.info(
-                "collector_cycle_completed",
-                extra={
-                    "event": "collector_cycle_completed",
-                    "worker": "collector",
-                    "attempted": cycle.attempted,
-                    "failed": cycle.failed,
-                    "duration_ms": round((time.perf_counter() - started) * 1000),
-                },
-            )
-            stop_event.wait(service.seconds_until_next_poll())
+                cycle_stop.set()
+                failures += 1
+                logger.exception("collector_retry", extra={"event": "collector_retry", "worker": "collector"})
+                if once:
+                    return 1
+                stop_event.wait(min(60, 5 * (2 ** min(failures - 1, 4))))
+    except KeyboardInterrupt:
+        stop_event.set()
     finally:
-        runtime.release()
-    print("Live collector stopped.")
+        try:
+            runtime.release()
+        except Exception:
+            logger.exception("worker_release_failed", extra={"worker": "collector"})
+        for signum, previous in previous_handlers.items():
+            signal.signal(signum, previous)
+    logger.info("worker_stopped", extra={"worker": "collector"})
     return 0
 
 
@@ -187,17 +156,21 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         configs = _selected_configs(load_live_source_configs(settings.LIVE_JOB_SOURCES_JSON), args)
         service = _service(configs)
+        service.include_discovered = not (args.source or args.family)
     except (LiveSourceConfigurationError, ValueError) as exc:
         print(f"Configuration error: {exc}")
         return 2
 
-    if args.command == "health":
-        service.synchronize()
-        _print_health(service)
-        return 0
-    if args.command == "once":
-        return _run_once(service)
-    return _run_forever(service)
+    from backend.app.core.database import engine
+
+    try:
+        if args.command == "health":
+            service.synchronize()
+            _print_health(service)
+            return 0
+        return _run_forever(service, once=args.command == "once")
+    finally:
+        engine.dispose()
 
 
 if __name__ == "__main__":

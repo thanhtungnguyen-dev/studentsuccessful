@@ -76,3 +76,61 @@ docker compose --env-file deploy/production.env.example -f docker-compose.produc
 ```
 
 Substitute real secret-store values only in the deployment environment, run the release migration once, then perform API, worker, storage, and restart smoke checks with a dedicated staging account. The ingress must terminate HTTPS for `FRONTEND_ORIGIN`; enable its HSTS policy once the domain is HTTPS-only.
+
+
+## Continuous collector process
+
+Run the collector as a separate background service with the same backend image,
+server-only configuration and database as the API:
+
+```sh
+python -m backend.app.commands.collect_live run
+```
+
+The API never starts a collector. HTTP traffic is not required. The existing
+production Compose collector role already uses this command. On Render, configure
+an independently running background-worker service with this start command and
+the existing backend configuration; do not use an HTTP request or web startup hook
+to launch it. No hosting plan or deployment availability is verified by this code.
+Choose hosting that keeps background processes running and restarts failures.
+
+The collector claims the existing singleton worker lease using a unique runtime
+UUID. It heartbeats before/after cycles, at most every ten seconds while waiting
+on collection or discovery, and after idle waits of at most twenty seconds
+(shorter for smaller worker leases). The coordinator renews in-flight source
+leases while HTTP runs in executor threads; there is no heartbeat thread or new
+scheduler. Each continuous/once cycle claims at most `LIVE_COLLECTOR_CONCURRENCY`
+sources, oldest due first, without queuing work behind soon-to-expire leases.
+Existing per-source budgets, adaptive scheduling and source backoff still apply.
+
+Temporary database/cycle failures produce safe structured error logs and
+interruptible retries at 5, 10, 20, 40, then at most 60 seconds. Successful cycles
+reset this delay. Existing SQLAlchemy pre-ping, recycle, connection timeout and
+pool limits handle reconnection; no separate connection pool is introduced.
+A failed source is recorded independently and does not prevent other sources
+from completing. Unexpected source exceptions remain visible in structured logs.
+
+SIGINT/SIGTERM stop further claims and signal in-flight collection between safe
+batches. Committed cursor progress survives interruption; hard termination is
+recovered through existing lease expiry and idempotent ingestion. Active HTTP
+units remain bounded by existing provider budgets and may take longer than a
+platform's termination grace period. Set the platform grace period appropriately;
+hard-kill correctness does not rely on a successful final lease release. Database
+resources are disposed on command exit. A failed cleanup is logged, not hidden.
+
+Bounded verification uses the same runtime and a real **due-source** scheduler
+cycle, including worker claim/heartbeat/release. It does not force future polls:
+
+```sh
+python -m backend.app.commands.collect_live once --all
+python -m backend.app.commands.worker_health collector
+python -m backend.app.commands.job_intelligence report
+python -m backend.app.commands.collect_live health
+```
+
+A successful `once` exits zero (including no due work); source/cycle failure or an
+already-held worker lease exits nonzero. After `once`, worker health correctly
+reports stopped. The intelligence report's `operations` section includes runtime
+identity, start time, heartbeat age/status, source leases/expiry, due work, recent
+errors and last collection success. These details stay in the operator command;
+the public worker health endpoint continues to expose only aggregate freshness.

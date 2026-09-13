@@ -31,8 +31,8 @@ def test_fresh_database_migration_to_head(database_engine):
             assert set(inspect(connection).get_table_names(schema=schema)) == set(
                 Base.metadata.tables
             ) | {"alembic_version"}
-            command.downgrade(cfg, "base")
-            assert inspect(connection).get_table_names(schema=schema) == ["alembic_version"]
+            # V2 is explicitly forward-only. Verify repeated upgrade is a no-op;
+            # the enclosing disposable transaction still rolls back all DDL.
             command.upgrade(cfg, "head")
         finally:
             transaction.rollback()

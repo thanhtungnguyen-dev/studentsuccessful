@@ -25,7 +25,8 @@ def test_artifact_migration(database_engine):
             )
             before = list(c.execute(text("SELECT * FROM users")).mappings())
             tables = set(inspect(c).get_table_names(schema=schema))
-            command.upgrade(cfg, "head")
+            # This historical rollback test ends before the forward-only V2 migration.
+            command.upgrade(cfg, "b25c6d4e8f10")
             assert set(inspect(c).get_table_names(schema=schema)) - tables == {
                 "career_artifacts",
                 "job_source_observations",
@@ -42,6 +43,7 @@ def test_artifact_migration(database_engine):
             command.downgrade(cfg, "bc7d90e658a4")
             assert set(inspect(c).get_table_names(schema=schema)) == tables
             assert list(c.execute(text("SELECT * FROM users")).mappings()) == before
-            command.upgrade(cfg, "head")
+            # This historical rollback test ends before the forward-only V2 migration.
+            command.upgrade(cfg, "b25c6d4e8f10")
         finally:
             tx.rollback()

@@ -1,0 +1,11 @@
+{
+  "provenance": "Structural extract of public probe; descriptions omitted; counts are fixture-only.",
+  "responses": [
+    {
+      "url": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite",
+      "status": 200,
+      "content_type": "text/html",
+      "content": "<!DOCTYPE html><html><head><title></title></head><body><div id=\"root\"></div></body></html>"
+    }
+  ]
+}

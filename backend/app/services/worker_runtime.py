@@ -121,3 +121,33 @@ def worker_health(
 
 
 __all__ = ["WorkerHealth", "WorkerRuntime", "worker_health"]
+
+
+def operational_status(session, *, now=None):
+    """Read-only process/source diagnostics; no configuration or credentials."""
+    from sqlalchemy import select
+
+    from backend.app.models.job import LiveSourceState
+
+    now = now or datetime.now(timezone.utc)
+    workers = []
+    for row in session.scalars(select(WorkerHeartbeat)):
+        health = worker_health(row.worker_name, session=session, now=now)
+        workers.append({
+            "worker": row.worker_name, "runtime_id": str(row.lease_token),
+            "started_at": row.started_at, "last_heartbeat_at": row.last_heartbeat_at,
+            "heartbeat_age_seconds": max(0, (now - row.last_heartbeat_at).total_seconds())
+            if row.last_heartbeat_at else None,
+            "status": health.status, "lease_expires_at": row.lease_expires_at,
+        })
+    sources = []
+    for row in session.scalars(select(LiveSourceState).order_by(LiveSourceState.source_key)):
+        leased = bool(row.lease_expires_at and row.lease_expires_at > now)
+        sources.append({
+            "source": row.source_key, "leased": leased,
+            "lease_expires_at": row.lease_expires_at,
+            "due": row.enabled and not leased and (row.next_poll_at is None or row.next_poll_at <= now),
+            "next_poll_at": row.next_poll_at, "last_success_at": row.last_success_at,
+            "last_error": row.last_error_category, "last_error_at": row.last_error_at,
+        })
+    return {"workers": workers, "sources": sources}

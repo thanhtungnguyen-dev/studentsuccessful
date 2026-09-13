@@ -103,10 +103,16 @@ class LiveSourceState(Base):
     source_family = Column(String(20), nullable=False)
     enabled = Column(Boolean, nullable=False, default=True, server_default=text("TRUE"))
     health = Column(
-        String(20), nullable=False, default=LiveSourceHealth.STALE,
+        String(20),
+        nullable=False,
+        default=LiveSourceHealth.STALE,
         server_default=text("'STALE'"),
     )
     normal_poll_interval_seconds = Column(Integer, nullable=False)
+    unchanged_successes = Column(Integer, nullable=False, server_default=text("0"), default=0)
+    last_change_at = Column(DateTime(timezone=True))
+    last_content_hash = Column(String(64))
+    retrieval_cursor = Column(String(255), nullable=True)
     last_attempt_at = Column(DateTime(timezone=True), nullable=True)
     last_success_at = Column(DateTime(timezone=True), nullable=True)
     last_completed_at = Column(DateTime(timezone=True), nullable=True)
@@ -120,41 +126,33 @@ class LiveSourceState(Base):
     last_http_status = Column(Integer, nullable=True)
     last_jobs_seen = Column(Integer, nullable=True)
     last_jobs_ingested = Column(Integer, nullable=True)
-    total_collection_attempts = Column(
-        Integer, nullable=False, default=0, server_default=text("0")
-    )
-    total_collection_failures = Column(
-        Integer, nullable=False, default=0, server_default=text("0")
-    )
-    total_jobs_observed = Column(
-        Integer, nullable=False, default=0, server_default=text("0")
-    )
-    total_jobs_ingested = Column(
-        Integer, nullable=False, default=0, server_default=text("0")
-    )
-    total_new_canonical_jobs = Column(
-        Integer, nullable=False, default=0, server_default=text("0")
-    )
+    total_collection_attempts = Column(Integer, nullable=False, default=0, server_default=text("0"))
+    total_collection_failures = Column(Integer, nullable=False, default=0, server_default=text("0"))
+    total_jobs_observed = Column(Integer, nullable=False, default=0, server_default=text("0"))
+    total_jobs_ingested = Column(Integer, nullable=False, default=0, server_default=text("0"))
+    total_new_canonical_jobs = Column(Integer, nullable=False, default=0, server_default=text("0"))
     total_duplicate_contributions = Column(
         Integer, nullable=False, default=0, server_default=text("0")
     )
     total_internship_or_coop_contributions = Column(
         Integer, nullable=False, default=0, server_default=text("0")
     )
-    total_official_apply_urls = Column(
-        Integer, nullable=False, default=0, server_default=text("0")
-    )
+    total_official_apply_urls = Column(Integer, nullable=False, default=0, server_default=text("0"))
     last_new_canonical_job_at = Column(DateTime(timezone=True), nullable=True)
     etag = Column(String(255), nullable=True)
     last_modified = Column(String(255), nullable=True)
     lease_token = Column(UUID(as_uuid=True), nullable=True)
     lease_expires_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(
-        DateTime(timezone=True), default=utc_now, nullable=False,
+        DateTime(timezone=True),
+        default=utc_now,
+        nullable=False,
         server_default=text("CURRENT_TIMESTAMP"),
     )
     updated_at = Column(
-        DateTime(timezone=True), default=utc_now, nullable=False,
+        DateTime(timezone=True),
+        default=utc_now,
+        nullable=False,
         server_default=text("CURRENT_TIMESTAMP"),
     )
 
@@ -164,7 +162,7 @@ class LiveSourceState(Base):
             name="ck_live_source_state_key_safe",
         ),
         CheckConstraint(
-            "source_family IN ('greenhouse', 'lever', 'ashby', 'smartrecruiters', 'rss')",
+            "source_family IN ('greenhouse', 'lever', 'ashby', 'smartrecruiters', 'rss', 'recruitee', 'personio', 'jsonld', 'workable', 'teamtailor')",
             name="ck_live_source_state_family",
         ),
         CheckConstraint(
@@ -355,6 +353,7 @@ class NormalizedJob(Base):
         server_default=text("CURRENT_TIMESTAMP"),
     )
     closed_at = Column(DateTime(timezone=True), nullable=True)
+    field_provenance = Column(JSONB, nullable=True)
     canonical_source_observation_id = Column(
         UUID(as_uuid=True),
         ForeignKey(
@@ -398,8 +397,7 @@ class NormalizedJob(Base):
             name="ck_normalized_job_application_url_http",
         ),
         CheckConstraint(
-            "current_payload_hash_sha256 IS NULL OR "
-            "current_payload_hash_sha256 ~ '^[0-9a-f]{64}$'",
+            "current_payload_hash_sha256 IS NULL OR current_payload_hash_sha256 ~ '^[0-9a-f]{64}$'",
             name="ck_normalized_job_current_hash_sha256",
         ),
         CheckConstraint(
@@ -719,9 +717,7 @@ class JobSourceObservation(Base):
         Integer, nullable=False, default=0, server_default=text("0")
     )
     last_absent_at = Column(DateTime(timezone=True), nullable=True)
-    explicitly_closed = Column(
-        Boolean, nullable=False, default=False, server_default=text("FALSE")
-    )
+    explicitly_closed = Column(Boolean, nullable=False, default=False, server_default=text("FALSE"))
     closed_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(
         DateTime(timezone=True),
@@ -759,8 +755,7 @@ class JobSourceObservation(Base):
             name="ck_job_source_observation_exact_fingerprint",
         ),
         CheckConstraint(
-            "current_payload_hash_sha256 IS NULL OR "
-            "current_payload_hash_sha256 ~ '^[0-9a-f]{64}$'",
+            "current_payload_hash_sha256 IS NULL OR current_payload_hash_sha256 ~ '^[0-9a-f]{64}$'",
             name="ck_job_source_observation_current_hash",
         ),
         CheckConstraint(

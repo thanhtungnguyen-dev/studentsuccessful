@@ -1,0 +1,11 @@
+{
+  "provenance": "Structural extract of public probe; descriptions omitted; counts are fixture-only.",
+  "responses": [
+    {
+      "url": "https://apply.workable.com/api/v1/widget/accounts/huggingface?details=true",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "content": "{\"name\": \"Hugging Face\", \"description\": \"\", \"jobs\": [{\"title\": \"Low-level Senior Software Engineer, Xet Storage - EMEA Remote\", \"shortcode\": \"F4C096B22E\", \"code\": \"\", \"employment_type\": \"Full-time\", \"telecommuting\": true, \"department\": \"Product\", \"url\": \"https://apply.workable.com/j/F4C096B22E\", \"shortlink\": \"https://apply.workable.com/j/F4C096B22E\", \"application_url\": \"https://apply.workable.com/j/F4C096B22E/apply\", \"published_on\": \"2026-07-30\", \"created_at\": \"2026-07-30\", \"country\": \"France\", \"city\": \"Paris\", \"state\": \"\\u00cele-de-France\", \"education\": \"Master's Degree\", \"experience\": \"Mid-Senior level\", \"function\": \"Engineering\", \"industry\": \"Computer Software\", \"locations\": [{\"country\": \"France\", \"countryCode\": \"FR\", \"city\": \"Paris\", \"region\": \"\\u00cele-de-France\", \"hidden\": true}], \"description\": \"<p>Public description omitted in structural fixture.</p>\"}, {\"title\": \"Low-Level Senior Software Engineer, Xet Storage - US Remote\", \"shortcode\": \"002470F128\", \"code\": \"\", \"employment_type\": \"Full-time\", \"telecommuting\": true, \"department\": \"Product\", \"url\": \"https://apply.workable.com/j/002470F128\", \"shortlink\": \"https://apply.workable.com/j/002470F128\", \"application_url\": \"https://apply.workable.com/j/002470F128/apply\", \"published_on\": \"2026-07-30\", \"created_at\": \"2026-07-30\", \"country\": \"United States\", \"city\": \"New York\", \"state\": \"New York\", \"education\": \"Master's Degree\", \"experience\": \"Mid-Senior level\", \"function\": \"Engineering\", \"industry\": \"Computer Software\", \"locations\": [{\"country\": \"United States\", \"countryCode\": \"US\", \"city\": \"New York\", \"region\": \"New York\", \"hidden\": true}], \"description\": \"<p>Public description omitted in structural fixture.</p>\"}]}"
+    }
+  ]
+}

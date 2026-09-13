@@ -65,7 +65,10 @@ from backend.app.models.taxonomy import (
 from backend.app.models.user import User, UserSession
 
 __all__ = [
-    "Project", "ProjectSkill", "ProjectCustomSkill", "UserCustomSkill",
+    "Project",
+    "ProjectSkill",
+    "ProjectCustomSkill",
+    "UserCustomSkill",
     "CareerArtifact",
     "WorkerHeartbeat",
     "WorkerRuntimeState",
@@ -128,3 +131,10 @@ __all__ = [
     "ApplicationStatus",
     "ApplicationStatusHistory",
 ]
+
+from backend.app.models.intelligence import (  # noqa: F401
+    JobChangeEvent,
+    SourceDiscoveryWork,
+    SourceFetchEvidence,
+    SourceRegistry,
+)

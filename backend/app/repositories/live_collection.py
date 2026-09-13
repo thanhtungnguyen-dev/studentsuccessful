@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
-from sqlalchemy import select
+from sqlalchemy import select, text
 
 from backend.app.models.job import LiveSourceHealth, LiveSourceState
 
@@ -25,6 +25,7 @@ class LiveSourceClaim:
     etag: str | None
     last_modified: str | None
     normal_poll_interval_seconds: int
+    retrieval_cursor: str | None = None
 
 
 class LiveSourceStateRepository:
@@ -42,6 +43,7 @@ class LiveSourceStateRepository:
         configs = tuple(configs)
         if not configs:
             return
+        self.session.execute(text("SELECT pg_advisory_xact_lock(260004)"))
         states = {
             state.source_key: state
             for state in self.session.scalars(
@@ -111,10 +113,12 @@ class LiveSourceStateRepository:
         *,
         force: bool,
         lease_seconds: int,
+        limit: int | None = None,
     ) -> tuple[LiveSourceClaim, ...]:
         configs = tuple(sorted(configs, key=lambda config: config.key))
         if not configs:
             return ()
+        self.session.execute(text("SELECT pg_advisory_xact_lock(260004)"))
         states = {
             state.source_key: state
             for state in self.session.scalars(
@@ -124,7 +128,12 @@ class LiveSourceStateRepository:
             )
         }
         claims: list[LiveSourceClaim] = []
+        configs = sorted(configs, key=lambda config: (
+            states[config.key].next_poll_at or now if config.key in states else now, config.key
+        ))
         for config in configs:
+            if limit is not None and len(claims) >= limit:
+                break
             state = states.get(config.key)
             if state is None or not state.enabled:
                 continue
@@ -144,6 +153,7 @@ class LiveSourceStateRepository:
                     etag=state.etag,
                     last_modified=state.last_modified,
                     normal_poll_interval_seconds=state.normal_poll_interval_seconds,
+                    retrieval_cursor=state.retrieval_cursor,
                 )
             )
         self.session.flush()

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 
 from backend.app.models.taxonomy import Company, Role
 
@@ -27,6 +27,7 @@ class LiveJobIngestionRepository:
         return rows[0] if rows else None
 
     def ensure_configured_catalog(self, company_name: str, role_name: str) -> None:
+        self.session.execute(text("SELECT pg_advisory_xact_lock(260003)"))
         company = self._unambiguous(
             select(Company).where(func.lower(Company.name) == company_name.casefold())
         )

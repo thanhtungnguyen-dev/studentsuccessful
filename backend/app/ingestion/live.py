@@ -11,11 +11,12 @@ import ipaddress
 import json
 import re
 import xml.etree.ElementTree as ElementTree
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from html import unescape
 from html.parser import HTMLParser
+from time import monotonic
 from typing import Literal
 from urllib.parse import quote, urlsplit
 
@@ -23,6 +24,7 @@ import httpx
 from pydantic import ConfigDict, Field, ValidationError, field_validator, model_validator
 
 from backend.app.ingestion.dto import ExternalJobDTO
+from backend.app.ingestion.public_http import public_get
 from backend.app.schemas.common import StrictBaseModel
 from backend.app.services.job_ingestion import (
     JobIngestionValidationError,
@@ -61,7 +63,18 @@ _BOARD_IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,127}")
 _HOSTNAME = re.compile(r"[A-Za-z0-9](?:[A-Za-z0-9.-]{0,251}[A-Za-z0-9])?")
 _MAX_RESPONSE_BYTES = 5 * 1024 * 1024
 _MAX_RETRY_AFTER_SECONDS = 86_400
-LIVE_SOURCE_FAMILIES = ("greenhouse", "lever", "ashby", "smartrecruiters", "rss")
+LIVE_SOURCE_FAMILIES = (
+    "greenhouse",
+    "lever",
+    "ashby",
+    "smartrecruiters",
+    "rss",
+    "recruitee",
+    "personio",
+    "jsonld",
+    "workable",
+    "teamtailor",
+)
 
 
 @dataclass(frozen=True)
@@ -77,6 +90,7 @@ class LiveFetchResult:
     etag: str | None
     last_modified: str | None
     complete_listing: bool
+    continuation: str | None = None
 
 
 class _SourceNotModified(RuntimeError):
@@ -147,7 +161,18 @@ class LiveJobSourceConfig(StrictBaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
     key: str
-    family: Literal["greenhouse", "lever", "ashby", "smartrecruiters", "rss"]
+    family: Literal[
+        "greenhouse",
+        "lever",
+        "ashby",
+        "smartrecruiters",
+        "rss",
+        "recruitee",
+        "personio",
+        "jsonld",
+        "workable",
+        "teamtailor",
+    ]
     company: str
     role: str = "Unspecified"
     enabled: bool = True
@@ -155,12 +180,16 @@ class LiveJobSourceConfig(StrictBaseModel):
     poll_interval_seconds: int | None = Field(default=None, ge=300, le=86_400)
     request_timeout_seconds: float | None = Field(default=None, gt=0, le=60)
     polling_tier: Literal["high", "normal", "low"] = "normal"
-    source_authority: Literal[
-        "OFFICIAL_COMPANY",
-        "OFFICIAL_ATS",
-        "TRUSTED_STRUCTURED",
-        "TRUSTED_AGGREGATOR",
-    ] | None = None
+    source_authority: (
+        Literal[
+            "OFFICIAL_COMPANY",
+            "OFFICIAL_ATS",
+            "TRUSTED_STRUCTURED",
+            "TRUSTED_AGGREGATOR",
+        ]
+        | None
+    ) = None
+    public_board_url: str | None = None
     board_token: str | None = None
     site: str | None = None
     job_board: str | None = None
@@ -198,7 +227,7 @@ class LiveJobSourceConfig(StrictBaseModel):
             raise ValueError("board identifier must contain only letters, digits, underscores, or hyphens")
         return value
 
-    @field_validator("feed_url")
+    @field_validator("feed_url", "public_board_url")
     @classmethod
     def safe_feed_url(cls, value: str | None) -> str | None:
         if value is None:
@@ -223,6 +252,11 @@ class LiveJobSourceConfig(StrictBaseModel):
             "ashby": self.job_board,
             "smartrecruiters": self.company_identifier,
             "rss": self.feed_url,
+            "recruitee": self.public_board_url,
+            "personio": self.public_board_url,
+            "jsonld": self.public_board_url,
+            "workable": self.public_board_url,
+            "teamtailor": self.public_board_url,
         }
         required = identifiers[self.family]
         if required is None:
@@ -230,10 +264,39 @@ class LiveJobSourceConfig(StrictBaseModel):
         unexpected = [
             name
             for name, value in identifiers.items()
-            if name != self.family and value is not None
+            if name != self.family
+            and value is not None
+            and not (
+                name in {"recruitee", "personio", "jsonld", "workable", "teamtailor"}
+                and self.family in {"recruitee", "personio", "jsonld", "workable", "teamtailor"}
+            )
         ]
         if unexpected:
-            raise ValueError("source configuration contains another family’s board identifier")
+            raise ValueError("source configuration contains another family's board identifier")
+        if self.public_board_url and self.family in {"recruitee", "personio"}:
+            host = urlsplit(self.public_board_url).hostname or ""
+            suffixes = (
+                (".recruitee.com",)
+                if self.family == "recruitee"
+                else (".jobs.personio.de", ".jobs.personio.com")
+            )
+            if not any(
+                host.endswith(suffix) and "." not in host[: -len(suffix)] for suffix in suffixes
+            ):
+                raise ValueError("Invalid provider board hostname")
+        if self.family == "workable":
+            parsed = urlsplit(self.public_board_url)
+            account = parsed.path.strip("/")
+            if (
+                parsed.hostname != "apply.workable.com"
+                or not _BOARD_IDENTIFIER.fullmatch(account)
+                or account in {"j", "api"}
+            ):
+                raise ValueError("Workable requires a canonical account URL")
+        if self.family == "teamtailor":
+            parsed = urlsplit(self.public_board_url)
+            if parsed.path not in {"", "/"} or parsed.query:
+                raise ValueError("Teamtailor requires a career-site root URL")
         if self.family != "lever" and self.region != "global":
             raise ValueError("only Lever supports the eu region setting")
         if self.family != "rss" and self.allowed_job_hosts:
@@ -254,7 +317,7 @@ class LiveJobSourceConfig(StrictBaseModel):
     def effective_source_authority(self) -> str:
         if self.source_authority is not None:
             return self.source_authority
-        return "TRUSTED_STRUCTURED" if self.family == "rss" else "OFFICIAL_ATS"
+        return "TRUSTED_STRUCTURED" if self.family in {"rss", "jsonld"} else "OFFICIAL_ATS"
 
     @property
     def permitted_job_hosts(self) -> tuple[str, ...]:
@@ -375,6 +438,12 @@ def _timestamp(record: dict[str, object], field: str) -> datetime | None:
 def _feed_timestamp(value: str | None, field: str) -> datetime | None:
     if value is None:
         return None
+    if not isinstance(value, str):
+        raise LiveSourceRecordError(f"{field} must be a timestamp")
+    if re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+        return None  # A calendar date alone does not establish a publication instant.
+    if re.fullmatch(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} UTC", value):
+        value = value[:-4].replace(" ", "T") + "+00:00"
     try:
         return _timestamp_value(value, field)
     except LiveSourceRecordError:
@@ -444,7 +513,7 @@ def _deduplicated_locations(values: list[str]) -> tuple[str, ...]:
 
 
 def _work_mode(value: str | None) -> str:
-    if value is None:
+    if not isinstance(value, str):
         return "UNSPECIFIED"
     normalized = re.sub(r"[\s_-]+", "", value).casefold()
     return {
@@ -455,7 +524,7 @@ def _work_mode(value: str | None) -> str:
 
 
 def _employment_type(value: str | None) -> str:
-    if value is None:
+    if not isinstance(value, str):
         return "UNSPECIFIED"
     normalized = re.sub(r"[\s_-]+", "", value).casefold()
     return {
@@ -467,6 +536,13 @@ def _employment_type(value: str | None) -> str:
         "contract": "CONTRACT",
         "newgrad": "NEW_GRAD",
         "newgraduate": "NEW_GRAD",
+        "studentintern": "INTERNSHIP",
+        "summerintern": "INTERNSHIP",
+        "softwareintern": "INTERNSHIP",
+        "cooperativeeducation": "CO_OP",
+        "universitygraduate": "NEW_GRAD",
+        "graduateprogram": "NEW_GRAD",
+        "temporary": "TEMPORARY",
     }.get(normalized, "UNSPECIFIED")
 
 
@@ -486,6 +562,10 @@ class LiveSourceAdapter:
         self.key = config.key
         self._timeout_seconds = timeout_seconds
         self._client = client
+        self.evidence_pages: list[dict] = []
+        self.evidence_parser_version = "structured-v2"
+        self._evidence_bytes = 0
+        self.evidence_truncated = False
         self.fetched_records = 0
         self.skipped_records = 0
         self.filtered_records = 0
@@ -508,55 +588,72 @@ class LiveSourceAdapter:
         accept: str,
         track_response_metadata: bool = True,
     ) -> bytes:
-        own_client = self._client is None
-        client = self._client or httpx.Client(
-            timeout=httpx.Timeout(self._timeout_seconds), follow_redirects=False
-        )
+        client = self._client
+        headers = {"Accept": accept}
+        if self._conditional_request_pending:
+            self._conditional_request_pending = False
+            if self._conditional_etag is not None:
+                headers["If-None-Match"] = self._conditional_etag
+            if self._conditional_last_modified is not None:
+                headers["If-Modified-Since"] = self._conditional_last_modified
         try:
-            headers = {"Accept": accept}
-            if self._conditional_request_pending:
-                self._conditional_request_pending = False
-                if self._conditional_etag is not None:
-                    headers["If-None-Match"] = self._conditional_etag
-                if self._conditional_last_modified is not None:
-                    headers["If-Modified-Since"] = self._conditional_last_modified
-            try:
+            if client is not None:
                 response = client.get(url, params=params, headers=headers)
-            except httpx.TimeoutException as exc:
-                raise LiveSourceFetchError(
-                    "public source request timed out", category="TIMEOUT"
-                ) from exc
-            except httpx.HTTPError as exc:
-                raise LiveSourceFetchError("public source request failed", category="NETWORK") from exc
-            if track_response_metadata:
-                self._last_http_status = response.status_code
-                self._last_etag = _safe_response_header(response.headers.get("ETag"))
-                self._last_modified = _safe_response_header(response.headers.get("Last-Modified"))
-            if response.status_code == 304:
-                raise _SourceNotModified
-            if response.status_code != 200:
-                if response.status_code == 429:
-                    category = "RATE_LIMITED"
-                elif 500 <= response.status_code <= 599:
-                    category = "HTTP_5XX"
-                else:
-                    category = "HTTP_ERROR"
-                raise LiveSourceFetchError(
-                    f"public source returned HTTP {response.status_code}",
-                    category=category,
-                    status_code=response.status_code,
-                    retry_after_seconds=_retry_after_seconds(response.headers.get("Retry-After")),
+            else:
+                target = str(httpx.URL(url, params=params)) if params else url
+                response = public_get(
+                    target, timeout=self._timeout_seconds, headers=headers, redirects=0
                 )
-            if len(response.content) > _MAX_RESPONSE_BYTES:
-                raise LiveSourceFetchError(
-                    "public source response is too large",
-                    category="OVERSIZED_RESPONSE",
-                    status_code=response.status_code,
-                )
-            return response.content
-        finally:
-            if own_client:
-                client.close()
+        except httpx.TimeoutException as exc:
+            raise LiveSourceFetchError(
+                "public source request timed out", category="TIMEOUT"
+            ) from exc
+        except (httpx.HTTPError, ValueError) as exc:
+            category = (
+                "OVERSIZED_RESPONSE"
+                if isinstance(exc, ValueError) and str(exc) == "Response too large"
+                else "NETWORK"
+            )
+            raise LiveSourceFetchError("public source request failed", category=category) from exc
+        if track_response_metadata:
+            self._last_http_status = response.status_code
+            self._last_etag = _safe_response_header(response.headers.get("ETag"))
+            self._last_modified = _safe_response_header(response.headers.get("Last-Modified"))
+        if response.status_code == 304:
+            raise _SourceNotModified
+        if response.status_code != 200:
+            if response.status_code == 429:
+                category = "RATE_LIMITED"
+            elif 500 <= response.status_code <= 599:
+                category = "HTTP_5XX"
+            else:
+                category = "HTTP_ERROR"
+            raise LiveSourceFetchError(
+                f"public source returned HTTP {response.status_code}",
+                category=category,
+                status_code=response.status_code,
+                retry_after_seconds=_retry_after_seconds(response.headers.get("Retry-After")),
+            )
+        if len(response.content) > _MAX_RESPONSE_BYTES:
+            raise LiveSourceFetchError(
+                "public source response is too large",
+                category="OVERSIZED_RESPONSE",
+                status_code=response.status_code,
+            )
+        self._evidence_bytes += len(response.content)
+        if self._evidence_bytes > 8 * 1024 * 1024 or len(self.evidence_pages) >= 52:
+            self.evidence_truncated = True
+            self.evidence_pages.clear()
+        if not self.evidence_truncated:
+            self.evidence_pages.append(
+                {
+                    "url": str(response.request.url),
+                    "content": response.text,
+                    "status": response.status_code,
+                    "content_type": response.headers.get("content-type", ""),
+                }
+            )
+        return response.content
 
     def _get_json(
         self,
@@ -580,10 +677,14 @@ class LiveSourceAdapter:
                 status_code=self._last_http_status,
             ) from exc
 
-    def _get_xml(self, url: str) -> ElementTree.Element:
+    def _get_xml(
+        self, url: str, *, params=None, track_response_metadata=True
+    ) -> ElementTree.Element:
         content = self._get_response_content(
             url,
             accept="application/rss+xml, application/atom+xml, application/xml, text/xml",
+            params=params,
+            track_response_metadata=track_response_metadata,
         )
         if b"<!DOCTYPE" in content.upper() or b"<!ENTITY" in content.upper():
             raise LiveSourceFetchError(
@@ -615,6 +716,9 @@ class LiveSourceAdapter:
         work_mode: str = "UNSPECIFIED",
         source_status: Literal["ACTIVE", "CLOSED"] = "ACTIVE",
     ) -> ExternalJobDTO:
+        from backend.app.ingestion.normalization import title_facts
+
+        inferred_role, inferred_employment, inferred_level = title_facts(title)
         return ExternalJobDTO(
             adapter_key=self.key,
             external_id=external_id,
@@ -622,9 +726,13 @@ class LiveSourceAdapter:
             application_url=application_url,
             company=self.config.company,
             title=title,
-            role=self.config.role,
-            employment_type=employment_type,
-            career_level="UNSPECIFIED",
+            role=(inferred_role or self.config.role)
+            if self.config.role == "Unspecified"
+            else self.config.role,
+            employment_type=inferred_employment
+            if employment_type == "UNSPECIFIED"
+            else employment_type,
+            career_level=inferred_level,
             work_mode=work_mode,
             description=description,
             posted_at=posted_at,
@@ -641,6 +749,10 @@ class LiveSourceAdapter:
     ) -> LiveFetchResult:
         """Fetch once, using public cache validators only when a source supplied them."""
 
+        self.evidence_pages: list[dict] = []
+        self.evidence_parser_version = "structured-v2"
+        self._evidence_bytes = 0
+        self.evidence_truncated = False
         self.fetched_records = 0
         self.skipped_records = 0
         self.filtered_records = 0
@@ -691,6 +803,10 @@ class LiveSourceAdapter:
             complete_listing=complete_listing,
         )
 
+    def fetch_batches(self, *, continuation=None, etag=None, last_modified=None):
+        """Normal providers retain their existing single-result path."""
+        yield self.fetch_with_metadata(etag=etag, last_modified=last_modified)
+
     def fetch(self) -> tuple[ExternalJobDTO, ...]:
         """Backward-compatible Phase 18 fetch interface."""
 
@@ -705,6 +821,84 @@ class LiveSourceAdapter:
 
 class GreenhouseAdapter(LiveSourceAdapter):
     family = "greenhouse"
+
+    def fetch_with_metadata(self, *, etag=None, last_modified=None):
+        # Compatibility for calibration and discovery, capped at 50 parsed details.
+        batches = list(self.fetch_batches(etag=etag, last_modified=last_modified))
+        return replace(
+            batches[-1],
+            records=tuple(record for batch in batches for record in batch.records),
+            fetched_records=sum(batch.fetched_records for batch in batches),
+            skipped_records=sum(batch.skipped_records for batch in batches),
+            filtered_records=sum(batch.filtered_records for batch in batches),
+        )
+
+    def fetch_batches(self, *, continuation=None, etag=None, last_modified=None):
+        # Bind the cursor to the board, so a reconfigured source starts afresh.
+        deadline = monotonic() + 60
+        prefix = f"gh:{self.config.board_token}:"
+        if continuation is None or not continuation.startswith(prefix):
+            try:
+                yield super().fetch_with_metadata(etag=etag, last_modified=last_modified)
+                return
+            except LiveSourceFetchError as exc:
+                if exc.category != "OVERSIZED_RESPONSE":
+                    raise
+            continuation = prefix + "0"
+        cursor = continuation[len(prefix):]
+        if not cursor.isdecimal() or len(cursor) > 20:
+            raise LiveSourceFetchError("Invalid Greenhouse continuation")
+        self.retrieval_strategy = "list-detail"
+        self._conditional_request_pending = False
+        self._last_etag = self._last_modified = None
+        endpoint = (
+            "https://boards-api.greenhouse.io/v1/boards/"
+            + quote(self.config.board_token, safe="") + "/jobs"
+        )
+        self.evidence_pages = []
+        self._evidence_bytes = 0
+        self.evidence_truncated = False
+        payload = self._get_json(endpoint)
+        jobs = _object(payload, "Greenhouse list").get("jobs")
+        if not isinstance(jobs, list):
+            raise LiveSourceFetchError("Greenhouse response has no jobs list")
+        # Keep only IDs from the bounded lightweight response. Numeric keyset
+        # traversal tolerates deletion/reordering and deduplicates overlapping IDs.
+        ids = set()
+        for job in jobs:
+            value = _object(job, "Greenhouse list job").get("id")
+            if type(value) is not int or value <= 0 or len(str(value)) > 20:
+                raise LiveSourceFetchError("Invalid Greenhouse list job ID")
+            ids.add(value)
+        del jobs, payload
+        pending = sorted(value for value in ids if value > int(cursor))
+        selected = pending[:min(self.config.max_postings, 50)]
+        # No snapshot contract: nonempty list/detail traversals never imply absence,
+        # even at wraparound. A complete empty list is authoritative on its own.
+        if not selected:
+            self.evidence_pages = []
+            yield LiveFetchResult((), 0, 0, 0, False, 200, None, None,
+                                  not ids, prefix + "0")
+            return
+        for index, job_id in enumerate(selected):
+            self.evidence_pages = []
+            self._evidence_bytes = 0
+            self.evidence_truncated = False
+            self.evidence_parser_version = "greenhouse-detail-v1"
+            raw = self._get_json(endpoint + "/" + str(job_id), track_response_metadata=False)
+            if _object(raw, "Greenhouse detail").get("id") != job_id:
+                raise LiveSourceFetchError("Greenhouse detail ID mismatch")
+            records, skipped = (), 0
+            try:
+                records = (self._parse_record(raw),)
+            except (JobIngestionValidationError, LiveSourceRecordError, ValidationError):
+                skipped = 1
+            del raw
+            done = index + 1 == len(pending)
+            yield LiveFetchResult(records, 1, skipped, 0, False, 200, None, None,
+                                  False, prefix + ("0" if done else str(job_id)))
+            if monotonic() >= deadline:
+                break
 
     def _records(self) -> list[object]:
         assert self.config.board_token is not None
@@ -1151,12 +1345,20 @@ def create_live_adapter(
 ) -> LiveSourceAdapter:
     """Build one configured public adapter without network activity."""
 
+    from backend.app.ingestion.coverage_providers import TeamtailorAdapter, WorkableAdapter
+    from backend.app.ingestion.structured import JsonLdAdapter, PersonioAdapter, RecruiteeAdapter
+
     adapters: dict[str, type[LiveSourceAdapter]] = {
         "greenhouse": GreenhouseAdapter,
         "lever": LeverAdapter,
         "ashby": AshbyAdapter,
         "smartrecruiters": SmartRecruitersAdapter,
         "rss": RssFeedAdapter,
+        "recruitee": RecruiteeAdapter,
+        "personio": PersonioAdapter,
+        "jsonld": JsonLdAdapter,
+        "workable": WorkableAdapter,
+        "teamtailor": TeamtailorAdapter,
     }
     return adapters[config.family](config, timeout_seconds=timeout_seconds, client=client)
 

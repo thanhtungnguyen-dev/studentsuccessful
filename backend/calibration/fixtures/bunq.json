@@ -1,0 +1,12 @@
+{
+  "provenance": "Structural extract from public bunq feed; descriptions omitted.",
+  "responses": [
+    {
+      "url": "https://bunq.recruitee.com/api/offers/",
+      "request_url": "https://bunq.recruitee.com/api/offers/",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "content": "{\"offers\": [{\"title\": \"Copywriting Intern\", \"on_site\": true, \"careers_apply_url\": \"https://careers.bunq.com/o/copywriting-intern-1/c/new\", \"hybrid\": true, \"locations\": [{\"id\": 39979, \"name\": \"Amsterdam\", \"state\": \"Noord-Holland\", \"country\": \"Netherlands\", \"city\": \"Amsterdam\", \"translations\": {\"en\": {\"name\": \"Amsterdam\", \"city\": \"Amsterdam\", \"postal_code\": null, \"street\": null, \"note\": null}}, \"country_code\": \"NL\", \"state_code\": \"NH\", \"postal_code\": null, \"street\": null, \"note\": null}], \"remote\": false, \"careers_url\": \"https://careers.bunq.com/o/copywriting-intern-1\", \"id\": 2736989, \"published_at\": \"2026-09-07 12:05:26 UTC\", \"employment_type_code\": \"internship\", \"updated_at\": \"2026-09-10 09:01:12 UTC\", \"description\": \"Public description omitted in structural fixture.\"}, {\"title\": \"Branch Manager, Belgium & Ireland\", \"on_site\": false, \"careers_apply_url\": \"https://careers.bunq.com/o/branch-manager-belgium-ireland/c/new\", \"hybrid\": true, \"locations\": [{\"id\": 39964, \"name\": \"Brussels\", \"state\": \"Brussels\", \"country\": \"Belgium\", \"city\": \"Brussels\", \"translations\": {\"en\": {\"name\": \"Brussels\", \"city\": \"Brussels\", \"postal_code\": null, \"street\": null, \"note\": null}}, \"country_code\": \"BE\", \"state_code\": \"BRU\", \"postal_code\": null, \"street\": null, \"note\": null}], \"remote\": false, \"careers_url\": \"https://careers.bunq.com/o/branch-manager-belgium-ireland\", \"id\": 2729497, \"published_at\": \"2026-09-01 14:09:41 UTC\", \"employment_type_code\": \"fulltime_permanent\", \"updated_at\": \"2026-09-04 12:14:53 UTC\", \"description\": \"Public description omitted in structural fixture.\"}]}"
+    }
+  ]
+}

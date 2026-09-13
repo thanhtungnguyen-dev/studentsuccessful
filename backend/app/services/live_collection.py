@@ -5,8 +5,8 @@ from __future__ import annotations
 import hashlib
 import threading
 from collections.abc import Callable, Iterable
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import dataclass
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
+from dataclasses import dataclass, replace
 from datetime import datetime, timedelta, timezone
 
 from backend.app.core.unit_of_work import UnitOfWork
@@ -34,6 +34,11 @@ DEFAULT_POLL_INTERVAL_SECONDS = {
     "ashby": 900,
     "smartrecruiters": 900,
     "rss": 1800,
+    "recruitee": 900,
+    "personio": 1800,
+    "jsonld": 3600,
+    "workable": 1800,
+    "teamtailor": 1800,
 }
 INITIAL_BACKOFF_SECONDS = 60
 MAX_RETRY_AFTER_SECONDS = 86_400
@@ -52,7 +57,7 @@ class LiveCollectionOutcome:
 
     @property
     def succeeded(self) -> bool:
-        return self.result is not None
+        return self.result is not None and self.error_category is None
 
 
 @dataclass(frozen=True)
@@ -138,12 +143,15 @@ class LiveCollectionService:
         *,
         default_timeout_seconds: float,
         max_concurrency: int = 3,
+        include_discovered: bool = True,
         max_backoff_seconds: int = 3_600,
         uow_factory: Callable[[], UnitOfWork] = UnitOfWork,
         now: Callable[[], datetime] = utc_now,
         jitter: Callable[[str, int, int], int] = deterministic_jitter_seconds,
     ) -> None:
-        self.configs = tuple(configs)
+        self.include_discovered = include_discovered
+        self.seeds = tuple(configs)
+        self.configs = self.seeds
         self.default_timeout_seconds = default_timeout_seconds
         self.max_concurrency = max_concurrency
         self.max_backoff_seconds = max_backoff_seconds
@@ -156,6 +164,29 @@ class LiveCollectionService:
             raise ValueError("max_concurrency must be between 1 and 16")
         if not INITIAL_BACKOFF_SECONDS <= max_backoff_seconds <= MAX_RETRY_AFTER_SECONDS:
             raise ValueError("max_backoff_seconds must be between 60 and 86400")
+
+    def _discover(self, *, on_tick=None, stop_event=None):
+        if stop_event is not None and stop_event.is_set():
+            return
+        if on_tick is not None:
+            # Discovery is bounded but includes HTTP; keep the coordinator alive.
+            with ThreadPoolExecutor(max_workers=1, thread_name_prefix="source-discovery") as executor:
+                future = executor.submit(self._discover)
+                while not future.done():
+                    on_tick()
+                    wait((future,), timeout=10)
+                future.result()
+            return
+        from backend.app.core.config import settings
+        from backend.app.services.source_intelligence import process_discovery
+
+        if settings.LIVE_SOURCE_DISCOVERY_ENABLED and self.include_discovered:
+            try:
+                process_discovery(uow_factory=self._uow_factory, now=self._now)
+            except Exception:
+                import logging
+
+                logging.getLogger("studentsuccessful.discovery").warning("discovery_cycle_failed")
 
     def normal_poll_interval_seconds(self, config: LiveJobSourceConfig) -> int:
         if config.poll_interval_seconds is not None:
@@ -174,20 +205,34 @@ class LiveCollectionService:
 
     def synchronize(self, now: datetime | None = None) -> None:
         now = self._utc(now or self._now())
-        intervals = {config.key: self.normal_poll_interval_seconds(config) for config in self.configs}
+        from backend.app.services.source_intelligence import effective_sources
+
+        self.configs = effective_sources(
+            self.seeds, self._uow_factory, include_discovered=self.include_discovered
+        )
+        intervals = {
+            config.key: self.normal_poll_interval_seconds(config) for config in self.configs
+        }
         with self._uow_factory() as uow:
             repository = LiveSourceStateRepository(uow.session)
             repository.synchronize_configurations(self.configs, intervals, now)
             repository.mark_stale((config.key for config in self.configs), now)
             uow.commit()
 
-    def run_cycle(self, *, force: bool = False) -> LiveCollectionCycle:
+    def run_cycle(self, *, force: bool = False, stop_event=None, on_tick=None) -> LiveCollectionCycle:
         """Claim due sources, run them with bounded concurrency, and persist outcomes."""
 
+        if stop_event is not None and stop_event.is_set():
+            return LiveCollectionCycle(())
         now = self._utc(self._now())
         self.synchronize(now)
-        claims = self._claim_due(now, force=force)
+        if stop_event is not None and stop_event.is_set():
+            return LiveCollectionCycle(())
+        claims = self._claim_due(
+            now, force=force, limit=self.max_concurrency if on_tick is not None else None
+        )
         if not claims:
+            self._discover(on_tick=on_tick, stop_event=stop_event)
             return LiveCollectionCycle(())
 
         adapters = tuple(
@@ -198,7 +243,7 @@ class LiveCollectionService:
         )
         registry = SourceAdapterRegistry(adapters)
         outcomes: list[LiveCollectionOutcome] = []
-        if self.max_concurrency == 1:
+        if self.max_concurrency == 1 and on_tick is None:
             completed = ((claim, self._outcome_for_claim(claim, registry)) for claim in claims)
             for claim, outcome in completed:
                 self._record_outcome(claim, outcome, self._utc(self._now()))
@@ -209,14 +254,33 @@ class LiveCollectionService:
                 thread_name_prefix="live-source",
             ) as executor:
                 futures = {
-                    executor.submit(self._outcome_for_claim, claim, registry): claim
+                    executor.submit(self._outcome_for_claim, claim, registry, stop_event): claim
                     for claim in claims
                 }
-                for future in as_completed(futures):
-                    claim = futures[future]
-                    outcome = future.result()
-                    self._record_outcome(claim, outcome, self._utc(self._now()))
-                    outcomes.append(outcome)
+                while futures:
+                    try:
+                        if on_tick is not None:
+                            on_tick()
+                        # Renew only currently executing claims, not a long queued backlog.
+                        with self._uow_factory() as uow:
+                            repository = LiveSourceStateRepository(uow.session)
+                            for claim in futures.values():
+                                state = repository.claimed_state(claim.config.key, claim.token)
+                                if state is not None:
+                                    state.lease_expires_at = self._utc(self._now()) + timedelta(seconds=150)
+                            uow.commit()
+                        done, _ = wait(futures, timeout=10, return_when=FIRST_COMPLETED)
+                        for future in done:
+                            claim = futures.pop(future)
+                            outcome = future.result()
+                            self._record_outcome(claim, outcome, self._utc(self._now()))
+                            outcomes.append(outcome)
+                    except BaseException:
+                        if stop_event is not None:
+                            stop_event.set()
+                        raise
+        if stop_event is None or not stop_event.is_set():
+            self._discover(on_tick=on_tick, stop_event=stop_event)
         return LiveCollectionCycle(tuple(sorted(outcomes, key=lambda outcome: outcome.source_key)))
 
     def run_forever(self, stop_event: threading.Event | None = None) -> None:
@@ -245,7 +309,7 @@ class LiveCollectionService:
             states = LiveSourceStateRepository(uow.session).list_states()
             return tuple(self._snapshot(state) for state in states)
 
-    def _claim_due(self, now: datetime, *, force: bool) -> tuple[LiveSourceClaim, ...]:
+    def _claim_due(self, now: datetime, *, force: bool, limit=None) -> tuple[LiveSourceClaim, ...]:
         longest_timeout = max(
             (self.request_timeout_seconds(config) for config in self.configs if config.enabled),
             default=self.default_timeout_seconds,
@@ -254,31 +318,90 @@ class LiveCollectionService:
         lease_seconds = max(60, int(longest_timeout) + 60)
         with self._uow_factory() as uow:
             claims = LiveSourceStateRepository(uow.session).claim_due(
-                self.configs, now, force=force, lease_seconds=lease_seconds
+                self.configs, now, force=force, lease_seconds=lease_seconds, limit=limit
             )
             uow.commit()
             return claims
 
     def _collect_claim(
-        self, claim: LiveSourceClaim, registry: SourceAdapterRegistry
+        self, claim: LiveSourceClaim, registry: SourceAdapterRegistry, stop_event=None
     ) -> LiveCollectionOutcome:
         adapter = registry.resolve(claim.config.key)
         if not isinstance(adapter, LiveSourceAdapter):
             raise ValueError("configured collector adapter is invalid")
-        fetched = adapter.fetch_with_metadata(etag=claim.etag, last_modified=claim.last_modified)
-        result = LiveJobIngestionService.ingest_adapter(adapter, registry, fetch_result=fetched)
+        combined = None
+        batches = adapter.fetch_batches(
+            continuation=claim.retrieval_cursor, etag=claim.etag, last_modified=claim.last_modified
+        )
+        try:
+            # Renew between network units, never holding a transaction during HTTP.
+            for _ in range(52):
+                if stop_event is not None and stop_event.is_set():
+                    if combined is not None:
+                        combined = replace(combined, complete_listing=False)
+                        break
+                    raise LiveSourceFetchError("Collection stopped", category="STOPPED")
+                with self._uow_factory() as uow:
+                    state = LiveSourceStateRepository(uow.session).claimed_state(
+                        claim.config.key, claim.token
+                    )
+                    if state is None:
+                        raise LiveSourceFetchError("Collection lease lost", category="LEASE_LOST")
+                    state.lease_expires_at = self._utc(self._now()) + timedelta(seconds=150)
+                    uow.commit()
+                try:
+                    fetched = next(batches)
+                except StopIteration:
+                    break
+                result = LiveJobIngestionService.ingest_adapter(
+                    adapter, registry, fetch_result=fetched, uow_factory=self._uow_factory
+                )
+                if combined is None:
+                    combined = result
+                else:
+                    counters = (
+                        "fetched", "parsed", "ingested", "malformed", "rejected", "filtered",
+                        "new_canonical_jobs", "duplicate_contributions",
+                        "internship_or_coop_contributions", "official_apply_urls",
+                    )
+                    combined = replace(
+                        result,
+                        **{name: getattr(combined, name) + getattr(result, name)
+                           for name in counters},
+                        complete_listing=combined.complete_listing and result.complete_listing,
+                        observed_external_ids=combined.observed_external_ids + result.observed_external_ids,
+                        content_hash=hashlib.sha256(
+                            ((combined.content_hash or "") + (result.content_hash or "")).encode()
+                        ).hexdigest(),
+                    )
+                if fetched.continuation is not None:
+                    # Advance only AFTER committed ingestion. Crash before this update
+                    # repeats one idempotent observation rather than losing a posting.
+                    with self._uow_factory() as uow:
+                        state = LiveSourceStateRepository(uow.session).claimed_state(
+                            claim.config.key, claim.token
+                        )
+                        if state is None:
+                            raise LiveSourceFetchError("Collection lease lost", category="LEASE_LOST")
+                        state.retrieval_cursor = fetched.continuation
+                        state.etag = state.last_modified = None
+                        uow.commit()
+        except LiveSourceFetchError as exc:
+            return LiveCollectionOutcome(
+                source_key=claim.config.key, family=claim.config.family, result=combined,
+                error_category=exc.category, http_status=exc.status_code,
+                retry_after_seconds=exc.retry_after_seconds,
+            )
         return LiveCollectionOutcome(
-            source_key=claim.config.key,
-            family=claim.config.family,
-            result=result,
-            http_status=result.http_status,
+            source_key=claim.config.key, family=claim.config.family,
+            result=combined, http_status=combined.http_status if combined else None,
         )
 
     def _outcome_for_claim(
-        self, claim: LiveSourceClaim, registry: SourceAdapterRegistry
+        self, claim: LiveSourceClaim, registry: SourceAdapterRegistry, stop_event=None
     ) -> LiveCollectionOutcome:
         try:
-            return self._collect_claim(claim, registry)
+            return self._collect_claim(claim, registry, stop_event)
         except LiveSourceFetchError as exc:
             return LiveCollectionOutcome(
                 source_key=claim.config.key,
@@ -296,6 +419,11 @@ class LiveCollectionService:
                 error_category="INGESTION",
             )
         except Exception:
+            import logging
+
+            logging.getLogger("studentsuccessful.collector").exception(
+                "source_collection_failed", extra={"event": "source_collection_failed", "worker": "collector"}
+            )
             # External data and transport errors never disclose raw provider text to storage.
             return LiveCollectionOutcome(
                 source_key=claim.config.key,
@@ -315,7 +443,10 @@ class LiveCollectionService:
                 claim.config.key, claim.token
             )
             if state is not None:
-                if outcome.succeeded:
+                if outcome.error_category == "STOPPED":
+                    state.lease_token = None
+                    state.lease_expires_at = None
+                elif outcome.succeeded:
                     assert outcome.result is not None
                     self._apply_success(state, outcome.result, completed_at)
                     if self._safe_for_lifecycle_reconciliation(outcome.result):
@@ -337,6 +468,7 @@ class LiveCollectionService:
         completed_at: datetime,
     ) -> None:
         prior_seen = state.last_jobs_seen
+        previous_failures = state.consecutive_failures
         state.total_collection_attempts += 1
         state.total_jobs_observed += result.parsed
         state.total_jobs_ingested += result.ingested
@@ -384,9 +516,22 @@ class LiveCollectionService:
                 state.etag = result.etag
             if result.last_modified is not None:
                 state.last_modified = result.last_modified
-        interval = state.normal_poll_interval_seconds
+        from backend.app.services.source_quality import adaptive_interval
+
+        changed = bool(result.content_hash and result.content_hash != state.last_content_hash)
+        state.unchanged_successes = 0 if changed else (state.unchanged_successes or 0) + 1
+        if changed:
+            state.last_change_at = completed_at
+            state.last_content_hash = result.content_hash
+        interval = adaptive_interval(
+            state.normal_poll_interval_seconds,
+            changed=changed,
+            new_jobs=result.new_canonical_jobs,
+            unchanged=state.unchanged_successes,
+            recovering=bool(previous_failures),
+        )
         state.next_poll_at = completed_at + timedelta(
-            seconds=interval + self._jitter_delay(state.source_key, interval, 0)
+            seconds=min(86400, interval + self._jitter_delay(state.source_key, interval, 0))
         )
         state.lease_token = None
         state.lease_expires_at = None
@@ -398,6 +543,20 @@ class LiveCollectionService:
         outcome: LiveCollectionOutcome,
         completed_at: datetime,
     ) -> None:
+        if outcome.result is not None:
+            result = outcome.result
+            state.total_jobs_observed += result.parsed
+            state.total_jobs_ingested += result.ingested
+            state.total_new_canonical_jobs += result.new_canonical_jobs
+            state.total_duplicate_contributions += result.duplicate_contributions
+            state.total_internship_or_coop_contributions += result.internship_or_coop_contributions
+            state.total_official_apply_urls += result.official_apply_urls
+            state.last_jobs_seen = result.parsed
+            state.last_jobs_ingested = result.ingested
+            if result.ingested:
+                state.last_success_at = completed_at
+            if result.new_canonical_jobs:
+                state.last_new_canonical_job_at = completed_at
         state.last_completed_at = completed_at
         state.total_collection_attempts += 1
         state.total_collection_failures += 1
@@ -408,6 +567,8 @@ class LiveCollectionService:
         state.health = (
             LiveSourceHealth.RATE_LIMITED
             if outcome.error_category == "RATE_LIMITED"
+            else LiveSourceHealth.DEGRADED
+            if outcome.result is not None and outcome.result.ingested
             else LiveSourceHealth.FAILING
         )
         delay = bounded_backoff_seconds(

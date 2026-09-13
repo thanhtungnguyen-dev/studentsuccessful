@@ -1,0 +1,11 @@
+{
+  "provenance": "Structural extract of public probe; descriptions omitted; counts are fixture-only.",
+  "responses": [
+    {
+      "url": "https://apply.workable.com/api/v1/widget/accounts/workable?details=true",
+      "status": 404,
+      "content_type": "text/plain; charset=utf-8",
+      "content": "Not Found"
+    }
+  ]
+}
