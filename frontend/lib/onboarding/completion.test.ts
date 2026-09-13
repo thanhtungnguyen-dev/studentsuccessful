@@ -3,6 +3,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { ApiClient, type CurrentUser } from "../api/client";
 import { postAuthDestination } from "./routing";
+import { WorkspaceNavigation } from "../../components/shell/AppShell";
 import { AuthStatus } from "../../components/auth/AuthStatus";
 
 const state = vi.hoisted(() => ({user: null as CurrentUser | null}));
@@ -35,7 +36,7 @@ it("directs incomplete users into review regardless of other account information
 it("home offers incomplete users Continue onboarding and keeps all editors accessible", () => {
   state.user = {...user,onboarding_completed_at:null};const html=renderToStaticMarkup(createElement(AuthStatus));
   expect(html).toContain("Continue onboarding");
-  for(const route of ["/profile","/education","/employment","/work-authorization","/preferences"]) expect(html).toContain(`href="${route}"`);
+  for(const route of ["/profile","/education","/employment","/work-authorization","/preferences"]) expect(renderToStaticMarkup(createElement(WorkspaceNavigation, { pathname: "/" }))).toContain(`href="${route}"`);
 });
 it("completed home keeps editing and manual review available without forcing onboarding", () => {
   state.user=user;const html=renderToStaticMarkup(createElement(AuthStatus));

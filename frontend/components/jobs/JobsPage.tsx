@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import {
   ApiError,
@@ -20,6 +20,8 @@ import {
   type SavedJobSearchCreate,
 } from "../../lib/api/client";
 import { useAuth } from "../auth/AuthProvider";
+import { DiscoveryFilters, AppliedFilters, EMPLOYMENT_TYPES, WORK_MODES, RECENCY_OPTIONS } from "./DiscoveryFilters";
+import { Skeleton } from "../ui/skeleton";
 import { MarkAsApplied } from "../applications/MarkAsApplied";
 import { safeApplicationUrl } from "../../lib/jobs/applicationUrl";
 
@@ -57,15 +59,6 @@ const DEFAULT_SEARCH: JobDiscoverySearch = {
   view: "all",
   page: 1,
 };
-const EMPLOYMENT_TYPES = ["INTERNSHIP", "CO_OP", "FULL_TIME", "PART_TIME", "CONTRACT", "NEW_GRAD"];
-const WORK_MODES = ["REMOTE", "HYBRID", "ON_SITE"];
-const RECENCY_OPTIONS: ReadonlyArray<{ value: JobRecency; label: string }> = [
-  { value: "1h", label: "Last hour" },
-  { value: "24h", label: "Last 24 hours" },
-  { value: "3d", label: "Last 3 days" },
-  { value: "7d", label: "Last 7 days" },
-  { value: "all", label: "All active jobs" },
-];
 const ALERT_MODE_OPTIONS: ReadonlyArray<{ value: SavedSearchAlertMode; label: string }> = [
   { value: "OFF", label: "Off" },
   { value: "INSTANT", label: "Instant" },
@@ -80,10 +73,6 @@ function optional(value: string): string | undefined {
 
 function unique(values: string[]): string[] {
   return [...new Set(values)];
-}
-
-function selectedValues(event: React.ChangeEvent<HTMLSelectElement>): string[] {
-  return Array.from(event.currentTarget.selectedOptions, (option) => option.value);
 }
 
 function known(values: string[], allowed: readonly string[]): string[] {
@@ -224,29 +213,26 @@ function hasFilters(search: JobDiscoverySearch): boolean {
 }
 
 function displayChoice(value: string): string {
-  return value.replaceAll("_", " ").replace(/\b\w/g, (character) => character.toUpperCase());
+  return value.toLowerCase().replaceAll("_", " ").replace(/\b\w/g, (character) => character.toUpperCase());
 }
 
 function JobMeta({ job }: { job: PublicJob | PublicJobDetail }) {
   return (
     <p className="muted">
-      {[job.company_name, job.role_name, job.work_mode, job.employment_type]
+      {[job.company_name, job.role_name, job.work_mode ? displayChoice(job.work_mode) : null, job.employment_type ? displayChoice(job.employment_type) : null]
         .filter(Boolean)
         .join(" · ")}
     </p>
   );
 }
 
+function formatJobDate(value: string) {
+  return new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }).format(new Date(value));
+}
+
 function JobFreshness({ job }: { job: PublicJob | PublicJobDetail }) {
-  const globalLabel = job.lifecycle === "NEW"
-    ? "NEW · First seen " + job.first_seen_at
-    : job.lifecycle + " · Last verified " + job.last_verified_at;
-  return (
-    <p className="muted">
-      {job.unseen ? "Unseen · " : ""}
-      {globalLabel}
-    </p>
-  );
+  const date = job.posted_at || job.first_seen_at;
+  return <p className="job-freshness muted">{job.unseen ? "Unseen · " : ""}{job.lifecycle === "NEW" ? "New · " : ""}{date ? <time dateTime={date}>{formatJobDate(date)}</time> : "Date not provided"}</p>;
 }
 
 export function jobDescriptionSummary(description: string | null): string {
@@ -314,24 +300,26 @@ export function JobDetail({
     return (
       <section className="auth-card dashboard-card">
         <h2>Job details</h2>
-        <p className="muted">Select a job to read its shared listing.</p>
+        <p className="muted">Select an opportunity to explore the role, requirements, and next steps.</p>
       </section>
     );
   }
   return (
-    <section className="auth-card dashboard-card job-detail" aria-live="polite">
+    <section className="auth-card dashboard-card job-detail" aria-label="Selected job details" tabIndex={0} aria-live="polite">
       <h2>{job.title}</h2>
       <JobMeta job={job} />
       <JobFreshness job={job} />
       <MatchedFilters filters={job.matched_filters ?? []} />
-      <p className="job-description">{job.description || "No description provided."}</p>
       <dl>
         <div><dt>Official source</dt><dd>{job.source_name}</dd></div>
         <div><dt>Locations</dt><dd>{job.locations.length ? job.locations.join(", ") : "Not provided"}</dd></div>
-        <div><dt>Posted</dt><dd>{job.posted_at || "Not provided"}</dd></div>
-        <div><dt>First seen</dt><dd>{job.first_seen_at}</dd></div>
-        <div><dt>Last verified</dt><dd>{job.last_verified_at}</dd></div>
+        <div><dt>Posted</dt><dd>{job.posted_at ? formatJobDate(job.posted_at) : "Not provided"}</dd></div>
+        <div><dt>First seen</dt><dd>{formatJobDate(job.first_seen_at)}</dd></div>
+        <div><dt>Last verified</dt><dd>{formatJobDate(job.last_verified_at)}</dd></div>
       </dl>
+      <JobActions job={job} onSave={onSave} onHide={onHide} pending={pending} tracked={tracked} onTracked={onTracked} />
+      <h3>About the role</h3>
+      <p className="job-description">{job.description || "No description provided."}</p>
       <RequirementList
         title="Skill requirements"
         items={job.skill_requirements.map((item) =>
@@ -350,7 +338,6 @@ export function JobDetail({
           [item.requirement_type, item.value, item.description].filter(Boolean).join(" · "),
         )}
       />
-      <JobActions job={job} onSave={onSave} onHide={onHide} pending={pending} tracked={tracked} onTracked={onTracked} />
       <div className="job-detail-links">
         <Link className="secondary" href={"/jobs/" + encodeURIComponent(job.id) + "/fit"}>View fit analysis</Link>
         <Link className="secondary" href={"/jobs/" + encodeURIComponent(job.id) + "/resume-alignment"}>View resume alignment</Link>
@@ -381,104 +368,9 @@ export function JobDetailFailure({ message, retry }: { message: string; retry: (
   );
 }
 
-type MultiField = "roles" | "countries" | "regions" | "cities" | "job_types" | "work_modes";
+export const JobSearchControls = DiscoveryFilters;
 
-export function JobSearchControls({
-  draft,
-  roles,
-  locations,
-  onChange,
-  onSubmit,
-  onClear,
-}: {
-  draft: JobDiscoveryDraft;
-  roles: CatalogItem[];
-  locations: CatalogLocation[];
-  onChange: (next: JobDiscoveryDraft) => void;
-  onSubmit: () => void;
-  onClear: () => void;
-}) {
-  const countries = unique(locations.map((location) => location.country_code)).sort();
-  const regions = unique(locations.map((location) => location.state_province).filter((value): value is string => Boolean(value))).sort();
-  const cities = unique(locations.map((location) => location.city)).sort();
-  function updateText(field: "keyword" | "company" | "requirement", value: string) {
-    onChange({ ...draft, [field]: value });
-  }
-  function updateMulti(field: MultiField, values: string[]) {
-    onChange({ ...draft, [field]: values });
-  }
-  function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    onSubmit();
-  }
-  return (
-    <form className="auth-card dashboard-card job-search" onSubmit={submit} aria-label="Filter jobs">
-      <header>
-        <div>
-          <h2>Filters</h2>
-          <p className="muted">Choose known job facts. Multiple choices in one filter are alternatives.</p>
-        </div>
-      </header>
-      <div className="job-search-grid">
-        <label>Role
-          <select multiple value={draft.roles} onChange={(event) => updateMulti("roles", selectedValues(event))}>
-            {roles.filter((role) => Boolean(role.slug)).map((role) => <option key={role.id} value={role.slug ?? ""}>{role.name}</option>)}
-          </select>
-        </label>
-        <label>Location
-          <select multiple value={draft.countries} onChange={(event) => updateMulti("countries", selectedValues(event))}>
-            {countries.map((country) => <option key={country} value={country}>{country}</option>)}
-          </select>
-        </label>
-        <label>Job type
-          <select multiple value={draft.job_types} onChange={(event) => updateMulti("job_types", selectedValues(event))}>
-            {EMPLOYMENT_TYPES.map((value) => <option key={value} value={value}>{displayChoice(value)}</option>)}
-          </select>
-        </label>
-        <label>Work mode
-          <select multiple value={draft.work_modes} onChange={(event) => updateMulti("work_modes", selectedValues(event))}>
-            {WORK_MODES.map((value) => <option key={value} value={value}>{displayChoice(value)}</option>)}
-          </select>
-        </label>
-        <label>Recency
-          <select value={draft.recency} onChange={(event) => onChange({ ...draft, recency: event.target.value as JobRecency })}>
-            {RECENCY_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-          </select>
-        </label>
-      </div>
-      <details className="job-more-filters">
-        <summary>More filters</summary>
-        <div className="job-search-grid">
-          <label>Region or province
-            <select multiple value={draft.regions} onChange={(event) => updateMulti("regions", selectedValues(event))}>
-              {regions.map((region) => <option key={region} value={region}>{region}</option>)}
-            </select>
-          </label>
-          <label>City
-            <select multiple value={draft.cities} onChange={(event) => updateMulti("cities", selectedValues(event))}>
-              {cities.map((city) => <option key={city} value={city}>{city}</option>)}
-            </select>
-          </label>
-          <label>Keywords
-            <input value={draft.keyword} onChange={(event) => updateText("keyword", event.target.value)} placeholder="Title, company, or description" />
-          </label>
-          <label>Company
-            <input value={draft.company} onChange={(event) => updateText("company", event.target.value)} placeholder="Company name" />
-          </label>
-          <label>Skill or technology
-            <input value={draft.requirement} onChange={(event) => updateText("requirement", event.target.value)} placeholder="Known requirement" />
-          </label>
-        </div>
-      </details>
-      <div className="form-actions">
-        <button type="submit">Apply filters</button>
-        <button className="secondary" type="button" onClick={onClear}>Clear filters</button>
-      </div>
-    </form>
-  );
-}
-
-function FeedViewTabs({ view, onChange }: { view: JobFeedView; onChange: (view: JobFeedView) => void }) {
+export function FeedViewTabs({ view, onChange }: { view: JobFeedView; onChange: (view: JobFeedView) => void }) {
   return (
     <nav className="job-feed-tabs" aria-label="Job views">
       {(["all", "saved", "hidden"] as const).map((value) => (
@@ -522,16 +414,15 @@ export function SavedSearchControls({
   onRetry: () => void;
 }) {
   return (
-    <section className="auth-card dashboard-card saved-searches">
-      <h2>Saved searches</h2>
-      <p className="muted">Save the exact filters you are using now.</p>
-      <div className="saved-search-create">
-        <label>
-          Search name
-          <input value={name} maxLength={100} onChange={(event) => onNameChange(event.target.value)} placeholder="Canada Backend Internships" />
-        </label>
-        <button type="button" onClick={onCreate}>Save current search</button>
-      </div>
+    <section className="saved-searches">
+      <h2>Saved searches</h2><p className="muted">Return to a search or save your applied filters.</p>
+      <details className="saved-search-create" key={searches?.map((search) => search.id).join(",")}>
+        <summary>Save current search</summary>
+        <form onSubmit={(event) => { event.preventDefault(); onCreate(); }}>
+          <label>Search name<input required value={name} maxLength={100} onChange={(event) => onNameChange(event.target.value)} placeholder="Name this search" /></label>
+          <div className="job-actions"><button type="submit">Save</button><button type="button" className="secondary" onClick={(event) => { event.currentTarget.closest("details")?.removeAttribute("open"); onNameChange(""); }}>Cancel</button></div>
+        </form>
+      </details>
       {error ? (
         <div>
           <p role="alert" className="auth-error">{error}</p>
@@ -600,6 +491,7 @@ export type JobsContentProps = {
   selectJob: (jobId: string) => void;
   changePage: (page: number) => void;
   clearFilters: () => void;
+  browseJobs?: () => void;
   retryJobs: () => void;
   retryDetail: () => void;
   toggleSave: (job: PublicJob | PublicJobDetail) => void;
@@ -619,6 +511,7 @@ export function JobsContent({
   selectJob,
   changePage,
   clearFilters,
+  browseJobs,
   retryJobs,
   retryDetail,
   toggleSave,
@@ -632,45 +525,30 @@ export function JobsContent({
         <p role="alert" className="auth-error">Could not load jobs. {error}</p>
         <button className="secondary" onClick={retryJobs}>Retry jobs</button>
       </section>
-    ) : <p role="status">Loading jobs…</p>;
+    ) : <div className="jobs-loading" role="status"><p>Loading jobs…</p>{[1, 2, 3].map((key) => <Skeleton key={key} className="job-result-skeleton" />)}</div>;
   }
   if (!result.items.length) {
-    return (
-      <section className="auth-card dashboard-card">
-        <h2>Jobs</h2>
-        <p className="muted">
-          {hasFilters(search) ? "No active jobs match these filters." : "No active jobs are available right now."}
-        </p>
-        {hasFilters(search) ? <button className="secondary" onClick={clearFilters}>Clear filters</button> : null}
-      </section>
-    );
+    const filtered = hasFilters(search);
+    const title = filtered ? "No jobs match these filters" : search.view === "saved" ? "No saved jobs yet" : search.view === "hidden" ? "No hidden jobs" : "No jobs available right now";
+    const message = filtered ? "Try removing a filter to broaden your search." : search.view === "saved" ? "Save jobs you’re interested in so you can return to them here." : search.view === "hidden" ? "Jobs you hide will appear here." : "New opportunities will appear here when they become available.";
+    return <section className="jobs-empty"><span className="jobs-empty-icon" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18M10 12v3h4v-3"/></svg></span><h2>{title}</h2><p className="muted">{message}</p>
+      {filtered ? <button className="secondary" onClick={clearFilters}>Clear filters</button> : search.view === "saved" && browseJobs ? <button className="secondary" onClick={browseJobs}>Browse jobs</button> : null}
+    </section>;
   }
 
   const selectedDetail = detail?.id === selected ? detail : null;
   const selectedDetailError = detailError?.jobId === selected ? detailError.message : "";
   return (
     <div className="jobs-layout">
-      <section className="auth-card dashboard-card">
+      <section className="jobs-results-pane" aria-label="Job results" tabIndex={0}>
         <h2>{search.view === "all" ? "Newest matching jobs" : displayChoice(search.view) + " jobs"}</h2>
-        <p className="muted">{result.total} canonical {result.total === 1 ? "job" : "jobs"}</p>
         <ul className="jobs-list">
           {result.items.map((job) => (
             <li key={job.id}>
-              <article className="job-card">
-                <strong>{job.title}</strong>
-                <JobMeta job={job} />
+              <article className="job-card" data-selected={selected === job.id}>
+                <button className="job-result-select" type="button" aria-pressed={selected === job.id} onClick={() => selectJob(job.id)}><strong>{job.title}</strong><span className="job-result-company">{job.company_name}</span><span className="job-result-meta">{[job.work_mode ? displayChoice(job.work_mode) : null, job.employment_type ? displayChoice(job.employment_type) : null].filter(Boolean).join(" · ")}</span></button>
                 <JobFreshness job={job} />
-                <MatchedFilters filters={job.matched_filters ?? []} />
-                <p className="job-summary">{jobDescriptionSummary(job.description)}</p>
-                <JobActions
-                  job={job}
-                  onDetails={() => selectJob(job.id)}
-                  onSave={() => toggleSave(job)}
-                  onHide={() => toggleHide(job)}
-                  pending={pendingJobIds.has(job.id)}
-                  tracked={trackedJobIds.has(job.id)}
-                  onTracked={onTracked}
-                />
+                <div className="job-actions"><button className="secondary" type="button" disabled={pendingJobIds.has(job.id)} onClick={() => toggleSave(job)}>{job.saved ? "Unsave" : "Save"}</button><button className="secondary" type="button" disabled={pendingJobIds.has(job.id)} onClick={() => toggleHide(job)}>{job.hidden ? "Unhide" : "Hide"}</button></div>
               </article>
             </li>
           ))}
@@ -678,7 +556,7 @@ export function JobsContent({
         <JobPagination result={result} changePage={changePage} />
       </section>
       {selected && !selectedDetail ? (
-        selectedDetailError ? <JobDetailFailure message={selectedDetailError} retry={retryDetail} /> : <p role="status">Loading job details…</p>
+        selectedDetailError ? <JobDetailFailure message={selectedDetailError} retry={retryDetail} /> : <section className="auth-card dashboard-card" role="status"><p>Loading job details…</p><Skeleton className="job-result-skeleton" /><Skeleton className="job-result-skeleton" /></section>
       ) : (
         <JobDetail
           job={selectedDetail}
@@ -712,6 +590,8 @@ export function JobsPage() {
   const [savedError, setSavedError] = useState("");
   const [savedAttempt, setSavedAttempt] = useState(0);
   const [savedName, setSavedName] = useState("");
+  const savedDialog = useRef<HTMLDialogElement>(null);
+  const savedTrigger = useRef<HTMLButtonElement>(null);
   const [pendingJobIds, setPendingJobIds] = useState<Set<string>>(() => new Set());
   const [trackedJobIds, setTrackedJobIds] = useState<Set<string>>(() => new Set());
 
@@ -970,10 +850,8 @@ export function JobsPage() {
 
   return (
     <main className="auth-shell dashboard-shell jobs-shell">
-      <Link href="/" className="brand">StudentSuccessful</Link>
-      <h1 className="profile-title">Jobs</h1>
-      <p className="muted">Filter canonical jobs by known facts. A match only means the job satisfies the filters you chose.</p>
-      <p><Link className="secondary" href="/alerts">View alerts</Link> <Link className="secondary" href="/applications">View applications</Link></p>
+      <header className="jobs-heading"><div><h1 className="profile-title">Jobs</h1><p className="muted">Discover opportunities that fit your goals.</p></div>
+      {user ? <button ref={savedTrigger} className="secondary" type="button" onClick={() => savedDialog.current?.showModal()}>Saved searches</button> : null}</header>
       {sessionError ? <p role="alert" className="auth-error">{sessionError}</p>
         : user === undefined ? <p role="status">Checking your session…</p>
           : user === null ? <p>Please <Link href="/login">Login</Link> to browse jobs.</p>
@@ -988,20 +866,24 @@ export function JobsPage() {
                   onSubmit={() => commitSearch(draft)}
                   onClear={clearFilters}
                 />
-                <FeedViewTabs view={search.view} onChange={(view) => navigateSearch({ ...search, view, page: 1 })} />
+                <AppliedFilters search={search} roles={roles} onChange={navigateSearch} onClear={clearFilters} />
+                <div className="jobs-results-bar"><FeedViewTabs view={search.view} onChange={(view) => navigateSearch({ ...search, view, page: 1 })} />{result ? <p className="muted">{result.total} {result.total === 1 ? "job" : "jobs"}{hasFilters(search) ? " matching your filters" : ""}</p> : null}</div>
+                <dialog ref={savedDialog} className="jobs-saved-dialog" aria-label="Saved searches" onClose={() => savedTrigger.current?.focus()} onClick={(event) => { if (event.target === event.currentTarget) { const rect = event.currentTarget.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) savedDialog.current?.close(); } }}>
+                <button type="button" className="secondary jobs-dialog-close" onClick={() => savedDialog.current?.close()}>Close saved searches</button>
                 <SavedSearchControls
                   searches={savedSearches}
                   name={savedName}
                   error={savedError}
                   onNameChange={setSavedName}
                   onCreate={() => void saveCurrentSearch()}
-                  onOpen={(saved) => navigateSearch(fromSavedSearchCriteria(saved.criteria))}
+                  onOpen={(saved) => { navigateSearch(fromSavedSearchCriteria(saved.criteria)); savedDialog.current?.close(); }}
                   onUpdateCriteria={(saved) => void updateSavedCriteria(saved)}
                   onRename={(saved) => void renameSavedSearch(saved)}
                   onDelete={(saved) => void deleteSavedSearch(saved)}
                   onAlertModeChange={(saved, mode) => void updateSavedAlertMode(saved, mode)}
                   onRetry={() => setSavedAttempt((value) => value + 1)}
                 />
+                </dialog>
                 {actionError ? <p role="alert" className="auth-error">{actionError}</p> : null}
                 <JobsContent
                   result={result}
@@ -1014,6 +896,7 @@ export function JobsPage() {
                   selectJob={selectJob}
                   changePage={(page) => navigateSearch({ ...search, page })}
                   clearFilters={clearFilters}
+                  browseJobs={() => navigateSearch({ ...DEFAULT_SEARCH, view: "all" })}
                   retryJobs={() => setAttempt((value) => value + 1)}
                   retryDetail={retryDetail}
                   toggleSave={(job) => void changeJobState(job, { saved: !job.saved })}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "../components/auth/AuthProvider";
+import { AppShell } from "../components/shell/AppShell";
 
 export const metadata: Metadata = {
   title: "StudentSuccessful",
@@ -18,8 +19,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-slate-50 text-slate-900 antialiased">
-        <AuthProvider>{children}</AuthProvider>
+      <body className="min-h-screen antialiased">
+        <AuthProvider><AppShell>{children}</AppShell></AuthProvider>
       </body>
     </html>
   );
