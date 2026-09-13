@@ -41,6 +41,8 @@ class Settings(BaseSettings):
 
     # Storage Adapter (local in development; private S3-compatible storage in production)
     STORAGE_BACKEND: str = "local"
+    # Demo/staging-only opt-in for platforms with ephemeral local filesystems.
+    ALLOW_EPHEMERAL_LOCAL_STORAGE: bool = False
     STORAGE_LOCAL_ROOT: str = str(PROJECT_ROOT / "data" / "resumes")
     STORAGE_S3_BUCKET: str = ""
     STORAGE_S3_REGION: str = ""
@@ -159,7 +161,9 @@ class Settings(BaseSettings):
                 raise ValueError(
                     "CRITICAL: a production PostgreSQL DATABASE_URL is required."
                 )
-            if self.STORAGE_BACKEND != "s3":
+            if self.STORAGE_BACKEND != "s3" and not (
+                self.STORAGE_BACKEND == "local" and self.ALLOW_EPHEMERAL_LOCAL_STORAGE
+            ):
                 raise ValueError("Production requires private S3-compatible resume storage")
             if self.STORAGE_S3_ENDPOINT_URL and not self.STORAGE_S3_ENDPOINT_URL.startswith("https://"):
                 raise ValueError("Production S3 endpoints must use HTTPS")

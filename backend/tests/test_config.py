@@ -51,6 +51,7 @@ def test_production_fails_fast_on_sqlite():
 def test_production_valid_configuration_needs_no_global_secret():
     config = production()
     assert config.SESSION_COOKIE_SECURE
+    assert not config.ALLOW_EPHEMERAL_LOCAL_STORAGE
     assert "SESSION_SECRET" not in Settings.model_fields
 
 
@@ -100,10 +101,23 @@ def test_migration_database_url_is_optional_and_separate(monkeypatch):
 
 
 def test_production_requires_private_s3_storage_and_disabled_debug():
-    with pytest.raises(ValueError, match="private S3"):
-        production(STORAGE_BACKEND="local")
+    with pytest.raises(ValueError, match="Production requires private S3-compatible resume storage"):
+        production(STORAGE_BACKEND="local", ALLOW_EPHEMERAL_LOCAL_STORAGE=False)
     with pytest.raises(ValueError, match="DEBUG=false"):
         production(DEBUG=True)
+
+
+def test_production_allows_explicit_ephemeral_local_storage_without_bypassing_debug_check():
+    config = production(STORAGE_BACKEND="local", ALLOW_EPHEMERAL_LOCAL_STORAGE=True)
+    assert config.STORAGE_BACKEND == "local"
+    assert config.ALLOW_EPHEMERAL_LOCAL_STORAGE
+
+    with pytest.raises(ValueError, match="DEBUG=false"):
+        production(
+            STORAGE_BACKEND="local",
+            ALLOW_EPHEMERAL_LOCAL_STORAGE=True,
+            DEBUG=True,
+        )
 
 
 def test_rejects_invalid_production_pool_and_worker_settings():

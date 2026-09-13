@@ -25,15 +25,15 @@ Use [production.env.example](../deploy/production.env.example) only as a placeho
 | Private | `DATABASE_URL`, optional `DATABASE_MIGRATION_URL`, S3 credentials, and any platform workload identity. |
 | Source configuration | `LIVE_JOB_SOURCES_JSON` and bounded polling settings. Public board identifiers need no credentials but require review before activation. |
 
-Production validation rejects HTTP origins, insecure session cookies, SQLite, debug mode, a non-`__Host-ss_session` cookie name, local resume storage, and invalid managed-storage settings. `DATABASE_URL` is the pooled application connection; the one-off migration job uses `DATABASE_MIGRATION_URL` when supplied and otherwise falls back to `DATABASE_URL`. Each process defaults to a conservative database pool of five connections plus at most five overflow connections.
+Production validation rejects HTTP origins, insecure session cookies, SQLite, debug mode, a non-`__Host-ss_session` cookie name, local resume storage, and invalid managed-storage settings. `ALLOW_EPHEMERAL_LOCAL_STORAGE=true` is the sole storage exception: it permits `STORAGE_BACKEND=local` for a demo or staging deployment while leaving all other production checks in force. `DATABASE_URL` is the pooled application connection; the one-off migration job uses `DATABASE_MIGRATION_URL` when supplied and otherwise falls back to `DATABASE_URL`. Each process defaults to a conservative database pool of five connections plus at most five overflow connections.
 
 The browser-facing frontend and API are same-origin through Next.js rewrites. Browser sessions retain host-only `Secure`, `HttpOnly`, and `SameSite=Lax` cookie behavior. Credentialed CORS and registration/login Origin checks allow only the configured frontend origin.
 
 ## Resume storage
 
-Production requires the `s3` adapter. It stores opaque server-generated keys below the configured prefix, requests AES-256 server-side encryption on writes, and never returns direct public object URLs. The bucket must block public access. Grant the deployed identity only bucket-head/list and prefix-scoped object get/put/delete permission. Enable bucket versioning and provider-managed encryption where available.
+Production requires the `s3` adapter by default. It stores opaque server-generated keys below the configured prefix, requests AES-256 server-side encryption on writes, and never returns direct public object URLs. The bucket must block public access. Grant the deployed identity only bucket-head/list and prefix-scoped object get/put/delete permission. Enable bucket versioning and provider-managed encryption where available.
 
-Local disk remains available only for development and disposable tests. Never rely on a container filesystem for production resume uploads.
+For a Render demo or staging deployment only, set `STORAGE_BACKEND=local` and `ALLOW_EPHEMERAL_LOCAL_STORAGE=true`. Render's local filesystem is ephemeral, so uploaded resumes can disappear after a restart or redeploy. Do not use this exception for durable production resume uploads.
 
 ## Backups and restore
 
