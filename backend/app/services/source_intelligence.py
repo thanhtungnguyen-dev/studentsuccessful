@@ -231,7 +231,7 @@ def preserve_fetch(adapter, uow_factory=UnitOfWork):
         statement = insert(SourceFetchEvidence).values(
             source_key=adapter.key,
             content_hash=digest,
-            parser_version="structured-v2",
+            parser_version=getattr(adapter, "evidence_parser_version", "structured-v2"),
             configuration=adapter.config.model_dump(mode="json"),
             pages=pages,
         )
@@ -265,6 +265,15 @@ def replay_fetch(source_key, digest, uow_factory=UnitOfWork):
             raise ValueError("Unknown fetch evidence")
         config = LiveJobSourceConfig.model_validate(row.configuration)
         pages = list(row.pages)
+        parser_version = row.parser_version
+    if parser_version == "greenhouse-detail-v1":
+        from backend.app.ingestion.live import LiveFetchResult
+
+        if config.family != "greenhouse" or len(pages) != 1:
+            raise ValueError("Invalid Greenhouse detail evidence")
+        adapter = create_live_adapter(config)
+        record = adapter._parse_record(json.loads(pages[0]["content"]))
+        return LiveFetchResult((record,), 1, 0, 0, False, 200, None, None, False)
 
     def handler(request):
         if not pages:

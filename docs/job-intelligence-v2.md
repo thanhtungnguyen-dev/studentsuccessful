@@ -172,8 +172,8 @@ AI/ML, infrastructure, semiconductors, autonomy, fintech, Canadian companies,
 startups and a community feed. Its expected-provider labels are selection hints;
 actual detection and success are measured independently.
 
-Limits: at most 40 source entries, four concurrent probes, six HTTP calls per
-source, five parsed jobs per source, and existing response/redirect safety caps.
+Limits: at most 40 source entries, four concurrent probes, six successful HTTP responses per
+source (plus one rejected oversized Greenhouse request), five parsed jobs per source, and existing response/redirect safety caps.
 Equivalent detected input identities are probed once. Default examples use the
 entire current set. Results are bounded samples, not full employer vacancy totals
 or a representative estimate of student opportunity share. Company completeness
@@ -192,8 +192,8 @@ duplicate-leakage estimate.
 Workday remains unsupported: sampled career sites returned a JavaScript shell or
 an HTTP failure; this pass did not establish a supported public list/detail
 contract with generalized pagination. It does not use browser automation or
-reverse-engineer employer-specific selectors. Large boards exceeding the 5 MiB
-cap remain rejected; the cap was not relaxed. Date-only publication values remain
+reverse-engineer employer-specific selectors. Oversized Ashby boards remain rejected; its documented public posting API
+has no pagination or lightweight list/detail contract. The cap was not relaxed. Date-only publication values remain
 raw evidence, without invented time zones. Explicit UTC timestamps from Recruitee
 are accepted. Salary and expiry remain raw evidence because the current DTO lacks
 those canonical fields. Permanent duration does not imply full-time hours.
@@ -211,3 +211,46 @@ No claimed independently verified Apply percentage is produced. Existing
 300–86,400-second polling bounds, failure backoff, ranking, filters and alerts
 remain unchanged. This one-time cross-section cannot calibrate longitudinal
 polling performance, so no interval change was justified.
+
+
+## Bounded Greenhouse large boards
+
+Normal boards retain the one-request `content=true` path. Only an oversized
+response selects the [documented Greenhouse list/detail API](https://docs.greenhouse.io/job-board.html).
+The fallback requests the lightweight `/jobs` list without descriptions, sorts
+unique numeric posting IDs, and fetches `/jobs/{id}` individually. Every response
+still uses the 5 MiB limit and the existing public-host/DNS/timeout protections.
+An oversized lightweight list or individual detail fails safely; no HTML fallback.
+
+Each detail is ingested through the existing service before the next request.
+Each source cycle processes at most `min(max_postings, 50)` details, stopping
+between details after a 60-second elapsed budget. One in-flight bounded request
+may overrun that budget. The initial cycle has at most 52 requests (rejected full
+response, lightweight list, 50 details); subsequent cycles have at most 51.
+Short lease renewals occur between batches, outside HTTP transactions.
+
+Migration `e28f9a1b324c` adds only a nullable `retrieval_cursor` to source state.
+These boards need multiple cycles, so this cursor prevents restarting at the
+first IDs on every poll or worker restart. It includes the board identity and
+last visited ID; `0` means the next pass starts at the beginning while retaining
+list/detail mode. Changed/deleted/reordered IDs do not invalidate the keyset.
+New lower IDs are visited after wraparound. Progress commits after ingestion;
+a crash in that gap safely repeats an idempotent posting. No snapshot generation
+or accumulated list of seen IDs is stored.
+
+Nonempty fallback traversals always set `complete_listing=false`, including the
+last batch: a mutable listing across cycles is not a provider snapshot. Thus
+unvisited or removed jobs receive no absence increments or closure. Only an
+authoritative empty lightweight list can supply empty-board evidence. Existing
+small-board reconciliation thresholds are unchanged. Positive observations and
+reopening still use existing lifecycle rules. Timeout, oversized detail, 5xx and
+429 stop traversal; committed observations/cursors survive and normal failure
+backoff (including Retry-After) wins. Useful partial failures retain counters
+and are degraded, or rate-limited for 429, rather than erasing successful work.
+
+Raw evidence is retained one detail response per existing evidence entry, with
+the existing ten-entry retention. `greenhouse-detail-v1` evidence replays that
+single detail offline without fetching a list or invoking lifecycle writes.
+Calibration reports retrieval strategy and continuation, retaining its five-job
+sample budget. Run only selected source fixtures when investigating large boards;
+a sampled partial result is never a valid-empty board or a complete inventory.

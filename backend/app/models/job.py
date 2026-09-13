@@ -112,6 +112,7 @@ class LiveSourceState(Base):
     unchanged_successes = Column(Integer, nullable=False, server_default=text("0"), default=0)
     last_change_at = Column(DateTime(timezone=True))
     last_content_hash = Column(String(64))
+    retrieval_cursor = Column(String(255), nullable=True)
     last_attempt_at = Column(DateTime(timezone=True), nullable=True)
     last_success_at = Column(DateTime(timezone=True), nullable=True)
     last_completed_at = Column(DateTime(timezone=True), nullable=True)

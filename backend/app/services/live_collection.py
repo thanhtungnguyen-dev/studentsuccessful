@@ -6,7 +6,7 @@ import hashlib
 import threading
 from collections.abc import Callable, Iterable
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timedelta, timezone
 
 from backend.app.core.unit_of_work import UnitOfWork
@@ -57,7 +57,7 @@ class LiveCollectionOutcome:
 
     @property
     def succeeded(self) -> bool:
-        return self.result is not None
+        return self.result is not None and self.error_category is None
 
 
 @dataclass(frozen=True)
@@ -294,15 +294,67 @@ class LiveCollectionService:
         adapter = registry.resolve(claim.config.key)
         if not isinstance(adapter, LiveSourceAdapter):
             raise ValueError("configured collector adapter is invalid")
-        fetched = adapter.fetch_with_metadata(etag=claim.etag, last_modified=claim.last_modified)
-        result = LiveJobIngestionService.ingest_adapter(
-            adapter, registry, fetch_result=fetched, uow_factory=self._uow_factory
+        combined = None
+        batches = adapter.fetch_batches(
+            continuation=claim.retrieval_cursor, etag=claim.etag, last_modified=claim.last_modified
         )
+        try:
+            # Renew between network units, never holding a transaction during HTTP.
+            for _ in range(52):
+                with self._uow_factory() as uow:
+                    state = LiveSourceStateRepository(uow.session).claimed_state(
+                        claim.config.key, claim.token
+                    )
+                    if state is None:
+                        raise LiveSourceFetchError("Collection lease lost", category="LEASE_LOST")
+                    state.lease_expires_at = self._utc(self._now()) + timedelta(seconds=150)
+                    uow.commit()
+                try:
+                    fetched = next(batches)
+                except StopIteration:
+                    break
+                result = LiveJobIngestionService.ingest_adapter(
+                    adapter, registry, fetch_result=fetched, uow_factory=self._uow_factory
+                )
+                if combined is None:
+                    combined = result
+                else:
+                    counters = (
+                        "fetched", "parsed", "ingested", "malformed", "rejected", "filtered",
+                        "new_canonical_jobs", "duplicate_contributions",
+                        "internship_or_coop_contributions", "official_apply_urls",
+                    )
+                    combined = replace(
+                        result,
+                        **{name: getattr(combined, name) + getattr(result, name)
+                           for name in counters},
+                        complete_listing=combined.complete_listing and result.complete_listing,
+                        observed_external_ids=combined.observed_external_ids + result.observed_external_ids,
+                        content_hash=hashlib.sha256(
+                            ((combined.content_hash or "") + (result.content_hash or "")).encode()
+                        ).hexdigest(),
+                    )
+                if fetched.continuation is not None:
+                    # Advance only AFTER committed ingestion. Crash before this update
+                    # repeats one idempotent observation rather than losing a posting.
+                    with self._uow_factory() as uow:
+                        state = LiveSourceStateRepository(uow.session).claimed_state(
+                            claim.config.key, claim.token
+                        )
+                        if state is None:
+                            raise LiveSourceFetchError("Collection lease lost", category="LEASE_LOST")
+                        state.retrieval_cursor = fetched.continuation
+                        state.etag = state.last_modified = None
+                        uow.commit()
+        except LiveSourceFetchError as exc:
+            return LiveCollectionOutcome(
+                source_key=claim.config.key, family=claim.config.family, result=combined,
+                error_category=exc.category, http_status=exc.status_code,
+                retry_after_seconds=exc.retry_after_seconds,
+            )
         return LiveCollectionOutcome(
-            source_key=claim.config.key,
-            family=claim.config.family,
-            result=result,
-            http_status=result.http_status,
+            source_key=claim.config.key, family=claim.config.family,
+            result=combined, http_status=combined.http_status if combined else None,
         )
 
     def _outcome_for_claim(
@@ -443,6 +495,20 @@ class LiveCollectionService:
         outcome: LiveCollectionOutcome,
         completed_at: datetime,
     ) -> None:
+        if outcome.result is not None:
+            result = outcome.result
+            state.total_jobs_observed += result.parsed
+            state.total_jobs_ingested += result.ingested
+            state.total_new_canonical_jobs += result.new_canonical_jobs
+            state.total_duplicate_contributions += result.duplicate_contributions
+            state.total_internship_or_coop_contributions += result.internship_or_coop_contributions
+            state.total_official_apply_urls += result.official_apply_urls
+            state.last_jobs_seen = result.parsed
+            state.last_jobs_ingested = result.ingested
+            if result.ingested:
+                state.last_success_at = completed_at
+            if result.new_canonical_jobs:
+                state.last_new_canonical_job_at = completed_at
         state.last_completed_at = completed_at
         state.total_collection_attempts += 1
         state.total_collection_failures += 1
@@ -453,6 +519,8 @@ class LiveCollectionService:
         state.health = (
             LiveSourceHealth.RATE_LIMITED
             if outcome.error_category == "RATE_LIMITED"
+            else LiveSourceHealth.DEGRADED
+            if outcome.result is not None and outcome.result.ingested
             else LiveSourceHealth.FAILING
         )
         delay = bounded_backoff_seconds(

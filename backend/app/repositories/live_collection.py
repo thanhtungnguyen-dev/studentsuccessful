@@ -25,6 +25,7 @@ class LiveSourceClaim:
     etag: str | None
     last_modified: str | None
     normal_poll_interval_seconds: int
+    retrieval_cursor: str | None = None
 
 
 class LiveSourceStateRepository:
@@ -146,6 +147,7 @@ class LiveSourceStateRepository:
                     etag=state.etag,
                     last_modified=state.last_modified,
                     normal_poll_interval_seconds=state.normal_poll_interval_seconds,
+                    retrieval_cursor=state.retrieval_cursor,
                 )
             )
         self.session.flush()

@@ -11,11 +11,12 @@ import ipaddress
 import json
 import re
 import xml.etree.ElementTree as ElementTree
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from html import unescape
 from html.parser import HTMLParser
+from time import monotonic
 from typing import Literal
 from urllib.parse import quote, urlsplit
 
@@ -89,6 +90,7 @@ class LiveFetchResult:
     etag: str | None
     last_modified: str | None
     complete_listing: bool
+    continuation: str | None = None
 
 
 class _SourceNotModified(RuntimeError):
@@ -561,6 +563,7 @@ class LiveSourceAdapter:
         self._timeout_seconds = timeout_seconds
         self._client = client
         self.evidence_pages: list[dict] = []
+        self.evidence_parser_version = "structured-v2"
         self._evidence_bytes = 0
         self.evidence_truncated = False
         self.fetched_records = 0
@@ -606,7 +609,12 @@ class LiveSourceAdapter:
                 "public source request timed out", category="TIMEOUT"
             ) from exc
         except (httpx.HTTPError, ValueError) as exc:
-            raise LiveSourceFetchError("public source request failed", category="NETWORK") from exc
+            category = (
+                "OVERSIZED_RESPONSE"
+                if isinstance(exc, ValueError) and str(exc) == "Response too large"
+                else "NETWORK"
+            )
+            raise LiveSourceFetchError("public source request failed", category=category) from exc
         if track_response_metadata:
             self._last_http_status = response.status_code
             self._last_etag = _safe_response_header(response.headers.get("ETag"))
@@ -742,6 +750,7 @@ class LiveSourceAdapter:
         """Fetch once, using public cache validators only when a source supplied them."""
 
         self.evidence_pages: list[dict] = []
+        self.evidence_parser_version = "structured-v2"
         self._evidence_bytes = 0
         self.evidence_truncated = False
         self.fetched_records = 0
@@ -794,6 +803,10 @@ class LiveSourceAdapter:
             complete_listing=complete_listing,
         )
 
+    def fetch_batches(self, *, continuation=None, etag=None, last_modified=None):
+        """Normal providers retain their existing single-result path."""
+        yield self.fetch_with_metadata(etag=etag, last_modified=last_modified)
+
     def fetch(self) -> tuple[ExternalJobDTO, ...]:
         """Backward-compatible Phase 18 fetch interface."""
 
@@ -808,6 +821,84 @@ class LiveSourceAdapter:
 
 class GreenhouseAdapter(LiveSourceAdapter):
     family = "greenhouse"
+
+    def fetch_with_metadata(self, *, etag=None, last_modified=None):
+        # Compatibility for calibration and discovery, capped at 50 parsed details.
+        batches = list(self.fetch_batches(etag=etag, last_modified=last_modified))
+        return replace(
+            batches[-1],
+            records=tuple(record for batch in batches for record in batch.records),
+            fetched_records=sum(batch.fetched_records for batch in batches),
+            skipped_records=sum(batch.skipped_records for batch in batches),
+            filtered_records=sum(batch.filtered_records for batch in batches),
+        )
+
+    def fetch_batches(self, *, continuation=None, etag=None, last_modified=None):
+        # Bind the cursor to the board, so a reconfigured source starts afresh.
+        deadline = monotonic() + 60
+        prefix = f"gh:{self.config.board_token}:"
+        if continuation is None or not continuation.startswith(prefix):
+            try:
+                yield super().fetch_with_metadata(etag=etag, last_modified=last_modified)
+                return
+            except LiveSourceFetchError as exc:
+                if exc.category != "OVERSIZED_RESPONSE":
+                    raise
+            continuation = prefix + "0"
+        cursor = continuation[len(prefix):]
+        if not cursor.isdecimal() or len(cursor) > 20:
+            raise LiveSourceFetchError("Invalid Greenhouse continuation")
+        self.retrieval_strategy = "list-detail"
+        self._conditional_request_pending = False
+        self._last_etag = self._last_modified = None
+        endpoint = (
+            "https://boards-api.greenhouse.io/v1/boards/"
+            + quote(self.config.board_token, safe="") + "/jobs"
+        )
+        self.evidence_pages = []
+        self._evidence_bytes = 0
+        self.evidence_truncated = False
+        payload = self._get_json(endpoint)
+        jobs = _object(payload, "Greenhouse list").get("jobs")
+        if not isinstance(jobs, list):
+            raise LiveSourceFetchError("Greenhouse response has no jobs list")
+        # Keep only IDs from the bounded lightweight response. Numeric keyset
+        # traversal tolerates deletion/reordering and deduplicates overlapping IDs.
+        ids = set()
+        for job in jobs:
+            value = _object(job, "Greenhouse list job").get("id")
+            if type(value) is not int or value <= 0 or len(str(value)) > 20:
+                raise LiveSourceFetchError("Invalid Greenhouse list job ID")
+            ids.add(value)
+        del jobs, payload
+        pending = sorted(value for value in ids if value > int(cursor))
+        selected = pending[:min(self.config.max_postings, 50)]
+        # No snapshot contract: nonempty list/detail traversals never imply absence,
+        # even at wraparound. A complete empty list is authoritative on its own.
+        if not selected:
+            self.evidence_pages = []
+            yield LiveFetchResult((), 0, 0, 0, False, 200, None, None,
+                                  not ids, prefix + "0")
+            return
+        for index, job_id in enumerate(selected):
+            self.evidence_pages = []
+            self._evidence_bytes = 0
+            self.evidence_truncated = False
+            self.evidence_parser_version = "greenhouse-detail-v1"
+            raw = self._get_json(endpoint + "/" + str(job_id), track_response_metadata=False)
+            if _object(raw, "Greenhouse detail").get("id") != job_id:
+                raise LiveSourceFetchError("Greenhouse detail ID mismatch")
+            records, skipped = (), 0
+            try:
+                records = (self._parse_record(raw),)
+            except (JobIngestionValidationError, LiveSourceRecordError, ValidationError):
+                skipped = 1
+            del raw
+            done = index + 1 == len(pending)
+            yield LiveFetchResult(records, 1, skipped, 0, False, 200, None, None,
+                                  False, prefix + ("0" if done else str(job_id)))
+            if monotonic() >= deadline:
+                break
 
     def _records(self) -> list[object]:
         assert self.config.board_token is not None

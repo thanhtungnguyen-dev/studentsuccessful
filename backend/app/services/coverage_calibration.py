@@ -188,7 +188,7 @@ def _probe(row, *, live, base, timeout, fetch):
             unknown_pattern=None,
             direct=config.effective_source_authority in {"OFFICIAL_ATS", "OFFICIAL_COMPANY"},
         )
-        # Five postings bound detail-fetch providers to <=6 HTTP calls/source.
+        # Five details plus list; Greenhouse may first reject one oversized response.
         config = config.model_copy(update={"max_postings": 5})
 
         def transport(req):
@@ -200,9 +200,10 @@ def _probe(row, *, live, base, timeout, fetch):
             )
 
         with httpx.Client(transport=httpx.MockTransport(transport)) as client:
-            parsed = create_live_adapter(
-                config, client=client, timeout_seconds=timeout
-            ).fetch_with_metadata()
+            adapter = create_live_adapter(config, client=client, timeout_seconds=timeout)
+            parsed = adapter.fetch_with_metadata()
+            result["retrieval_strategy"] = getattr(adapter, "retrieval_strategy", "normal")
+            result["continuation"] = parsed.continuation
         records = parsed.records
         result.update(
             jobs=len(records),
@@ -220,6 +221,8 @@ def _probe(row, *, live, base, timeout, fetch):
             result["status"] = "INVALID_RESPONSE"
     except Exception as error:
         result["status"] = error_category(error)
+        if isinstance(error, LiveSourceFetchError):
+            result["failure_category"] = error.category
     return result, records
 
 
