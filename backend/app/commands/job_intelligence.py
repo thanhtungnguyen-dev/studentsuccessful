@@ -59,6 +59,9 @@ def main():
         return
     with UnitOfWork() as uow:
         report = quality_report(uow.session)
+        from backend.app.services.worker_runtime import operational_status
+
+        report["operations"] = operational_status(uow.session)
         report["fetch_evidence"] = [
             dict(source=row.source_key, hash=row.content_hash, fetched_at=row.last_fetched_at)
             for row in uow.session.execute(

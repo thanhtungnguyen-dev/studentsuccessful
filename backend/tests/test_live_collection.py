@@ -509,7 +509,7 @@ def test_bounded_concurrency_limits_independent_source_workers(monkeypatch):
     maximum = 0
     recorded: list[LiveCollectionOutcome] = []
 
-    def collect_claim(claim, registry):
+    def collect_claim(claim, registry, stop_event=None):
         nonlocal active, maximum
         del registry
         with lock:
@@ -523,7 +523,7 @@ def test_bounded_concurrency_limits_independent_source_workers(monkeypatch):
         return LiveCollectionOutcome(claim.config.key, claim.config.family, success_result(claim.config.key))
 
     monkeypatch.setattr(service, "synchronize", lambda now=None: None)
-    monkeypatch.setattr(service, "_claim_due", lambda now, force: claims)
+    monkeypatch.setattr(service, "_claim_due", lambda now, force, limit=None: claims)
     monkeypatch.setattr(service, "_collect_claim", collect_claim)
     monkeypatch.setattr(
         service,
@@ -564,7 +564,7 @@ def test_slow_timeout_worker_does_not_prevent_a_healthy_worker(monkeypatch):
     release_slow = threading.Event()
     recorded: list[LiveCollectionOutcome] = []
 
-    def collect_claim(claim, registry):
+    def collect_claim(claim, registry, stop_event=None):
         del registry
         if claim.config.key == slow.key:
             slow_started.set()
@@ -574,7 +574,7 @@ def test_slow_timeout_worker_does_not_prevent_a_healthy_worker(monkeypatch):
         return LiveCollectionOutcome(claim.config.key, claim.config.family, success_result(claim.config.key))
 
     monkeypatch.setattr(service, "synchronize", lambda now=None: None)
-    monkeypatch.setattr(service, "_claim_due", lambda now, force: claims)
+    monkeypatch.setattr(service, "_claim_due", lambda now, force, limit=None: claims)
     monkeypatch.setattr(service, "_collect_claim", collect_claim)
     monkeypatch.setattr(
         service,

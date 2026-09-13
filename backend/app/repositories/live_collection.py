@@ -113,6 +113,7 @@ class LiveSourceStateRepository:
         *,
         force: bool,
         lease_seconds: int,
+        limit: int | None = None,
     ) -> tuple[LiveSourceClaim, ...]:
         configs = tuple(sorted(configs, key=lambda config: config.key))
         if not configs:
@@ -127,7 +128,12 @@ class LiveSourceStateRepository:
             )
         }
         claims: list[LiveSourceClaim] = []
+        configs = sorted(configs, key=lambda config: (
+            states[config.key].next_poll_at or now if config.key in states else now, config.key
+        ))
         for config in configs:
+            if limit is not None and len(claims) >= limit:
+                break
             state = states.get(config.key)
             if state is None or not state.enabled:
                 continue

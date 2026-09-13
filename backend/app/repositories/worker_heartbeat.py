@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from uuid import UUID
 
 from sqlalchemy import select
+from sqlalchemy.dialects.postgresql import insert
 
 from backend.app.models.operations import WorkerHeartbeat, WorkerRuntimeState
 
@@ -24,6 +25,12 @@ class WorkerHeartbeatRepository:
         *,
         lease_seconds: int,
     ) -> bool:
+        # Concurrent first starts must serialize on the existing singleton row.
+        self.session.execute(
+            insert(WorkerHeartbeat).values(worker_name=worker_name).on_conflict_do_nothing(
+                index_elements=["worker_name"]
+            )
+        )
         row = self._locked(worker_name)
         if row is not None and self._held_by_another(row, token, now):
             return False

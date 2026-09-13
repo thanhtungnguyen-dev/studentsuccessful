@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import threading
 from collections.abc import Callable, Iterable
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from dataclasses import dataclass, replace
 from datetime import datetime, timedelta, timezone
 
@@ -165,7 +165,18 @@ class LiveCollectionService:
         if not INITIAL_BACKOFF_SECONDS <= max_backoff_seconds <= MAX_RETRY_AFTER_SECONDS:
             raise ValueError("max_backoff_seconds must be between 60 and 86400")
 
-    def _discover(self):
+    def _discover(self, *, on_tick=None, stop_event=None):
+        if stop_event is not None and stop_event.is_set():
+            return
+        if on_tick is not None:
+            # Discovery is bounded but includes HTTP; keep the coordinator alive.
+            with ThreadPoolExecutor(max_workers=1, thread_name_prefix="source-discovery") as executor:
+                future = executor.submit(self._discover)
+                while not future.done():
+                    on_tick()
+                    wait((future,), timeout=10)
+                future.result()
+            return
         from backend.app.core.config import settings
         from backend.app.services.source_intelligence import process_discovery
 
@@ -208,14 +219,20 @@ class LiveCollectionService:
             repository.mark_stale((config.key for config in self.configs), now)
             uow.commit()
 
-    def run_cycle(self, *, force: bool = False) -> LiveCollectionCycle:
+    def run_cycle(self, *, force: bool = False, stop_event=None, on_tick=None) -> LiveCollectionCycle:
         """Claim due sources, run them with bounded concurrency, and persist outcomes."""
 
+        if stop_event is not None and stop_event.is_set():
+            return LiveCollectionCycle(())
         now = self._utc(self._now())
         self.synchronize(now)
-        claims = self._claim_due(now, force=force)
+        if stop_event is not None and stop_event.is_set():
+            return LiveCollectionCycle(())
+        claims = self._claim_due(
+            now, force=force, limit=self.max_concurrency if on_tick is not None else None
+        )
         if not claims:
-            self._discover()
+            self._discover(on_tick=on_tick, stop_event=stop_event)
             return LiveCollectionCycle(())
 
         adapters = tuple(
@@ -226,7 +243,7 @@ class LiveCollectionService:
         )
         registry = SourceAdapterRegistry(adapters)
         outcomes: list[LiveCollectionOutcome] = []
-        if self.max_concurrency == 1:
+        if self.max_concurrency == 1 and on_tick is None:
             completed = ((claim, self._outcome_for_claim(claim, registry)) for claim in claims)
             for claim, outcome in completed:
                 self._record_outcome(claim, outcome, self._utc(self._now()))
@@ -237,15 +254,33 @@ class LiveCollectionService:
                 thread_name_prefix="live-source",
             ) as executor:
                 futures = {
-                    executor.submit(self._outcome_for_claim, claim, registry): claim
+                    executor.submit(self._outcome_for_claim, claim, registry, stop_event): claim
                     for claim in claims
                 }
-                for future in as_completed(futures):
-                    claim = futures[future]
-                    outcome = future.result()
-                    self._record_outcome(claim, outcome, self._utc(self._now()))
-                    outcomes.append(outcome)
-        self._discover()
+                while futures:
+                    try:
+                        if on_tick is not None:
+                            on_tick()
+                        # Renew only currently executing claims, not a long queued backlog.
+                        with self._uow_factory() as uow:
+                            repository = LiveSourceStateRepository(uow.session)
+                            for claim in futures.values():
+                                state = repository.claimed_state(claim.config.key, claim.token)
+                                if state is not None:
+                                    state.lease_expires_at = self._utc(self._now()) + timedelta(seconds=150)
+                            uow.commit()
+                        done, _ = wait(futures, timeout=10, return_when=FIRST_COMPLETED)
+                        for future in done:
+                            claim = futures.pop(future)
+                            outcome = future.result()
+                            self._record_outcome(claim, outcome, self._utc(self._now()))
+                            outcomes.append(outcome)
+                    except BaseException:
+                        if stop_event is not None:
+                            stop_event.set()
+                        raise
+        if stop_event is None or not stop_event.is_set():
+            self._discover(on_tick=on_tick, stop_event=stop_event)
         return LiveCollectionCycle(tuple(sorted(outcomes, key=lambda outcome: outcome.source_key)))
 
     def run_forever(self, stop_event: threading.Event | None = None) -> None:
@@ -274,7 +309,7 @@ class LiveCollectionService:
             states = LiveSourceStateRepository(uow.session).list_states()
             return tuple(self._snapshot(state) for state in states)
 
-    def _claim_due(self, now: datetime, *, force: bool) -> tuple[LiveSourceClaim, ...]:
+    def _claim_due(self, now: datetime, *, force: bool, limit=None) -> tuple[LiveSourceClaim, ...]:
         longest_timeout = max(
             (self.request_timeout_seconds(config) for config in self.configs if config.enabled),
             default=self.default_timeout_seconds,
@@ -283,13 +318,13 @@ class LiveCollectionService:
         lease_seconds = max(60, int(longest_timeout) + 60)
         with self._uow_factory() as uow:
             claims = LiveSourceStateRepository(uow.session).claim_due(
-                self.configs, now, force=force, lease_seconds=lease_seconds
+                self.configs, now, force=force, lease_seconds=lease_seconds, limit=limit
             )
             uow.commit()
             return claims
 
     def _collect_claim(
-        self, claim: LiveSourceClaim, registry: SourceAdapterRegistry
+        self, claim: LiveSourceClaim, registry: SourceAdapterRegistry, stop_event=None
     ) -> LiveCollectionOutcome:
         adapter = registry.resolve(claim.config.key)
         if not isinstance(adapter, LiveSourceAdapter):
@@ -301,6 +336,11 @@ class LiveCollectionService:
         try:
             # Renew between network units, never holding a transaction during HTTP.
             for _ in range(52):
+                if stop_event is not None and stop_event.is_set():
+                    if combined is not None:
+                        combined = replace(combined, complete_listing=False)
+                        break
+                    raise LiveSourceFetchError("Collection stopped", category="STOPPED")
                 with self._uow_factory() as uow:
                     state = LiveSourceStateRepository(uow.session).claimed_state(
                         claim.config.key, claim.token
@@ -358,10 +398,10 @@ class LiveCollectionService:
         )
 
     def _outcome_for_claim(
-        self, claim: LiveSourceClaim, registry: SourceAdapterRegistry
+        self, claim: LiveSourceClaim, registry: SourceAdapterRegistry, stop_event=None
     ) -> LiveCollectionOutcome:
         try:
-            return self._collect_claim(claim, registry)
+            return self._collect_claim(claim, registry, stop_event)
         except LiveSourceFetchError as exc:
             return LiveCollectionOutcome(
                 source_key=claim.config.key,
@@ -379,6 +419,11 @@ class LiveCollectionService:
                 error_category="INGESTION",
             )
         except Exception:
+            import logging
+
+            logging.getLogger("studentsuccessful.collector").exception(
+                "source_collection_failed", extra={"event": "source_collection_failed", "worker": "collector"}
+            )
             # External data and transport errors never disclose raw provider text to storage.
             return LiveCollectionOutcome(
                 source_key=claim.config.key,
@@ -398,7 +443,10 @@ class LiveCollectionService:
                 claim.config.key, claim.token
             )
             if state is not None:
-                if outcome.succeeded:
+                if outcome.error_category == "STOPPED":
+                    state.lease_token = None
+                    state.lease_expires_at = None
+                elif outcome.succeeded:
                     assert outcome.result is not None
                     self._apply_success(state, outcome.result, completed_at)
                     if self._safe_for_lifecycle_reconciliation(outcome.result):
