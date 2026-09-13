@@ -19,8 +19,8 @@ const authorization:WorkAuthorization={...metadata,country_code:"CA",authorizati
 const preferences:DashboardPreferences={preferences:{},labelsUnavailable:false,catalogs:{role_ids:[],industry_ids:[],location_ids:[],company_ids:[],skill_ids:[]}};
 
 it("completed Home renders a dashboard with account context and five sections", () => {
- state.user=user;const html=render(h(AuthStatus));expect(html).toContain('>Home</h1>');expect(html).toContain(user.email);expect(html).toContain('dashboard-grid');expect(html).not.toContain('Continue onboarding');
- for(const title of ['Application Profile','Education','Employment','Work Authorization','Career Preferences'])expect(html).toContain('Edit '+title);expect(html).toContain('href="/candidate"');expect(html).toContain('View Candidate Profile');expect(html).toContain('href="/jobs"');expect(html).toContain('Browse Jobs');
+ state.user=user;const html=render(h(AuthStatus));expect(html).toContain('>Home</h1>');expect(html).toContain(user.email);expect(html).toContain('dashboard-overview');expect(html).not.toContain('Continue onboarding');
+ for(const title of ['Personal Information','Education','Employment','Work Authorization','Career Preferences'])expect(html).toContain('Edit '+title);expect(html).toContain('href="/candidate"');expect(html).toContain('View Candidate Profile');expect(html).toContain('href="/jobs"');expect(html).toContain('Browse Jobs');
 });
 it("renders saved profile facts with existing field labels", () => {
  const html=render(h(ProfileSummary,{data:{legal_first_name:"Ada",legal_last_name:"Lovelace",preferred_name:"A",address_city:"Calgary"}}));
@@ -58,8 +58,8 @@ it("renders understandable failure and a keyboard-accessible section retry", () 
  const html=render(h(DashboardSectionContent<string>,{state:{status:'error',message:'Please try again.'},title:'Education',retry:vi.fn(),children:value => h('p',null,value)}));
  expect(html).toContain('role="alert"');expect(html).toContain('Could not load education');expect(html).toContain('<button');expect(html).toContain('Retry Education');expect(html).not.toContain('No education');
 });
-it.each([['Application Profile','/profile'],['Education','/education'],['Employment','/employment'],['Work Authorization','/work-authorization'],['Career Preferences','/preferences']])("routes %s editing to %s", (title,route) => {
- const html=render(h(Dashboard));expect(html).toContain(`href="${route}">Edit ${title}</a>`);
+it.each([['Personal Information','/profile'],['Education','/education'],['Employment','/employment'],['Work Authorization','/work-authorization'],['Career Preferences','/preferences']])("routes %s editing to %s", (title,route) => {
+ const html=render(h(Dashboard));expect(html).toMatch(new RegExp(`aria-label="Edit ${title}"[^>]*href="${route}"`));
 });
 it("loads persisted values again on remount/refresh with no dashboard write operation", async () => {
  const read=vi.spyOn(apiClient,'getProfile').mockResolvedValueOnce({legal_first_name:'Ada',legal_last_name:'Lovelace'}).mockResolvedValueOnce({legal_first_name:'Updated',legal_last_name:'Lovelace'});
@@ -89,9 +89,18 @@ it("propagates a catalog authentication failure to session handling", async () =
  catalogs();vi.mocked(apiClient.listSkills).mockRejectedValue(new ApiError(401,'Expired'));await expect(dashboardLoaders.preferences()).rejects.toMatchObject({status:401});
 });
 it("preserves incomplete login/review routing and does not show the dashboard", () => {
- state.user={...user,onboarding_completed_at:null};expect(postAuthDestination(state.user)).toBe('/onboarding/review');const html=render(h(AuthStatus));expect(html).toContain('Continue onboarding');expect(html).not.toContain('dashboard-grid');expect(postAuthDestination(user)).toBe('/');
+ state.user={...user,onboarding_completed_at:null};expect(postAuthDestination(state.user)).toBe('/onboarding/review');const html=render(h(AuthStatus));expect(html).toContain('Continue onboarding');expect(html).not.toContain('dashboard-overview');expect(postAuthDestination(user)).toBe('/');
 });
 it("does not render dashboard data for anonymous, unknown or failed sessions", () => {
- for(const current of [null,undefined]){state.user=current;expect(render(h(AuthStatus))).not.toContain('dashboard-grid');}
- state.user=null;expect(render(h(AuthStatus))).toContain('href="/login"');state.user=user;state.error='Session unavailable';const html=render(h(AuthStatus));expect(html).not.toContain('dashboard-grid');expect(html).toContain('Session unavailable');
+ for(const current of [null,undefined]){state.user=current;expect(render(h(AuthStatus))).not.toContain('dashboard-overview');}
+ state.user=null;expect(render(h(AuthStatus))).toContain('href="/login"');state.user=user;state.error='Session unavailable';const html=render(h(AuthStatus));expect(html).not.toContain('dashboard-overview');expect(html).toContain('Session unavailable');
+});
+
+it("gives each career destination one semantic link without nested controls", () => {
+ const html=render(h(Dashboard));
+ const cards=html.slice(html.indexOf('class="career-actions"'),html.indexOf('class="overview-group"'));
+ expect(cards.match(/<a /g)).toHaveLength(3);
+ expect(cards).not.toContain('<button');
+ for(const label of ['Browse Jobs','View Candidate Profile','View Applications'])expect(cards).toContain(`aria-label="${label}"`);
+ expect(cards.match(/class="action-link"/g)).toHaveLength(3);
 });
