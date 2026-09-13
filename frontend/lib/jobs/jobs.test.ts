@@ -1,8 +1,9 @@
-import { createElement as h } from "react";
+import { createElement as h, isValidElement, type ReactElement, type ReactNode } from "react";
 import { renderToStaticMarkup as render } from "react-dom/server";
 import { afterEach, expect, it, vi } from "vitest";
 
 import {
+  FeedViewTabs,
   JobDetail,
   JobDetailFailure,
   JobSearchControls,
@@ -17,6 +18,7 @@ import {
   type JobDiscoverySearch,
   type JobsContentProps,
 } from "../../components/jobs/JobsPage";
+import { AppliedFilters, JobFilterPopover } from "../../components/jobs/DiscoveryFilters";
 import {
   ApiClient,
   type CurrentUser,
@@ -243,18 +245,18 @@ it("renders the primary filters, secondary filters, and no recommendation langua
     onSubmit: vi.fn(),
     onClear: vi.fn(),
   }));
-  for (const text of ["Filters", "Role", "Location", "Job type", "Work mode", "Recency", "More filters", "Keywords", "Skill or technology", "Apply filters", "Clear filters"]) {
+  for (const text of ["Job filters", "Role", "Location", "Job type", "Work mode", "Recency", "More filters", "Keywords", "Skill or technology", "Apply filters", "Clear filters"]) {
     expect(html).toContain(text);
   }
   expect(html).not.toMatch(/recommended|candidate fit|match percentage|AI explanation/i);
 });
 
-it("renders concise canonical cards with filter explanations and state actions", () => {
+it("renders compact selectable results and preserves detail actions", () => {
   const html = renderJobsContent();
   for (const value of [
-    "Newest matching jobs", "Backend Software Engineer Intern", "Example Co", "HYBRID", "INTERNSHIP",
-    "Unseen", "NEW", "Matched your filters: Role: Backend · Country: CA · Job type: Internship",
-    "Apply", "Details", "Save", "Hide",
+    "Newest matching jobs", "Backend Software Engineer Intern", "Example Co", "Hybrid", "Internship",
+    "Unseen", "New", "Matched your filters: Role: Backend · Country: CA · Job type: Internship",
+    "Apply", "Save", "Hide",
   ]) expect(html).toContain(value);
   expect(html).not.toMatch(/source adapter|external id|source url|snapshot|hash|recommendation/i);
 });
@@ -286,7 +288,7 @@ it("renders empty, loading, error, pagination, and retry states", () => {
     detail: null,
     search: { ...search, countries: ["CA"] },
   });
-  expect(empty).toContain("No active jobs match these filters.");
+  expect(empty).toContain("No jobs match these filters");
   expect(empty).toContain("Clear filters");
   expect(renderJobsContent({ result: null, selected: null, detail: null })).toContain("Loading jobs…");
   const failed = renderJobsContent({ result: null, error: "Please try again.", selected: null, detail: null });
@@ -310,6 +312,84 @@ it("uses a safe direct application link and displays retryable detail failure", 
 it("shows authenticated controls while the canonical feed is loading", () => {
   authState.user = signedInUser;
   const html = render(h(JobsPage));
-  expect(html).toContain("Filters");
+  expect(html).toContain("Job filters");
   expect(html).toContain("Loading jobs…");
+});
+
+
+it("keeps the applied row absent for an unfiltered search and names each actual active value", () => {
+  expect(render(h(AppliedFilters, { search, roles: [], onChange: vi.fn(), onClear: vi.fn() }))).toBe("");
+  const html = render(h(AppliedFilters, { search: { ...search, work_modes: ["REMOTE", "HYBRID"], keyword: "Python" }, roles: [], onChange: vi.fn(), onClear: vi.fn() }));
+  for (const label of ["Remove Remote filter", "Remove Hybrid filter", "Remove Python filter", "Clear all"]) expect(html).toContain(label);
+});
+
+it.each(["all", "saved", "hidden"] as const)("identifies the %s view without fabricated tab counts", (view) => {
+  const html = render(h(FeedViewTabs, { view, onChange: vi.fn() }));
+  expect(html.match(/aria-pressed="true"/g)).toHaveLength(1);
+  expect(html).toContain('aria-pressed="true" type="button">' + view[0].toUpperCase() + view.slice(1));
+  expect(html).not.toMatch(/\d/);
+});
+
+it.each([
+  ["all", "No jobs available right now"], ["saved", "No saved jobs yet"], ["hidden", "No hidden jobs"],
+] as const)("distinguishes the unfiltered %s empty state", (view, message) => {
+  const html = renderJobsContent({ search: { ...search, view }, result: { ...page, items: [], total: 0 }, browseJobs: vi.fn() });
+  expect(html).toContain(message);
+  expect(html).not.toContain("Clear filters");
+  if (view === "saved") expect(html).toContain("Browse jobs");
+});
+
+it("uses honest filtered empty messaging even in Saved and Hidden views", () => {
+  for (const view of ["saved", "hidden"] as const) {
+    const html = renderJobsContent({ search: { ...search, view, keyword: "missing" }, result: { ...page, items: [], total: 0 } });
+    expect(html).toContain("No jobs match these filters");
+    expect(html).not.toContain(view === "saved" ? "No saved jobs yet" : "No hidden jobs");
+  }
+});
+
+it("starts filter popovers closed with semantic controls and explicit empty options", () => {
+  const html = render(h(JobFilterPopover, { label: "Role", children: "No roles available." }));
+  expect(html).toContain('aria-expanded="false"');
+  expect(html).toContain('aria-controls=');
+  expect(html).toContain('hidden="" role="group" aria-label="Role"');
+  const filters = render(h(JobSearchControls, { draft: search, roles: [], locations: [], onChange: vi.fn(), onSubmit: vi.fn(), onClear: vi.fn() }));
+  expect(filters).toContain("No roles available for the current jobs.");
+  expect(filters).toContain("No locations available for the current jobs.");
+  expect(filters).toContain('type="checkbox"');
+  expect(filters).not.toContain("multiple=");
+});
+
+it("keeps long descriptions in detail and the selected result programmatically identifiable", () => {
+  const html = renderJobsContent();
+  expect(html).toContain('data-selected="true"');
+  expect(html).toContain('class="job-result-select" type="button" aria-pressed="true"');
+  expect(html).not.toContain('class="job-summary"');
+  expect(html.indexOf("Locations")).toBeLessThan(html.indexOf("About the role"));
+});
+
+
+type ControlProps = { children?: ReactNode; "aria-label"?: string; onClick?: () => void };
+function controls(node: ReactNode): ReactElement<ControlProps>[] {
+  if (Array.isArray(node)) return node.flatMap(controls);
+  if (!isValidElement<ControlProps>(node)) return [];
+  return [node, ...controls(node.props.children)];
+}
+
+it("removes only one applied OR value, resets pagination, and preserves the active view", () => {
+  const onChange = vi.fn();
+  const active: JobDiscoverySearch = { ...search, view: "saved", page: 3, work_modes: ["REMOTE", "HYBRID"], keyword: "Python" };
+  const tree = AppliedFilters({ search: active, roles: [], onChange, onClear: vi.fn() });
+  const remove = controls(tree).find((node) => node.props["aria-label"] === "Remove Remote filter");
+  expect(remove).toBeDefined();
+  remove!.props.onClick!();
+  expect(onChange).toHaveBeenCalledExactlyOnceWith({ ...active, page: 1, work_modes: ["HYBRID"] });
+  expect(active.work_modes).toEqual(["REMOTE", "HYBRID"]);
+});
+
+it("clears recency back to all without dropping unrelated applied values", () => {
+  const onChange = vi.fn();
+  const active: JobDiscoverySearch = { ...search, recency: "7d", countries: ["CA"], view: "hidden", page: 2 };
+  const tree = AppliedFilters({ search: active, roles: [], onChange, onClear: vi.fn() });
+  controls(tree).find((node) => node.props["aria-label"] === "Remove Last 7 days filter")!.props.onClick!();
+  expect(onChange).toHaveBeenCalledExactlyOnceWith({ ...active, page: 1, recency: "all" });
 });
