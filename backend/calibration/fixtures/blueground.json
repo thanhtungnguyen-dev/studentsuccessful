@@ -1,0 +1,11 @@
+{
+  "provenance": "Structural extract of public probe; descriptions omitted; counts are fixture-only.",
+  "responses": [
+    {
+      "url": "https://apply.workable.com/api/v1/widget/accounts/blueground?details=true",
+      "status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "content": "{\"name\": \"Blueground\", \"description\": \"\", \"jobs\": [{\"title\": \"Business Development Representative\", \"shortcode\": \"0FD01ABC66\", \"code\": \"\", \"employment_type\": \"Full-time\", \"telecommuting\": true, \"department\": \"Shared Services\", \"url\": \"https://apply.workable.com/j/0FD01ABC66\", \"shortlink\": \"https://apply.workable.com/j/0FD01ABC66\", \"application_url\": \"https://apply.workable.com/j/0FD01ABC66/apply\", \"published_on\": \"2026-08-18\", \"created_at\": \"2026-08-18\", \"country\": \"United States\", \"city\": \"\", \"state\": \"\", \"education\": \"Bachelor's Degree\", \"experience\": \"Associate\", \"function\": \"Sales\", \"industry\": \"Real Estate\", \"locations\": [{\"country\": \"United States\", \"countryCode\": \"US\", \"city\": \"\", \"region\": null, \"hidden\": false}], \"description\": \"<p>Public description omitted in structural fixture.</p>\"}, {\"title\": \"Client Experience Coordinator (English & Greek Speaker) - Talent Pool\", \"shortcode\": \"186545F8C1\", \"code\": null, \"employment_type\": \"Full-time\", \"telecommuting\": false, \"department\": \"Shared Services\", \"url\": \"https://apply.workable.com/j/186545F8C1\", \"shortlink\": \"https://apply.workable.com/j/186545F8C1\", \"application_url\": \"https://apply.workable.com/j/186545F8C1/apply\", \"published_on\": \"2026-02-12\", \"created_at\": \"2025-09-30\", \"country\": \"Greece\", \"city\": \"Athens\", \"state\": \"Attica\", \"education\": null, \"experience\": \"Associate\", \"function\": \"Customer Service\", \"industry\": \"Real Estate\", \"locations\": [{\"country\": \"Greece\", \"countryCode\": \"GR\", \"city\": \"Athens\", \"region\": \"Attica\", \"hidden\": false}], \"description\": \"<p>Public description omitted in structural fixture.</p>\"}]}"
+    }
+  ]
+}

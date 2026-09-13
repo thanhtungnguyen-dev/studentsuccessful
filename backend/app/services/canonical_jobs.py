@@ -72,6 +72,10 @@ def canonical_url_fingerprint(value: str) -> str:
         and path.endswith("/apply")
     ):
         path = path[:-6]
+    if hostname == "apply.workable.com" and path.endswith("/apply"):
+        path = path[:-6]
+    if hostname.endswith(".workable.com") and path.endswith("/candidates/new"):
+        path = path[:-15]
     if hostname.endswith(".recruitee.com") and path.startswith("/o/") and path.endswith("/c/new"):
         path = path[:-6]
     canonical = urlunsplit(
@@ -380,6 +384,19 @@ class CanonicalJobService:
     ) -> NormalizedJob | None:
         scores: dict[object, int] = {}
         for candidate in candidates:
+            # Strong conflicting requisitions override every weaker match, including shared
+            # source-page URLs. Apply before scoring, independently of title/location equality.
+            from backend.app.ingestion.source_detection import detect_source
+
+            try:
+                left = detect_source(candidate.application_url, "Identity")
+                right = detect_source(incoming_url, "Identity") if incoming_url else None
+            except ValueError:
+                left = right = None
+            known_left = left or urlsplit(candidate.application_url).hostname == "apply.workable.com"
+            known_right = right or incoming_url and urlsplit(incoming_url).hostname == "apply.workable.com"
+            if known_left and known_right and canonical_url_fingerprint(candidate.application_url) != application_fingerprint:
+                continue
             score = 0
             if candidate.application_url_fingerprint == application_fingerprint:
                 score = max(score, 300)
@@ -389,22 +406,7 @@ class CanonicalJobService:
                 exact_fingerprint is not None
                 and candidate.company_title_location_fingerprint == exact_fingerprint
             ):
-                # Distinct direct ATS requisitions must not merge on generic titles.
-                from backend.app.ingestion.source_detection import detect_source
-
-                try:
-                    left = detect_source(candidate.application_url, "Identity")
-                    right = detect_source(incoming_url, "Identity") if incoming_url else None
-                except ValueError:
-                    left = right = None
-                distinct = (
-                    left
-                    and right
-                    and canonical_url_fingerprint(candidate.application_url)
-                    != application_fingerprint
-                )
-                if not distinct:
-                    score = max(score, 100)
+                score = max(score, 100)
             if score:
                 scores[candidate.canonical_job_id] = max(
                     score, scores.get(candidate.canonical_job_id, 0)

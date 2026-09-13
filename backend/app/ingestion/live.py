@@ -71,6 +71,8 @@ LIVE_SOURCE_FAMILIES = (
     "recruitee",
     "personio",
     "jsonld",
+    "workable",
+    "teamtailor",
 )
 
 
@@ -158,7 +160,16 @@ class LiveJobSourceConfig(StrictBaseModel):
 
     key: str
     family: Literal[
-        "greenhouse", "lever", "ashby", "smartrecruiters", "rss", "recruitee", "personio", "jsonld"
+        "greenhouse",
+        "lever",
+        "ashby",
+        "smartrecruiters",
+        "rss",
+        "recruitee",
+        "personio",
+        "jsonld",
+        "workable",
+        "teamtailor",
     ]
     company: str
     role: str = "Unspecified"
@@ -242,6 +253,8 @@ class LiveJobSourceConfig(StrictBaseModel):
             "recruitee": self.public_board_url,
             "personio": self.public_board_url,
             "jsonld": self.public_board_url,
+            "workable": self.public_board_url,
+            "teamtailor": self.public_board_url,
         }
         required = identifiers[self.family]
         if required is None:
@@ -252,14 +265,12 @@ class LiveJobSourceConfig(StrictBaseModel):
             if name != self.family
             and value is not None
             and not (
-                name in {"recruitee", "personio", "jsonld"}
-                and self.family in {"recruitee", "personio", "jsonld"}
+                name in {"recruitee", "personio", "jsonld", "workable", "teamtailor"}
+                and self.family in {"recruitee", "personio", "jsonld", "workable", "teamtailor"}
             )
         ]
         if unexpected:
-            raise ValueError(
-                "source configuration contains another family's board identifier"
-            )
+            raise ValueError("source configuration contains another family's board identifier")
         if self.public_board_url and self.family in {"recruitee", "personio"}:
             host = urlsplit(self.public_board_url).hostname or ""
             suffixes = (
@@ -271,6 +282,19 @@ class LiveJobSourceConfig(StrictBaseModel):
                 host.endswith(suffix) and "." not in host[: -len(suffix)] for suffix in suffixes
             ):
                 raise ValueError("Invalid provider board hostname")
+        if self.family == "workable":
+            parsed = urlsplit(self.public_board_url)
+            account = parsed.path.strip("/")
+            if (
+                parsed.hostname != "apply.workable.com"
+                or not _BOARD_IDENTIFIER.fullmatch(account)
+                or account in {"j", "api"}
+            ):
+                raise ValueError("Workable requires a canonical account URL")
+        if self.family == "teamtailor":
+            parsed = urlsplit(self.public_board_url)
+            if parsed.path not in {"", "/"} or parsed.query:
+                raise ValueError("Teamtailor requires a career-site root URL")
         if self.family != "lever" and self.region != "global":
             raise ValueError("only Lever supports the eu region setting")
         if self.family != "rss" and self.allowed_job_hosts:
@@ -412,6 +436,12 @@ def _timestamp(record: dict[str, object], field: str) -> datetime | None:
 def _feed_timestamp(value: str | None, field: str) -> datetime | None:
     if value is None:
         return None
+    if not isinstance(value, str):
+        raise LiveSourceRecordError(f"{field} must be a timestamp")
+    if re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+        return None  # A calendar date alone does not establish a publication instant.
+    if re.fullmatch(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} UTC", value):
+        value = value[:-4].replace(" ", "T") + "+00:00"
     try:
         return _timestamp_value(value, field)
     except LiveSourceRecordError:
@@ -481,7 +511,7 @@ def _deduplicated_locations(values: list[str]) -> tuple[str, ...]:
 
 
 def _work_mode(value: str | None) -> str:
-    if value is None:
+    if not isinstance(value, str):
         return "UNSPECIFIED"
     normalized = re.sub(r"[\s_-]+", "", value).casefold()
     return {
@@ -492,7 +522,7 @@ def _work_mode(value: str | None) -> str:
 
 
 def _employment_type(value: str | None) -> str:
-    if value is None:
+    if not isinstance(value, str):
         return "UNSPECIFIED"
     normalized = re.sub(r"[\s_-]+", "", value).casefold()
     return {
@@ -504,6 +534,13 @@ def _employment_type(value: str | None) -> str:
         "contract": "CONTRACT",
         "newgrad": "NEW_GRAD",
         "newgraduate": "NEW_GRAD",
+        "studentintern": "INTERNSHIP",
+        "summerintern": "INTERNSHIP",
+        "softwareintern": "INTERNSHIP",
+        "cooperativeeducation": "CO_OP",
+        "universitygraduate": "NEW_GRAD",
+        "graduateprogram": "NEW_GRAD",
+        "temporary": "TEMPORARY",
     }.get(normalized, "UNSPECIFIED")
 
 
@@ -632,10 +669,14 @@ class LiveSourceAdapter:
                 status_code=self._last_http_status,
             ) from exc
 
-    def _get_xml(self, url: str) -> ElementTree.Element:
+    def _get_xml(
+        self, url: str, *, params=None, track_response_metadata=True
+    ) -> ElementTree.Element:
         content = self._get_response_content(
             url,
             accept="application/rss+xml, application/atom+xml, application/xml, text/xml",
+            params=params,
+            track_response_metadata=track_response_metadata,
         )
         if b"<!DOCTYPE" in content.upper() or b"<!ENTITY" in content.upper():
             raise LiveSourceFetchError(
@@ -1213,6 +1254,7 @@ def create_live_adapter(
 ) -> LiveSourceAdapter:
     """Build one configured public adapter without network activity."""
 
+    from backend.app.ingestion.coverage_providers import TeamtailorAdapter, WorkableAdapter
     from backend.app.ingestion.structured import JsonLdAdapter, PersonioAdapter, RecruiteeAdapter
 
     adapters: dict[str, type[LiveSourceAdapter]] = {
@@ -1224,6 +1266,8 @@ def create_live_adapter(
         "recruitee": RecruiteeAdapter,
         "personio": PersonioAdapter,
         "jsonld": JsonLdAdapter,
+        "workable": WorkableAdapter,
+        "teamtailor": TeamtailorAdapter,
     }
     return adapters[config.family](config, timeout_seconds=timeout_seconds, client=client)
 

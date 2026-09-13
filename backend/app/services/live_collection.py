@@ -37,6 +37,8 @@ DEFAULT_POLL_INTERVAL_SECONDS = {
     "recruitee": 900,
     "personio": 1800,
     "jsonld": 3600,
+    "workable": 1800,
+    "teamtailor": 1800,
 }
 INITIAL_BACKOFF_SECONDS = 60
 MAX_RETRY_AFTER_SECONDS = 86_400

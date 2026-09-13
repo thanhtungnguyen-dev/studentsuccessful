@@ -161,7 +161,7 @@ class LiveSourceState(Base):
             name="ck_live_source_state_key_safe",
         ),
         CheckConstraint(
-            "source_family IN ('greenhouse', 'lever', 'ashby', 'smartrecruiters', 'rss', 'recruitee', 'personio', 'jsonld')",
+            "source_family IN ('greenhouse', 'lever', 'ashby', 'smartrecruiters', 'rss', 'recruitee', 'personio', 'jsonld', 'workable', 'teamtailor')",
             name="ck_live_source_state_family",
         ),
         CheckConstraint(

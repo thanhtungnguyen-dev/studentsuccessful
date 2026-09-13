@@ -62,8 +62,24 @@ class RecruiteeAdapter(LiveSourceAdapter):
             description=_html_description(row, "description"),
             locations=tuple(values),
             posted_at=_feed_timestamp(row.get("published_at"), "published_at"),
-            employment_type=_employment_type(row.get("employment_type")),
-            work_mode=_work_mode(row.get("workplace_type")),
+            employment_type=_employment_type(
+                row.get("employment_type") or row.get("employment_type_code")
+            ),
+            source_updated_at=_feed_timestamp(row.get("updated_at"), "updated_at"),
+            work_mode=_work_mode(row.get("workplace_type"))
+            if row.get("workplace_type")
+            else next(
+                (
+                    mode
+                    for key, mode in (
+                        ("remote", "REMOTE"),
+                        ("hybrid", "HYBRID"),
+                        ("on_site", "ON_SITE"),
+                    )
+                    if row.get(key) is True
+                ),
+                "UNSPECIFIED",
+            ),
         )
 
 

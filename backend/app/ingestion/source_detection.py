@@ -18,8 +18,12 @@ def source_identity(config: LiveJobSourceConfig) -> str:
         "recruitee": config.public_board_url,
         "personio": config.public_board_url,
         "jsonld": config.public_board_url,
+        "workable": config.public_board_url,
+        "teamtailor": config.public_board_url,
     }[config.family]
-    if config.family in {"recruitee", "personio"}:
+    if config.family == "workable":
+        return urlsplit(value).path.strip("/").lower()
+    if config.family in {"recruitee", "personio", "teamtailor"}:
         return urlsplit(value).hostname.lower()
     if config.family in {"rss", "jsonld"}:
         p = urlsplit(value)
@@ -52,8 +56,8 @@ def detect_source(url: str, company: str) -> LiveJobSourceConfig | None:
         host == "api.ashbyhq.com" and len(parts) >= 3 and parts[:2] == ["posting-api", "job-board"]
     ):
         family, field, value = "ashby", "job_board", parts[2]
-    elif host == "api.smartrecruiters.com" and len(parts) >= 2 and parts[0] == "v1":
-        return None
+    elif host == "api.smartrecruiters.com" and len(parts) >= 3 and parts[:2] == ["v1", "companies"]:
+        family, field, value = "smartrecruiters", "company_identifier", parts[2]
     elif host == "api.smartrecruiters.com" and len(parts) >= 2 and parts[0] == "companies":
         family, field, value = "smartrecruiters", "company_identifier", parts[1]
     elif host == "jobs.ashbyhq.com" and parts:
@@ -64,6 +68,45 @@ def detect_source(url: str, company: str) -> LiveJobSourceConfig | None:
         family, field, value = "recruitee", "public_board_url", f"https://{host}"
     elif re.fullmatch(r"[a-z0-9-]+\.jobs\.personio\.(de|com)", host):
         family, field, value = "personio", "public_board_url", f"https://{host}"
+    elif (
+        host == "apply.workable.com"
+        and len(parts) == 5
+        and parts[:4] == ["api", "v1", "widget", "accounts"]
+    ):
+        family, field, value = (
+            "workable",
+            "public_board_url",
+            f"https://apply.workable.com/{parts[4]}",
+        )
+    elif host == "apply.workable.com" and parts and parts[0] not in {"j", "api"}:
+        family, field, value = (
+            "workable",
+            "public_board_url",
+            f"https://apply.workable.com/{parts[0]}",
+        )
+    elif host == "www.workable.com" and len(parts) == 3 and parts[:2] == ["api", "accounts"]:
+        family, field, value = (
+            "workable",
+            "public_board_url",
+            f"https://apply.workable.com/{parts[2]}",
+        )
+    elif re.fullmatch(r"[a-z0-9-]+\.workable\.com", host) and host.split(".")[0] not in {
+        "www",
+        "apply",
+        "help",
+    }:
+        family, field, value = (
+            "workable",
+            "public_board_url",
+            f"https://apply.workable.com/{host.split('.')[0]}",
+        )
+    elif re.fullmatch(r"[a-z0-9-]+\.teamtailor\.com", host) and host.split(".")[0] not in {
+        "app",
+        "support",
+        "api",
+        "www",
+    }:
+        family, field, value = "teamtailor", "public_board_url", f"https://{host}"
     if not family:
         return None
     config = LiveJobSourceConfig(
@@ -73,6 +116,48 @@ def detect_source(url: str, company: str) -> LiveJobSourceConfig | None:
         region=region,
         max_postings=50,
         **{field: value},
+    )
+    key = (
+        "discovered-"
+        + hashlib.sha256((family + ":" + source_identity(config)).encode()).hexdigest()[:32]
+    )
+    return config.model_copy(update={"key": key})
+
+
+def detect_content(url: str, company: str, content: str):
+    """Recognize structured evidence, never guess a provider from arbitrary page text."""
+    import xml.etree.ElementTree as ET
+
+    from backend.app.ingestion.structured import jsonld_jobs
+
+    config = detect_source(url, company)
+    if config:
+        return config
+    family = None
+    if jsonld_jobs(content):
+        family = "jsonld"
+    elif "<!DOCTYPE" not in content.upper() and "<!ENTITY" not in content.upper():
+        try:
+            root = ET.fromstring(content)
+            if root.tag in {"rss", "{http://www.w3.org/2005/Atom}feed"}:
+                family = "rss"
+                if any(
+                    node.tag.startswith("{https://teamtailor.com/locations}")
+                    for node in root.iter()
+                ):
+                    family = "teamtailor"
+        except (ET.ParseError, ValueError):
+            pass
+    if not family:
+        return None
+    p = urlsplit(url)
+    value = f"https://{p.netloc}" if family == "teamtailor" else url
+    config = LiveJobSourceConfig(
+        key="candidate",
+        family=family,
+        company=company,
+        max_postings=50,
+        **{"feed_url" if family == "rss" else "public_board_url": value},
     )
     key = (
         "discovered-"

@@ -1,0 +1,209 @@
+{
+  "version": "coverage-v2",
+  "sources": [
+    {
+      "company": "Workable",
+      "url": "https://www.workable.com/api/accounts/workable?details=true",
+      "category": "hr technology",
+      "provider": "workable",
+      "fixture": "fixtures/workable.json"
+    },
+    {
+      "company": "Hugging Face",
+      "url": "https://www.workable.com/api/accounts/huggingface?details=true",
+      "category": "AI/ML",
+      "provider": "workable",
+      "fixture": "fixtures/huggingface.json"
+    },
+    {
+      "company": "Blueground",
+      "url": "https://www.workable.com/api/accounts/blueground?details=true",
+      "category": "startup",
+      "provider": "workable",
+      "fixture": "fixtures/blueground.json"
+    },
+    {
+      "company": "Teamtailor",
+      "url": "https://career.teamtailor.com/jobs.rss",
+      "category": "hr technology",
+      "provider": "teamtailor",
+      "fixture": "fixtures/teamtailor.json"
+    },
+    {
+      "company": "NVIDIA",
+      "url": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite",
+      "category": "semiconductors",
+      "provider": "workday",
+      "fixture": "fixtures/workday.json"
+    },
+    {
+      "company": "Cloudflare",
+      "url": "https://boards.greenhouse.io/cloudflare",
+      "category": "cloud/infrastructure",
+      "provider": "greenhouse"
+    },
+    {
+      "company": "Stripe",
+      "url": "https://boards.greenhouse.io/stripe",
+      "category": "fintech",
+      "provider": "greenhouse"
+    },
+    {
+      "company": "Databricks",
+      "url": "https://boards.greenhouse.io/databricks",
+      "category": "AI/ML",
+      "provider": "greenhouse"
+    },
+    {
+      "company": "Figma",
+      "url": "https://boards.greenhouse.io/figma",
+      "category": "technology",
+      "provider": "greenhouse"
+    },
+    {
+      "company": "MongoDB",
+      "url": "https://boards.greenhouse.io/mongodb",
+      "category": "cloud/infrastructure",
+      "provider": "greenhouse"
+    },
+    {
+      "company": "Roblox",
+      "url": "https://boards.greenhouse.io/roblox",
+      "category": "technology",
+      "provider": "greenhouse"
+    },
+    {
+      "company": "Aurora",
+      "url": "https://boards.greenhouse.io/aurorainnovation",
+      "category": "autonomous systems",
+      "provider": "greenhouse"
+    },
+    {
+      "company": "Tenstorrent",
+      "url": "https://boards.greenhouse.io/tenstorrent",
+      "category": "semiconductors",
+      "provider": "greenhouse"
+    },
+    {
+      "company": "Coinbase",
+      "url": "https://boards.greenhouse.io/coinbase",
+      "category": "fintech",
+      "provider": "greenhouse"
+    },
+    {
+      "company": "Wealthsimple",
+      "url": "https://jobs.lever.co/wealthsimple",
+      "category": "Canadian fintech",
+      "provider": "lever"
+    },
+    {
+      "company": "StackAdapt",
+      "url": "https://jobs.lever.co/stackadapt",
+      "category": "Canadian tech",
+      "provider": "lever"
+    },
+    {
+      "company": "Palantir",
+      "url": "https://jobs.lever.co/palantir",
+      "category": "AI/ML",
+      "provider": "lever"
+    },
+    {
+      "company": "Zoox",
+      "url": "https://jobs.lever.co/zoox",
+      "category": "robotics",
+      "provider": "lever"
+    },
+    {
+      "company": "OpenAI",
+      "url": "https://jobs.ashbyhq.com/openai",
+      "category": "AI/ML",
+      "provider": "ashby"
+    },
+    {
+      "company": "Anthropic",
+      "url": "https://jobs.ashbyhq.com/anthropic",
+      "category": "AI/ML",
+      "provider": "ashby"
+    },
+    {
+      "company": "Cohere",
+      "url": "https://jobs.ashbyhq.com/cohere",
+      "category": "Canadian AI/ML",
+      "provider": "ashby"
+    },
+    {
+      "company": "Ramp",
+      "url": "https://jobs.ashbyhq.com/ramp",
+      "category": "fintech",
+      "provider": "ashby"
+    },
+    {
+      "company": "Linear",
+      "url": "https://jobs.ashbyhq.com/linear",
+      "category": "startup",
+      "provider": "ashby"
+    },
+    {
+      "company": "Bosch",
+      "url": "https://jobs.smartrecruiters.com/BoschGroup",
+      "category": "large technology",
+      "provider": "smartrecruiters"
+    },
+    {
+      "company": "Visa",
+      "url": "https://jobs.smartrecruiters.com/Visa",
+      "category": "large technology",
+      "provider": "smartrecruiters"
+    },
+    {
+      "company": "Ubisoft",
+      "url": "https://jobs.smartrecruiters.com/Ubisoft2",
+      "category": "large technology",
+      "provider": "smartrecruiters"
+    },
+    {
+      "company": "bunq",
+      "url": "https://bunq.recruitee.com",
+      "category": "startup",
+      "provider": "recruitee",
+      "fixture": "fixtures/bunq.json"
+    },
+    {
+      "company": "n8n",
+      "url": "https://n8n.recruitee.com",
+      "category": "startup",
+      "provider": "recruitee"
+    },
+    {
+      "company": "DeepL",
+      "url": "https://deepl.jobs.personio.de",
+      "category": "technology",
+      "provider": "personio"
+    },
+    {
+      "company": "Personio",
+      "url": "https://personio.jobs.personio.de",
+      "category": "technology",
+      "provider": "personio"
+    },
+    {
+      "company": "Python Jobs (publisher)",
+      "url": "https://www.python.org/jobs/feed/rss/",
+      "category": "community job board",
+      "provider": "rss"
+    },
+    {
+      "company": "AMD",
+      "url": "https://amd.wd1.myworkdayjobs.com/External",
+      "category": "semiconductors",
+      "provider": "workday"
+    },
+    {
+      "company": "Kry",
+      "url": "https://career.kry.se/jobs.rss",
+      "category": "health technology",
+      "provider": "teamtailor"
+    }
+  ]
+}

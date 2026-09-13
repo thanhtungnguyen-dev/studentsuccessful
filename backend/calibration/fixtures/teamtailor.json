@@ -1,0 +1,11 @@
+{
+  "provenance": "Structural extract of public probe; descriptions omitted; counts are fixture-only.",
+  "responses": [
+    {
+      "url": "https://career.teamtailor.com/jobs.rss",
+      "status": 200,
+      "content_type": "application/rss+xml; charset=utf-8",
+      "content": "<rss xmlns:ns0=\"https://teamtailor.com/locations\" version=\"2.0\">\n  <channel>\n    <title>Teamtailor</title>\n    <description>Current job openings</description>\n    <link>https://career.teamtailor.com/jobs</link>\n    <item>\n      <title>Account Executive - UK Enterprise</title>\n      <description>Public description omitted in structural fixture.</description>\n      <pubDate>Mon, 06 Jul 2026 08:58:57 +0200</pubDate>\n      <link>https://career.teamtailor.com/jobs/8021334-account-executive-uk-enterprise</link>\n      <remoteStatus>hybrid</remoteStatus>\n      <guid>a79a10f6-9f69-49b0-9f6d-8bed3d6e3a4f</guid>\n      <ns0:locations>\n        <ns0:location>\n          <ns0:name>London</ns0:name>\n          <ns0:address>16 Laystall Court</ns0:address>\n          <ns0:zip>EC1R 4</ns0:zip>\n          <ns0:city>London</ns0:city>\n          <ns0:country>United Kingdom</ns0:country>\n        </ns0:location>\n      </ns0:locations>\n      <ns0:department>Sales</ns0:department>\n      <ns0:role>Account Executive</ns0:role>\n      <ns0:division />\n    </item>\n    <item>\n      <title>Mid-Market Account Executive (Outbound) - Madrid</title>\n      <description>Public description omitted in structural fixture.</description>\n      <pubDate>Thu, 23 Apr 2026 12:41:59 +0200</pubDate>\n      <link>https://career.teamtailor.com/jobs/7623275-mid-market-account-executive-outbound-madrid</link>\n      <remoteStatus>hybrid</remoteStatus>\n      <guid>fb63bcb7-fcdf-4f35-ba55-b800505f8294</guid>\n      <ns0:locations>\n        <ns0:location>\n          <ns0:name>Madrid</ns0:name>\n          <ns0:address>Monday Chamberi</ns0:address>\n          <ns0:zip>28010</ns0:zip>\n          <ns0:city>Madrid</ns0:city>\n          <ns0:country>Spain</ns0:country>\n        </ns0:location>\n      </ns0:locations>\n      <ns0:department>Sales</ns0:department>\n      <ns0:role>Account Executive</ns0:role>\n      <ns0:division />\n    </item>\n    </channel>\n</rss>"
+    }
+  ]
+}

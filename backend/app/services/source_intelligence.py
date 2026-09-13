@@ -160,37 +160,9 @@ def process_discovery(
                 if response.status_code == 429 or response.status_code >= 500:
                     raise ValueError("Temporary discovery failure")
                 if response.status_code == 200:
-                    config = detect_source(str(response.url), company)
-                    if config is None:
-                        import xml.etree.ElementTree as ET
+                    from backend.app.ingestion.source_detection import detect_content
 
-                        from backend.app.ingestion.structured import jsonld_jobs
-
-                        family = None
-                        if jsonld_jobs(response.text):
-                            family = "jsonld"
-                        elif (
-                            b"<!DOCTYPE" not in response.content.upper()
-                            and b"<!ENTITY" not in response.content.upper()
-                        ):
-                            try:
-                                root = ET.fromstring(response.content)
-                                if root.tag in {"rss", "{http://www.w3.org/2005/Atom}feed"}:
-                                    family = "rss"
-                            except ET.ParseError:
-                                pass
-                        if family:
-                            config = LiveJobSourceConfig(
-                                key="discovered-" + key[:32],
-                                family=family,
-                                company=company,
-                                max_postings=50,
-                                **{
-                                    "feed_url" if family == "rss" else "public_board_url": str(
-                                        response.url
-                                    )
-                                },
-                            )
+                    config = detect_content(str(response.url), company, response.text)
             if config:
                 with uow_factory() as uow:
                     known = uow.session.scalar(
