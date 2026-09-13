@@ -1,0 +1,66 @@
+import { test, expect } from "@playwright/test";
+import { randomUUID } from "node:crypto";
+
+test("real registration, refresh, shared tabs, CSRF logout, and login", async ({ page, context }) => {
+  const email = `r5-${randomUUID()}@example.com`;
+  const password = "Example-browser-password-1";
+  await page.goto("/");
+  await expect(page.getByRole("link", { name: "Register", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Login", exact: true })).toBeVisible();
+  await page.screenshot({ path: test.info().outputPath("signed-out.png") });
+  await page.getByRole("link", { name: "Register", exact: true }).click();
+  await page.getByLabel("Email", { exact: true }).fill(email);
+  await page.getByLabel("Password", { exact: true }).fill(password);
+  await page.getByLabel("Confirm password").fill("mismatch");
+  await page.getByRole("button", { name: "Register", exact: true }).click();
+  await expect(page.getByRole("main").getByRole("alert")).toHaveText("Passwords do not match.");
+  await page.getByLabel("Confirm password").fill(password);
+  await page.getByRole("button", { name: "Register", exact: true }).click();
+  await expect(page).toHaveURL("http://localhost:3000/onboarding/review");
+  await page.getByRole("button", { name: "Complete onboarding", exact: true }).click();
+  await expect(page).toHaveURL("http://localhost:3000/");
+  await expect(page.getByText(`Signed in as ${email}`)).toBeVisible();
+  // Browser automation may inspect HttpOnly metadata; application JS never reads it.
+  const cookies = await context.cookies();
+  const session = cookies.find((cookie) => cookie.name === "ss_session")!;
+  expect(Boolean(session?.httpOnly)).toBe(true);
+  expect(cookies.some((cookie) => cookie.name === "ss_csrf" && !cookie.httpOnly)).toBe(true);
+  await page.reload();
+  await expect(page.getByText(`Signed in as ${email}`)).toBeVisible();
+  const second = await context.newPage();
+  await second.goto("/");
+  await expect(second.getByText(`Signed in as ${email}`)).toBeVisible();
+  await page.bringToFront();
+  const logoutRequest = page.waitForRequest((request) => request.url().endsWith("/api/v1/auth/logout") && request.method() === "POST");
+  await page.getByRole("button", { name: "Logout", exact: true }).click();
+  const request = await logoutRequest;
+  const csrf = cookies.find((cookie) => cookie.name === "ss_csrf")!;
+  expect(request.headers()["x-csrf-token"] === csrf.value).toBe(true);
+  await expect(page.getByRole("link", { name: "Login", exact: true })).toBeVisible();
+  await second.reload();
+  await expect(second.getByRole("link", { name: "Login", exact: true })).toBeVisible();
+  await expect(second.getByText(`Signed in as ${email}`)).not.toBeVisible();
+  // A cleared browser cookie alone is insufficient: the old session must be revoked server-side.
+  const replay = await context.request.get("/api/v1/auth/me", { headers: { Cookie: `ss_session=${session.value}` } });
+  expect(replay.status()).toBe(401);
+  await page.bringToFront();
+  await page.getByRole("link", { name: "Login", exact: true }).click();
+  await page.getByLabel("Email", { exact: true }).fill(email);
+  await page.getByLabel("Password", { exact: true }).fill("wrong-password");
+  await page.getByRole("button", { name: "Login", exact: true }).click();
+  await expect(page.getByRole("main").getByRole("alert")).toHaveText("Invalid email or password.");
+  await page.getByLabel("Password", { exact: true }).fill(password);
+  await page.getByRole("button", { name: "Login", exact: true }).click();
+  await expect(page).toHaveURL("http://localhost:3000/");
+  await expect(page.getByText(`Signed in as ${email}`)).toBeVisible();
+  // The real backend duplicate-registration response is presented safely.
+  await page.screenshot({ path: test.info().outputPath("signed-in.png") });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({ path: test.info().outputPath("signed-in-mobile.png") });
+  await page.goto("/register");
+  await page.getByLabel("Email", { exact: true }).fill(email);
+  await page.getByLabel("Password", { exact: true }).fill(password);
+  await page.getByLabel("Confirm password").fill(password);
+  await page.getByRole("button", { name: "Register", exact: true }).click();
+  await expect(page.getByRole("main").getByRole("alert")).toHaveText("An account with this email already exists. Please log in.");
+});

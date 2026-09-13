@@ -1,0 +1,17 @@
+{
+  "name": "studentsuccessful",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "python3 -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 & npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "start": "python3 -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 & npm --prefix frontend run start",
+    "lint": "npm --prefix frontend run type-check",
+    "test": "npm --prefix frontend run test",
+    "generate:api": "./scripts/generate-api-client.sh"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.13.0"
+  }
+}

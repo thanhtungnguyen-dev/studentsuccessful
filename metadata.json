@@ -1,0 +1,6 @@
+{
+  "name": "StudentSuccessful",
+  "description": "Maintainable Career & Internship Platform for Students with structured profiling, resume parsing, explainable matching, and application tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

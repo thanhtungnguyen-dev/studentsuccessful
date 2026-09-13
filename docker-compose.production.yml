@@ -1,0 +1,112 @@
+# Production deployment shape: managed PostgreSQL and private S3-compatible
+# storage are supplied by the platform secret store. HTTPS terminates at the
+# managed ingress/reverse proxy in front of the frontend service.
+x-backend: &backend
+  image: ${IMAGE_PREFIX:-studentsuccessful}-backend:${IMAGE_TAG:-phase25}
+  build:
+    context: .
+    dockerfile: backend/Dockerfile
+  environment:
+    APP_ENV: production
+    DEBUG: "false"
+    DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
+    DATABASE_POOL_SIZE: ${DATABASE_POOL_SIZE:-5}
+    DATABASE_MAX_OVERFLOW: ${DATABASE_MAX_OVERFLOW:-5}
+    DATABASE_POOL_TIMEOUT_SECONDS: ${DATABASE_POOL_TIMEOUT_SECONDS:-30}
+    DATABASE_POOL_RECYCLE_SECONDS: ${DATABASE_POOL_RECYCLE_SECONDS:-1800}
+    DATABASE_CONNECT_TIMEOUT_SECONDS: ${DATABASE_CONNECT_TIMEOUT_SECONDS:-10}
+    FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:?FRONTEND_ORIGIN is required}
+    SESSION_COOKIE_NAME: __Host-ss_session
+    SESSION_COOKIE_SECURE: "true"
+    STORAGE_BACKEND: s3
+    STORAGE_S3_BUCKET: ${STORAGE_S3_BUCKET:?STORAGE_S3_BUCKET is required}
+    STORAGE_S3_REGION: ${STORAGE_S3_REGION:?STORAGE_S3_REGION is required}
+    STORAGE_S3_ENDPOINT_URL: ${STORAGE_S3_ENDPOINT_URL:-}
+    STORAGE_S3_PREFIX: ${STORAGE_S3_PREFIX:-resumes}
+    # Static credentials are optional when the deployment platform supplies a
+    # workload identity through its normal AWS credential provider chain.
+    AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+    AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+    AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
+    LIVE_JOB_SOURCES_JSON: ${LIVE_JOB_SOURCES_JSON:-[]}
+    LIVE_JOB_HTTP_TIMEOUT_SECONDS: ${LIVE_JOB_HTTP_TIMEOUT_SECONDS:-10}
+    LIVE_COLLECTOR_CONCURRENCY: ${LIVE_COLLECTOR_CONCURRENCY:-3}
+    LIVE_COLLECTOR_MAX_BACKOFF_SECONDS: ${LIVE_COLLECTOR_MAX_BACKOFF_SECONDS:-3600}
+    WORKER_LEASE_SECONDS: ${WORKER_LEASE_SECONDS:-120}
+    WORKER_HEARTBEAT_STALE_SECONDS: ${WORKER_HEARTBEAT_STALE_SECONDS:-180}
+    JOB_NEW_WINDOW_HOURS: ${JOB_NEW_WINDOW_HOURS:-72}
+    JOB_CLOSE_AFTER_SUCCESSFUL_ABSENCES: ${JOB_CLOSE_AFTER_SUCCESSFUL_ABSENCES:-2}
+
+services:
+  migrate:
+    <<: *backend
+    command: ["python", "-m", "alembic", "-c", "backend/alembic.ini", "upgrade", "head"]
+    restart: "no"
+
+  backend:
+    <<: *backend
+    command: ["python", "-m", "uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    restart: unless-stopped
+    stop_grace_period: 30s
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=4)"]
+      interval: 15s
+      timeout: 5s
+      start_period: 20s
+      retries: 10
+
+  collector:
+    <<: *backend
+    command: ["python", "-m", "backend.app.commands.collect_live", "run"]
+    restart: unless-stopped
+    stop_grace_period: 30s
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-m", "backend.app.commands.worker_health", "collector"]
+      interval: 15s
+      timeout: 5s
+      start_period: 30s
+      retries: 10
+
+  alert-worker:
+    <<: *backend
+    command: ["python", "-m", "backend.app.commands.process_job_alerts", "run"]
+    restart: unless-stopped
+    stop_grace_period: 30s
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-m", "backend.app.commands.worker_health", "alert-worker"]
+      interval: 15s
+      timeout: 5s
+      start_period: 30s
+      retries: 10
+
+  frontend:
+    image: ${IMAGE_PREFIX:-studentsuccessful}-frontend:${IMAGE_TAG:-phase25}
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        BACKEND_INTERNAL_URL: http://backend:8000
+    environment:
+      BACKEND_INTERNAL_URL: http://backend:8000
+    ports:
+      - "127.0.0.1:3000:3000"
+    restart: unless-stopped
+    stop_grace_period: 15s
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      start_period: 20s
+      retries: 10

@@ -1,0 +1,121 @@
+x-postgres-env: &postgres-env
+  POSTGRES_USER: ${POSTGRES_USER:-postgres}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+  POSTGRES_DB: ${POSTGRES_DB:-studentsuccessful}
+
+x-backend: &backend
+  image: ${COMPOSE_PROJECT_NAME:-studentsuccessful}-backend:local
+  build:
+    context: .
+    dockerfile: backend/Dockerfile
+  environment:
+    <<: *postgres-env
+    APP_ENV: development
+    FRONTEND_ORIGIN: http://localhost:3000
+    SESSION_COOKIE_SECURE: "false"
+    STORAGE_BACKEND: local
+    STORAGE_LOCAL_ROOT: /data/resumes
+    LIVE_JOB_SOURCES_JSON: "${LIVE_JOB_SOURCES_JSON:-[]}"
+    LIVE_JOB_HTTP_TIMEOUT_SECONDS: "${LIVE_JOB_HTTP_TIMEOUT_SECONDS:-10}"
+    LIVE_COLLECTOR_CONCURRENCY: "${LIVE_COLLECTOR_CONCURRENCY:-3}"
+    LIVE_COLLECTOR_MAX_BACKOFF_SECONDS: "${LIVE_COLLECTOR_MAX_BACKOFF_SECONDS:-3600}"
+    JOB_NEW_WINDOW_HOURS: "${JOB_NEW_WINDOW_HOURS:-72}"
+    JOB_CLOSE_AFTER_SUCCESSFUL_ABSENCES: "${JOB_CLOSE_AFTER_SUCCESSFUL_ABSENCES:-2}"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment: *postgres-env
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  migrate:
+    <<: *backend
+    command: ["python", "-m", "alembic", "-c", "backend/alembic.ini", "upgrade", "head"]
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  backend:
+    <<: *backend
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - backend_resumes:/data/resumes
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=4)"]
+      interval: 5s
+      timeout: 5s
+      start_period: 10s
+      retries: 20
+
+  collector:
+    <<: *backend
+    command: ["python", "-m", "backend.app.commands.collect_live", "run"]
+    restart: unless-stopped
+    stop_grace_period: 30s
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-m", "backend.docker_entrypoint", "python", "-m", "backend.app.commands.worker_health", "collector"]
+      interval: 15s
+      timeout: 5s
+      start_period: 30s
+      retries: 10
+
+  alert-worker:
+    <<: *backend
+    command: ["python", "-m", "backend.app.commands.process_job_alerts", "run"]
+    restart: unless-stopped
+    stop_grace_period: 30s
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-m", "backend.docker_entrypoint", "python", "-m", "backend.app.commands.worker_health", "alert-worker"]
+      interval: 15s
+      timeout: 5s
+      start_period: 30s
+      retries: 10
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        BACKEND_INTERNAL_URL: http://backend:8000
+    environment:
+      BACKEND_INTERNAL_URL: http://backend:8000
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      start_period: 10s
+      retries: 20
+
+volumes:
+  postgres_data:
+  backend_resumes:
