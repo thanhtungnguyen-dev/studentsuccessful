@@ -322,3 +322,34 @@ separate. Greenhouse hostname variants and Lever/Ashby application suffixes shar
 identity. Aggregator absence never supplies closure evidence; secondary positives
 cannot reopen officially closed/absent jobs. Existing official reconciliation
 thresholds still apply. No schema changes or automatic production imports.
+
+
+## Canada/US technical ingestion scope
+
+Official ingestion, structured aggregator imports and discovery enqueueing use
+one deterministic `job_scope` classifier before catalog/per-record writes. A
+posting needs explicit Canada, US or Remote North America location evidence and
+technical role/title evidence. Unknown/worldwide-only locations are excluded;
+company headquarters never imply posting geography. Global boards remain valid.
+Multi-location postings qualify if at least one explicit location qualifies.
+
+Internship/co-op priority is VERY_HIGH; new-grad/entry/student is HIGH; general
+technical work is NORMAL; senior/staff/principal, part-time and contract is LOWER.
+Priority never rejects an otherwise valid technical posting. Existing employment
+and career-level fields retain these facts for ranking consumers; the current
+newest/oldest/title feed ordering is unchanged. No new recommendation system.
+
+`ingest_live` prints per-run `scope_filtered`, CA/US/North-America counts. The
+source report includes persisted registry counts by provider. Scope counts are
+not persisted. Existing content hashes use accepted records only; intentional
+scope drops do not count as malformed/provider-filtered records or block complete
+listing reconciliation. Partial listings, parser failures, ETags, leases, cursors,
+backoff and concurrency retain existing safeguards. Source-level fetch evidence
+and descriptions remain stored under existing limits. No pruning or migration.
+
+Existing global canonical data is not deleted or rewritten. Saved jobs and
+application references remain intact. The default feed is not retroactively
+filtered in SQL; future clean complete source refreshes use in-scope absence IDs.
+The corpus adds only evidenced supported-provider boards from the existing public
+internship/new-grad corpora. Evidence geography is not a live availability claim.
+Workday remains unsupported; public Workday reverse engineering is deferred.

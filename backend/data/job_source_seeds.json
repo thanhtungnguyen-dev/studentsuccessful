@@ -1,11 +1,59 @@
 [
   {
+    "key": "seed-006c5936bfe9cddd87077959",
+    "company": "BlackEdge Capital",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/blackedgecapital",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
+  },
+  {
     "key": "seed-01c456df784446b49acb2b88",
     "company": "Primer",
     "provider": "ashby",
     "url": "https://jobs.ashbyhq.com/primer",
     "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-027aa748c1223295720b6942",
+    "company": "Ontic",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/Ontic",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-035847d11cd820ef945b7e4b",
+    "company": "Baton",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/batoncorporation",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-0471d3140356d9c53d5c3f01",
+    "company": "Dexmate",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/dexmate",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-0481e5446acbd7ba72573604",
+    "company": "Synergy ECP",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/synergyecp",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-04974909396c36b04fbdc7d9",
+    "company": "Torc Robotics",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/torcrobotics",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
   },
   {
     "key": "seed-04db3593a25a4fb93bf621a7",
@@ -40,6 +88,14 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-091aa837a0404c5b5ae0a7f7",
+    "company": "Credence",
+    "provider": "workable",
+    "url": "https://apply.workable.com/credence",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-0a09a9fbb53f39a0011088cb",
     "company": "National Software Management",
     "provider": "smartrecruiters",
@@ -48,11 +104,51 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-0a6190a4e17e28913732950a",
+    "company": "CoServe Global Solutions",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/CoServeGlobalSolutions",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-0b69c02e52700e0420fe4ff8",
+    "company": "IonQ",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/ionq",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-0c21606b2866bdf18ec253a4",
     "company": "Belvedere Trading",
     "provider": "lever",
     "url": "https://jobs.lever.co/belvederetrading",
     "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README.md",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-0c7da11365ce132141bbfe3e",
+    "company": "PMG",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/pmg",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-0dc600a565b2f41ef643c4d0",
+    "company": "GrayMatter Robotics",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/graymatter-robotics",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-10b47ab6f96b2b525c53c973",
+    "company": "Relativity Space",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/relativity",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
     "geography": "United States"
   },
   {
@@ -64,12 +160,36 @@
     "geography": "United States"
   },
   {
+    "key": "seed-12f8b24fc700ea04b9b92854",
+    "company": "Vestwell",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/vestwell",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-14a0adccbf2aa9e4db226ed9",
     "company": "Hadrian",
     "provider": "ashby",
     "url": "https://jobs.ashbyhq.com/hadrian-automation",
     "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README.md",
     "geography": "United States"
+  },
+  {
+    "key": "seed-14b0915ef80c07778675d1bd",
+    "company": "Oligo Space",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/oligo",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-14d1cd8c89455636940f7cee",
+    "company": "Equitable Bank",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/eqbank",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "Canada"
   },
   {
     "key": "seed-153d2bbe5c4ed96a0b73d895",
@@ -96,6 +216,14 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-16b4bc65d2a3c1905f3fd400",
+    "company": "Maxima",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/maxima",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-17b2ecdecfc0ab822a835b13",
     "company": "Composio",
     "provider": "ashby",
@@ -104,11 +232,51 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-17f44e574b4f240b6bf05791",
+    "company": "Meridian Partners",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/morsecorpcoop",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-19779706cba71f6446969f70",
+    "company": "Feathery",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/feathery",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "Canada"
+  },
+  {
+    "key": "seed-19c1cd9c3145dbe62b0e1261",
+    "company": "Sciemo",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/sciemo",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-1a4da9cdf6d8d560b59750f3",
     "company": "Optiver",
     "provider": "greenhouse",
     "url": "https://boards.greenhouse.io/optiverprivate",
     "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README.md",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-1a97dcdb48f96ea2e21dda23",
+    "company": "Multiply Labs",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/multiplylabs",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-1ae4fb5ce1c777d4f30c51d7",
+    "company": "Diesel Laptops",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/DieselLaptops",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
     "geography": "United States"
   },
   {
@@ -126,6 +294,14 @@
     "url": "https://jobs.lever.co/CesiumAstro",
     "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-1de2d7d594e3b2881db01512",
+    "company": "Geotab",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/geotab",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "Canada"
   },
   {
     "key": "seed-1df0e588290be69d6d964398",
@@ -192,11 +368,35 @@
     "geography": "United States"
   },
   {
+    "key": "seed-20e8337410a44151a2d65e0d",
+    "company": "Spacial AI",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/spacial",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-2129e2172b8cc7be478dfe38",
     "company": "Solidigm",
     "provider": "smartrecruiters",
     "url": "https://jobs.smartrecruiters.com/Solidigm",
     "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README.md",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-225af2c36c0c95c0e35ea739",
+    "company": "Muon Space",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/muonspace",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-23f6187707c5ee95d2845779",
+    "company": "Veeva Systems",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/veeva",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
     "geography": "United States"
   },
   {
@@ -216,6 +416,14 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-255c41a3aedd5d8ff2c2edcd",
+    "company": "Agile Defense",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/agile-defense",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-26502abf3919b49a2d439613",
     "company": "The Exploration",
     "provider": "ashby",
@@ -224,12 +432,44 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-270d8dca1d0cb2c092455589",
+    "company": "Robinhood",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/robinhood",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README.md",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-272ab015c1a952ebc4692ec7",
+    "company": "Bertram Capital Management",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/bertramcapitalmanagement",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-29070ae9ad07f9575706567a",
     "company": "Viam",
     "provider": "greenhouse",
     "url": "https://boards.greenhouse.io/viamrobotics",
     "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-2910b7d807c9c3bb9ca85e24",
+    "company": "XPENG Motors",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/xpengmotors",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-29d366f0161acd8886a9f8c3",
+    "company": "SoloPulse",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/solopulseco",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
   },
   {
     "key": "seed-2a2bed4c78c03355ef889318",
@@ -248,12 +488,36 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-2af892fa41b21b07469ade02",
+    "company": "Kitware",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/kitware",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-2be038a05c8bec7768031eda",
+    "company": "Reflect Orbital",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/reflect-orbital",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
+  },
+  {
     "key": "seed-2ced87de3d0772151adf00d2",
     "company": "Hipp Health",
     "provider": "ashby",
     "url": "https://jobs.ashbyhq.com/hipp",
     "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-2cffdedd1500792cc1b2aab7",
+    "company": "Emerald AI",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/emerald-ai",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
   },
   {
     "key": "seed-2d6d187189d96c3a8390e6bd",
@@ -272,12 +536,68 @@
     "geography": "United States"
   },
   {
+    "key": "seed-2ecb85104daadf9febdbbd10",
+    "company": "Creatify Lab",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/creatify",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-2ed192be60d91f25de62ecea",
+    "company": "AmNet Services",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/AmNetServicesInc",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-2ee339887fcab46f8c437a19",
+    "company": "The Brattle Group",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/thebrattlegroup",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-2fe35e4c0a72d11e9471f16e",
+    "company": "Lumotive",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/lumotive",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-3100b14de26e46a0ca060264",
     "company": "Katalyst Space Technologies",
     "provider": "greenhouse",
     "url": "https://boards.greenhouse.io/katalyst",
     "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-31783390e34e956cc4e88b8b",
+    "company": "Acron Aviation",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/acronaviation",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-32590b0b10087a5da75b44b5",
+    "company": "Kodiak Robotics",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/kodiak",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-35e09d0cb821a48152fa8114",
+    "company": "Mirantis",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/Mirantis",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
   },
   {
     "key": "seed-36f7345b5d8ab5c5f7d07169",
@@ -312,12 +632,52 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-390ae8f861aea8d79b51d834",
+    "company": "Astera",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/astera",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-3a0a1f7e1bd24b4148c9d694",
     "company": "Alarm.com",
     "provider": "greenhouse",
     "url": "https://boards.greenhouse.io/alarmcom",
     "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-3a1fcea7916ef37b3990fc08",
+    "company": "Trexquant",
+    "provider": "workable",
+    "url": "https://apply.workable.com/trexquant",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-3ac8a67d38be932ec31c9b6a",
+    "company": "Bree",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/bree",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "Canada"
+  },
+  {
+    "key": "seed-3b0244f55cd293a736b5f011",
+    "company": "Exegy",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/exegy",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "Canada"
+  },
+  {
+    "key": "seed-3b0561c1b8ddacbe565d79aa",
+    "company": "System Canada Technologies",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/systemCanadaTechnologies",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "Canada"
   },
   {
     "key": "seed-3b3d8f948d3585e570e2c152",
@@ -333,6 +693,14 @@
     "provider": "lever",
     "url": "https://jobs.lever.co/standtogether",
     "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README.md",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-3d46426029ab807789d65eb4",
+    "company": "Revenue Analytics",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/revenueanalytics",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
     "geography": "United States"
   },
   {
@@ -376,6 +744,14 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-4003fa6bdd5afa744437eb7f",
+    "company": "Digs",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/digs",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-403cf940d87d2288562c249d",
     "company": "Smarter Agent",
     "provider": "smartrecruiters",
@@ -390,6 +766,30 @@
     "url": "https://jobs.ashbyhq.com/n8n",
     "evidence": "https://n8n.io/careers/",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-40f93aa91f86457c1a3c1d4e",
+    "company": "ResponsiveAds",
+    "provider": "workable",
+    "url": "https://apply.workable.com/responsiveads-inc",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "Canada"
+  },
+  {
+    "key": "seed-4250b4b7502af4cfacf6f5c8",
+    "company": "Armadin",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/armadin",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-43ac6f5305c603e6ffed30e8",
+    "company": "AltaML",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/altaml",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "Canada"
   },
   {
     "key": "seed-43c0bbc72dd3c8751dae0636",
@@ -416,6 +816,22 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-44e38b3c425502572d5564b0",
+    "company": "SOSi",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/SOSi1",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-4513f7fee87bc4a77a9f974a",
+    "company": "Quantinuum",
+    "provider": "lever",
+    "url": "https://jobs.eu.lever.co/quantinuum",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
+  },
+  {
     "key": "seed-465a017930f83ea36b1d64df",
     "company": "MongoDB",
     "provider": "greenhouse",
@@ -429,6 +845,14 @@
     "provider": "greenhouse",
     "url": "https://boards.greenhouse.io/hyannisportresearch",
     "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README.md",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-4727b39f5c46fd29f5c92ca6",
+    "company": "Contoro",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/contoro",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
     "geography": "United States"
   },
   {
@@ -488,6 +912,30 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-4c9b2041c5aed8990500b278",
+    "company": "Zettabyte",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/zettabyte-space",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-4d89ae3b0286df2e7aa9e500",
+    "company": "KAYAK",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/KAYAK",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-4debd1d73aea1ae741e4e0db",
+    "company": "AppLovin",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/applovin",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-4e2328bfd06f5a7fa4f72703",
     "company": "Hermeus",
     "provider": "lever",
@@ -512,12 +960,44 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-5165d9923552dcb534840155",
+    "company": "Vector Atomic",
+    "provider": "workable",
+    "url": "https://apply.workable.com/vectoratomic",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-51dec241cf5f7d73d03c671a",
+    "company": "Truveta",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/truveta",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-53d299e4c7beb4123f665b03",
+    "company": "Rover",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/rover",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-544c783a18ceb6b2325f41bd",
     "company": "Personio",
     "provider": "personio",
     "url": "https://personio.jobs.personio.de",
     "evidence": "backend/calibration/sources.json",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-555e7c897748380e156773b3",
+    "company": "SZNS Solutions",
+    "provider": "workable",
+    "url": "https://apply.workable.com/szns",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
   },
   {
     "key": "seed-563089935b6d6fd721ca3f05",
@@ -536,12 +1016,28 @@
     "geography": "United States"
   },
   {
+    "key": "seed-57a9df8b2b7e8ae7ad79f474",
+    "company": "AMI",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/ami",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "Canada"
+  },
+  {
     "key": "seed-584b04e72e45bea5b10c48a7",
     "company": "Barnes & Thornburg",
     "provider": "ashby",
     "url": "https://jobs.ashbyhq.com/barnes",
     "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-593605e31ad090c47c3cbba5",
+    "company": "Mill",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/mill",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
   },
   {
     "key": "seed-595f7a79d08e7c743438a4b3",
@@ -566,6 +1062,14 @@
     "url": "https://boards.greenhouse.io/instalilyai",
     "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-5d995f465b765ce7483413ce",
+    "company": "Dynamic Catholic",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/dynamiccatholic",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
   },
   {
     "key": "seed-5dfaa01b7702370259837b5f",
@@ -600,6 +1104,14 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-6079532bd5b48db6c8008f4f",
+    "company": "Canonical",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/canonical",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "Canada"
+  },
+  {
     "key": "seed-63613241cb22a6ad4f6341c4",
     "company": "Gallup",
     "provider": "greenhouse",
@@ -622,6 +1134,14 @@
     "url": "https://jobs.ashbyhq.com/anthropic",
     "evidence": "backend/calibration/sources.json",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-6465dad9e6e34237aa1831c4",
+    "company": "Astera Labs",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/asteralabs",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
   },
   {
     "key": "seed-6522876d6fa6784c6fc0b9a7",
@@ -656,6 +1176,14 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-6793674937e1d263776e30bf",
+    "company": "Alpha Nexus Group",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/AlphaNexusGroup",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-67b3cf80f2efa39fdacd8dc2",
     "company": "Pilot",
     "provider": "smartrecruiters",
@@ -672,12 +1200,44 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-6810060ae648bd7711725f89",
+    "company": "Kognitos",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/Kognitos",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-68957e98c90239e8cc5484b0",
+    "company": "Evolver",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/evolver",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-690a9ad67689717957e1289e",
+    "company": "Georgian Partners Growth",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/georgian",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "Canada"
+  },
+  {
     "key": "seed-698123646dcd81f5547c1eed",
     "company": "Antares Nuclear",
     "provider": "ashby",
     "url": "https://jobs.ashbyhq.com/Antares",
     "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-69ef4af2b23bcfb285bf0f3b",
+    "company": "Fluxergy",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/fluxergy-2",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
   },
   {
     "key": "seed-6a0358ddd6dc3707834f814e",
@@ -696,12 +1256,52 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-6b37634615f7f41cc77db9d8",
+    "company": "Clarity Innovations",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/clarityinnovates",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-6bea30ca43ebade5965464c8",
     "company": "WallStreetQuants",
     "provider": "workable",
     "url": "https://apply.workable.com/wallstreetquants",
     "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-6c118226ef44d230210c8566",
+    "company": "Valstad",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/valstad",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-6d4d0d9e2d0b218e97352039",
+    "company": "xAI",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/xai",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-6dcfbdab14618b5515f43303",
+    "company": "Babel Street",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/babelstreet",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-6eebd5cabfad07e03f46adc0",
+    "company": "Weave",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/weave",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
   },
   {
     "key": "seed-6fa46893cfa913041b3d9379",
@@ -720,12 +1320,44 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-70ca27e140203216a29ed8b3",
+    "company": "PlusAI",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/plus-2",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-71bec3c5d2456585628e72c1",
+    "company": "Freedom Technology Solutions Group",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/freedomconsulting",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-7273ddf2d71b5c8ac031ce9c",
     "company": "Hatch IT",
     "provider": "lever",
     "url": "https://jobs.lever.co/hatchit",
     "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-72cb02b816ae8b6f7eaec358",
+    "company": "pony.ai",
+    "provider": "workable",
+    "url": "https://apply.workable.com/pony-dot-ai",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-735c6d4f58380108de54abdb",
+    "company": "Ivo",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/ivo",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
   },
   {
     "key": "seed-736a84791c85ca3841136909",
@@ -750,6 +1382,14 @@
     "url": "https://jobs.ashbyhq.com/koahlabs",
     "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-763863cf55938a547f9f54a7",
+    "company": "Avalore",
+    "provider": "workable",
+    "url": "https://apply.workable.com/avalore",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
   },
   {
     "key": "seed-76a5c0a8d181f89e97fd13e6",
@@ -808,12 +1448,28 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-7d134a5317774fc984bb0716",
+    "company": "Promise Robotics",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/promiserobotics",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "Canada"
+  },
+  {
     "key": "seed-7d59c57bd6c6e9e9248a9b74",
     "company": "Nooks",
     "provider": "ashby",
     "url": "https://jobs.ashbyhq.com/nooks",
     "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-7e1fa222992604ba67f11773",
+    "company": "RegDesk",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/RegDeskInc",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
   },
   {
     "key": "seed-7e3a508f03397b0e418c2999",
@@ -840,6 +1496,46 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-809ea6bde837babefb4af00e",
+    "company": "Makai Labs",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/makai-labs",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-826732a43323f0e1862a08d2",
+    "company": "OneImaging",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/oneimaging",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-8292887126396bfb888727a9",
+    "company": "OpenTable",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/opentable",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "Canada"
+  },
+  {
+    "key": "seed-8306e0ac4608a560c455c3c3",
+    "company": "Iambic Therapeutics",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/iambic-therapeutics",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-83cafc35ba8edf0d07735d5e",
+    "company": "TribalScale",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/tribalscale",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "Canada"
+  },
+  {
     "key": "seed-8550ac9aad7224b4b608c018",
     "company": "LiveScore Group",
     "provider": "greenhouse",
@@ -848,12 +1544,36 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-85efe78fe2b56f2593a3bf7d",
+    "company": "Mirego",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/mirego",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "Canada"
+  },
+  {
+    "key": "seed-88d71e2cd50197d0c59fd60f",
+    "company": "Presidency Solutions",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/PresidencySolutions1",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-88d9eb49cec5d55fa0e26a2b",
     "company": "Bedrock Robotics",
     "provider": "ashby",
     "url": "https://jobs.ashbyhq.com/bedrock-robotics",
     "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-89254228202ae7c0814136e9",
+    "company": "Crown Innovations",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/CrownInnovationsInc",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
   },
   {
     "key": "seed-8abdbb99d32fafc99085b246",
@@ -870,6 +1590,14 @@
     "url": "https://boards.greenhouse.io/xantium",
     "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-8b6b6528421e13975bd53355",
+    "company": "Relay",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/relaypro",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
   },
   {
     "key": "seed-8c24663c4cc68538b5a10ee7",
@@ -896,6 +1624,14 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-8d1b1b88b51306ff1cd0f9fa",
+    "company": "3RedPartners",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/3redpartners",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-8d6836be3b6307f5627f13c6",
     "company": "Uare.ai",
     "provider": "greenhouse",
@@ -920,6 +1656,22 @@
     "geography": "United States"
   },
   {
+    "key": "seed-8ff217ee3efb1f429186e5f9",
+    "company": "Encephalo Investments",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/EncephaloInvestments",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-905f66c99d074852c1bbb3d7",
+    "company": "DiDi Global",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/didi",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-92ded20a1a2e253671da0ebf",
     "company": "Rollout",
     "provider": "ashby",
@@ -928,11 +1680,27 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-9313aed649e4a312206c9176",
+    "company": "Sajix",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/SajixSoftwareSolutionPrivateLimited",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-939ebc9f6d45d87ce7c0d290",
     "company": "ID.me",
     "provider": "greenhouse",
     "url": "https://boards.greenhouse.io/idmeuniversityrecruiting",
     "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README.md",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-93c7410e7f3e9be2a8a5c2f6",
+    "company": "Eudia",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/eudia",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
     "geography": "United States"
   },
   {
@@ -952,6 +1720,14 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-953f19b0927be19bbb63fe66",
+    "company": "Mariana Minerals",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/marianaminerals",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-954434deba79578b7029ee7d",
     "company": "Palantir",
     "provider": "lever",
@@ -968,6 +1744,14 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-95c2f281491f4b36f6196838",
+    "company": "Northwestern Mutual",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/NorthwesternMutual",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-961a397decc6600fd418f34c",
     "company": "bunq",
     "provider": "recruitee",
@@ -981,6 +1765,14 @@
     "provider": "greenhouse",
     "url": "https://boards.greenhouse.io/genevatrading",
     "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README.md",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-96ace5478695df83f3caac5e",
+    "company": "Atomic Semi",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/atomicsemi",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
     "geography": "United States"
   },
   {
@@ -1008,6 +1800,30 @@
     "geography": "United States"
   },
   {
+    "key": "seed-99c566512f3735b2d4230be3",
+    "company": "Foundation Health",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/foundationhealthcareers",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-9b19ae57adc4d91717079c28",
+    "company": "Boston Engineering",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/BostonEngineeringCorporation",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-9b63118a19468dabd91ccfb7",
+    "company": "CWILL",
+    "provider": "workable",
+    "url": "https://apply.workable.com/cwill-us",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-9bcde8e055bf1bfe56aff6af",
     "company": "Icon",
     "provider": "ashby",
@@ -1030,6 +1846,14 @@
     "url": "https://jobs.ashbyhq.com/aiprise",
     "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-a081ab8aececdddaeb596c2e",
+    "company": "Smiths Detection",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/SmithsGroup2",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
   },
   {
     "key": "seed-a0ff87f01b7ab4a61294b34c",
@@ -1056,6 +1880,14 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-a288a1b958feb0cb50348556",
+    "company": "Accenture",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/accenturefederalservices",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-a2b4dc33b7b8404e5cb72414",
     "company": "Aquatic Capital Management",
     "provider": "greenhouse",
@@ -1080,6 +1912,14 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-a4fce440a7226f8ec6ff72a8",
+    "company": "KOSTAL Group",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/KOSTALGroup",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
+  },
+  {
     "key": "seed-a5aff0f66b7eeeb0485028f3",
     "company": "Tebra",
     "provider": "greenhouse",
@@ -1094,6 +1934,38 @@
     "url": "https://jobs.smartrecruiters.com/NextCenturyCorporation",
     "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-a60cf42729de3dda81643856",
+    "company": "Solace Health",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/solace",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-a63b2055882dbb4ffefd0c6e",
+    "company": "OceanComm",
+    "provider": "workable",
+    "url": "https://apply.workable.com/oceancomm",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-a6509557d99220370d8c70c9",
+    "company": "Fab2",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/fab2",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-a74c3234b63a610a0ef28667",
+    "company": "Kepler Communications",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/kepler",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "Canada"
   },
   {
     "key": "seed-a7903671f323fb67f898581f",
@@ -1192,6 +2064,14 @@
     "geography": "United States"
   },
   {
+    "key": "seed-ad1414d7746e828519242846",
+    "company": "Neuralink",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/neuralink",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-ad986937f0ce7ce209740d0c",
     "company": "DeepL",
     "provider": "ashby",
@@ -1224,6 +2104,14 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-b01defaa017de3e8fae38389",
+    "company": "Winsupply",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/Winsupply1",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
+  },
+  {
     "key": "seed-b0d1ade0040ad83605a24bbd",
     "company": "Chicago Trading",
     "provider": "greenhouse",
@@ -1238,6 +2126,38 @@
     "url": "https://jobs.smartrecruiters.com/SQexpetsLLC",
     "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-b212ef96e26eeff8da39d314",
+    "company": "Global Lending Services",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/glsllc",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-b28d26a26816e4ba71cdf185",
+    "company": "DRW",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/drweng",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-b32db8b27b732c1b9a0be0f7",
+    "company": "Radix Trading",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/radixuniversity",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-b3bb5283bef0219374a86d1d",
+    "company": "Terranova",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/terranova",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
   },
   {
     "key": "seed-b412bfa61ce9cd09cd2ef7fa",
@@ -1288,12 +2208,44 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-b5b2f341fadf837645ddb207",
+    "company": "OnLogic",
+    "provider": "workable",
+    "url": "https://apply.workable.com/onlogic-inc",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
+  },
+  {
     "key": "seed-b5f6e5f96a3b355865cb6013",
     "company": "HP IQ",
     "provider": "greenhouse",
     "url": "https://boards.greenhouse.io/hpiq",
     "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-b6ef0207d5b6df2de4ce2bba",
+    "company": "Sigla",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/SiglaLLC",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-b75b488e91459a419f3a6874",
+    "company": "Zoro",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/Zoro",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-b7cee64b9670b0f697e14e47",
+    "company": "Glide",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/glide",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
   },
   {
     "key": "seed-b7e8f8cb40e86bca4e64fde3",
@@ -1328,6 +2280,14 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-ba4be4f207e0831886727d72",
+    "company": "North Star Staffing Solutions",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/NorthStarStaffingSolutions1",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-ba687e191588400c9d80550e",
     "company": "Melius",
     "provider": "ashby",
@@ -1344,11 +2304,27 @@
     "geography": "United States"
   },
   {
+    "key": "seed-bcb6011eb7bd7b51033108dd",
+    "company": "Diversified Automation",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/diversified-automation",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
+  },
+  {
     "key": "seed-bdb7d7475fefa51e5257c4af",
     "company": "Skyward",
     "provider": "smartrecruiters",
     "url": "https://jobs.smartrecruiters.com/Skyward1",
     "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README.md",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-bddcc81f18ee59f2b2003ded",
+    "company": "Voloridge",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/voloridgeinvestmentmanagement",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
     "geography": "United States"
   },
   {
@@ -1358,6 +2334,14 @@
     "url": "https://boards.greenhouse.io/stripe",
     "evidence": "backend/calibration/sources.json",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-c085d1330156338a38299205",
+    "company": "Mulligan Funding",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/mulliganfunding",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
   },
   {
     "key": "seed-c156334ff97a13bd06bc1dee",
@@ -1376,6 +2360,14 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-c276f2b05adf324b36d0a4d6",
+    "company": "ShyftLabs",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/shyftlabs",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "Canada"
+  },
+  {
     "key": "seed-c2a37503f993e9af76bbf325",
     "company": "WhatNot",
     "provider": "ashby",
@@ -1392,12 +2384,36 @@
     "geography": "United States"
   },
   {
+    "key": "seed-c4263d321242b52e473d48c8",
+    "company": "Point72",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/point72",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-c50da09ceee1a3989dc5ab17",
+    "company": "Docugami",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/docugami",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-c540cd691383fa7b3eddc8d7",
     "company": "Valon",
     "provider": "ashby",
     "url": "https://jobs.ashbyhq.com/Valon",
     "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-c5521df503c5333064917ff1",
+    "company": "VWH Capital Management",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/VWHCapitalManagementLP",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
   },
   {
     "key": "seed-c816aa9534b5ddd1b4e06cf9",
@@ -1408,6 +2424,22 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-ca48ab4c0604c7d733e34a76",
+    "company": "DataVisor",
+    "provider": "workable",
+    "url": "https://apply.workable.com/datavisor-jobs",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-cb4afde8c1d622f52b85db74",
+    "company": "Rivet Industries",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/rivet",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
+  },
+  {
     "key": "seed-cb554c8f208ae16016481d18",
     "company": "General Matter",
     "provider": "greenhouse",
@@ -1416,12 +2448,44 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-cb9074eb037eab09a29f1090",
+    "company": "Monogram",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/monogram",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-cc0944acc5319095b563aeff",
+    "company": "Audax Group",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/audaxgroup",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
+  },
+  {
     "key": "seed-cc214e885e56c28b3e410f9b",
     "company": "Snowflake",
     "provider": "ashby",
     "url": "https://jobs.ashbyhq.com/snowflake",
     "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-cd0f8bba166a580a0ebfe63b",
+    "company": "Rainmaker",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/make-rain",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-cd16f06a4642d2aa731bbeaf",
+    "company": "SA Technologies",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/SATechnologiesInc4",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
   },
   {
     "key": "seed-cd4d66bff910e3066a31c55e",
@@ -1440,6 +2504,14 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-ce75c67646453b855555ea9c",
+    "company": "M3USA",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/M3USA",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
+  },
+  {
     "key": "seed-ce93025ee9697d7e0e790749",
     "company": "Commure",
     "provider": "ashby",
@@ -1456,12 +2528,92 @@
     "geography": "United States"
   },
   {
+    "key": "seed-cf6cb4d02481391a233fe6dd",
+    "company": "Arista Networks",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/AristaNetworks",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-d01263f7c745622edc1e6a36",
+    "company": "Self Financial",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/selffinancial",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-d0729964f8ca4d046440122f",
+    "company": "Infleqtion",
+    "provider": "workable",
+    "url": "https://apply.workable.com/coldquanta",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-d15eb9c9d030cce2273d5a85",
+    "company": "Integra FEC",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/integra",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-d18b5d9a8e9b888afaabf09f",
+    "company": "Wealth.com",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/wealth-com",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-d3f88d9410fc0bb2e9c41150",
+    "company": "InterImage",
+    "provider": "workable",
+    "url": "https://apply.workable.com/interimage",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-d41b78827fc6440385a53287",
+    "company": "Genetec",
+    "provider": "workable",
+    "url": "https://apply.workable.com/genetec-inc",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "Canada"
+  },
+  {
     "key": "seed-d4c8301857c587a5f5c12eb1",
     "company": "Lawrence Livermore National Laboratory (LLNL)",
     "provider": "smartrecruiters",
     "url": "https://jobs.smartrecruiters.com/LLNL",
     "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README.md",
     "geography": "United States"
+  },
+  {
+    "key": "seed-d5fe4fc7f9b07c71b5e4781c",
+    "company": "Walleye Capital",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/walleyecapital-external-students",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-d6d6701490fbb52a4501ca19",
+    "company": "Pattern Data",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/patterndata",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-d7731de9eea1830eb9c6474e",
+    "company": "Human Computer Lab",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/human-computer-lab",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "Canada"
   },
   {
     "key": "seed-d77c0fe686de3b6c59bdb46d",
@@ -1528,6 +2680,14 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-db2ef1126649cc5c1577cd92",
+    "company": "NationGraph",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/nationgraph",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "Canada"
+  },
+  {
     "key": "seed-db9f1ea67f3eb56af2ef54cf",
     "company": "Zip",
     "provider": "ashby",
@@ -1584,12 +2744,28 @@
     "geography": "United States"
   },
   {
+    "key": "seed-dfe0e45519aa8d12e42b6005",
+    "company": "CapTech Consulting",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/CapTechConsulting",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-e15eebc8ef47c4b5c80e7c10",
     "company": "Anduril",
     "provider": "greenhouse",
     "url": "https://boards.greenhouse.io/andurilindustries",
     "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-e1ac9c9f36d08a2c6644e4b9",
+    "company": "Xsolla",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/xsolla",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "Canada"
   },
   {
     "key": "seed-e1c335c4f1afc550b3c8cf83",
@@ -1600,12 +2776,28 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-e233e92534a648b190903d91",
+    "company": "Astera Labs",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/asteraearlycareer2026",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "Canada"
+  },
+  {
     "key": "seed-e2a693063932dca9225f8406",
     "company": "Confido",
     "provider": "ashby",
     "url": "https://jobs.ashbyhq.com/confido",
     "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-e34b9ec168dac907333660e6",
+    "company": "SingleStore",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/singlestore",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
   },
   {
     "key": "seed-e5acbb496c8a7ae97c58c4d7",
@@ -1624,6 +2816,14 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-e85766633bfa3bbe36d844e1",
+    "company": "Voyager Technologies",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/voyagertechnologiesinc",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-e8879633b0406388942d0916",
     "company": "Sage",
     "provider": "greenhouse",
@@ -1640,6 +2840,14 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-e908014854d476bbfad3c37c",
+    "company": "ServiceNow",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/ServiceNow",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-ea064671eb8f8f9df246a337",
     "company": "Trulioo",
     "provider": "ashby",
@@ -1648,11 +2856,51 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-ea4dae0c187042798391c882",
+    "company": "Field AI",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/field-ai",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-eb7ff94af79c806ea04c4ac4",
+    "company": "Remarcable",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/remarcable-inc",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "Canada"
+  },
+  {
+    "key": "seed-ebb670c497b0d39ecee6247e",
+    "company": "SEP",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/sep",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README.md",
+    "geography": "United States"
+  },
+  {
     "key": "seed-ebd88e8e49873f19d04a8227",
     "company": "Pacific Fusion",
     "provider": "greenhouse",
     "url": "https://boards.greenhouse.io/pacificfusion",
     "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README.md",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-ed419f51a52f636d2114c8ae",
+    "company": "WorldQuant",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/worldquant",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-ed49bac47af90ec33316ab1b",
+    "company": "Woven",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/woven-by-toyota",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
     "geography": "United States"
   },
   {
@@ -1672,11 +2920,59 @@
     "geography": "United States"
   },
   {
+    "key": "seed-edd3472043649fef8f374671",
+    "company": "Zaber Technologies",
+    "provider": "workable",
+    "url": "https://apply.workable.com/zaber",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "Canada"
+  },
+  {
+    "key": "seed-ee1e9bd3bfbecdd4d6ddeb2a",
+    "company": "Walleye Capital",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/walleyecapital-external-fulltime",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-ee692bcba60154c4091243b6",
+    "company": "SourceDirect Talent",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/SourceDirectTalent",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-ef30fc41cbd43237ead4b0e9",
+    "company": "Jumio",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/jumio",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-f007ba1ccdd6f70a577b023c",
+    "company": "Postman",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/postman",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
+  },
+  {
     "key": "seed-f022a1faeabe1185d42098c6",
     "company": "Tanium",
     "provider": "greenhouse",
     "url": "https://boards.greenhouse.io/tanium",
     "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README.md",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-f120098e08bb908b384b723e",
+    "company": "Merative",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/TruvenHealthAnalyticsanIBMCompany",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
     "geography": "United States"
   },
   {
@@ -1720,6 +3016,22 @@
     "geography": "United States"
   },
   {
+    "key": "seed-f3d79b469f7553c19ad9cc64",
+    "company": "Trace3",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/trace3",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
+    "key": "seed-f44d012276b726a4e74bd426",
+    "company": "Acceldata",
+    "provider": "lever",
+    "url": "https://jobs.lever.co/acceldata",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "Canada"
+  },
+  {
     "key": "seed-f51be46c3ff4fc8c6ec88948",
     "company": "Geotab",
     "provider": "greenhouse",
@@ -1752,6 +3064,14 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-f9071d0589c41ebdaa3ef6d4",
+    "company": "Integra FEC",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/integrainterns",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/README-Off-Season.md",
+    "geography": "United States"
+  },
+  {
     "key": "seed-fa8e29a62ddf2957cc8168bd",
     "company": "Notion",
     "provider": "ashby",
@@ -1760,12 +3080,28 @@
     "geography": "Other/Unknown"
   },
   {
+    "key": "seed-fabb7334c5cdeb10f11cc7dd",
+    "company": "Scout AI",
+    "provider": "greenhouse",
+    "url": "https://boards.greenhouse.io/scoutai",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
+  },
+  {
     "key": "seed-fc0345d91db9d4ecec1a7396",
     "company": "Homey",
     "provider": "workable",
     "url": "https://apply.workable.com/homey",
     "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-fc7af0c0e8470e69fbd17ce4",
+    "company": "Vital Lyfe",
+    "provider": "ashby",
+    "url": "https://jobs.ashbyhq.com/vital-lyfe",
+    "evidence": "https://github.com/SimplifyJobs/Summer2027-Internships/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
   },
   {
     "key": "seed-fc9444c4b1e43c624ad5a683",
@@ -1790,5 +3126,13 @@
     "url": "https://jobs.ashbyhq.com/people-culture-talent",
     "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/README.md",
     "geography": "Other/Unknown"
+  },
+  {
+    "key": "seed-ff5ef58722756b26905e58dc",
+    "company": "PQ",
+    "provider": "smartrecruiters",
+    "url": "https://jobs.smartrecruiters.com/PQ",
+    "evidence": "https://github.com/SimplifyJobs/New-Grad-Positions/blob/dev/.github/scripts/listings.json",
+    "geography": "United States"
   }
 ]

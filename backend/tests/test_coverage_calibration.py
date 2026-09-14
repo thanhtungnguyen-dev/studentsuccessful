@@ -396,11 +396,12 @@ def test_new_provider_ingestion_multi_location_and_inventory(isolated_database):
     adapter, client = fixture_adapter("huggingface", "Hugging Face", "workable")
     with client:
         result = LiveJobIngestionService.ingest_adapter(adapter, SourceAdapterRegistry([adapter]))
-    assert result.ingested == 2
+    assert result.ingested == 1
+    assert result.scope_filtered == 1
     with UnitOfWork() as uow:
         report = quality_report(uow.session)
-        assert report["inventory"]["canonical_jobs"] == 2
-        assert report["inventory"]["official_canonical_preference"] == 2
+        assert report["inventory"]["canonical_jobs"] == 1
+        assert report["inventory"]["official_canonical_preference"] == 1
         assert report["inventory"]["independently_verified_apply_rate"] is None
     job = ingest(record(external_id="multi", locations=("Calgary, AB", "Austin, TX")))
     assert (

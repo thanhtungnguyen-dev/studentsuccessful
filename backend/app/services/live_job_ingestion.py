@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
+from collections import Counter
 from collections.abc import Callable
 from dataclasses import dataclass
 
 from backend.app.core.unit_of_work import UnitOfWork
 from backend.app.ingestion.adapters import SourceAdapterRegistry
+from backend.app.ingestion.job_scope import geography, scoped_records
 from backend.app.ingestion.live import LiveFetchResult, LiveSourceAdapter
 from backend.app.repositories.live_job_ingestion import LiveJobIngestionRepository
 from backend.app.services.job_ingestion import JobIngestionService, JobIngestionValidationError
@@ -22,6 +26,10 @@ class LiveSourceIngestionResult:
     malformed: int
     rejected: int
     filtered: int
+    scope_filtered: int = 0
+    jobs_ca: int = 0
+    jobs_us: int = 0
+    jobs_north_america: int = 0
     not_modified: bool = False
     http_status: int | None = None
     etag: str | None = None
@@ -33,6 +41,7 @@ class LiveSourceIngestionResult:
     internship_or_coop_contributions: int = 0
     official_apply_urls: int = 0
     content_hash: str | None = None
+    content_fingerprints: tuple[tuple[str, str], ...] = ()
 
 
 class LiveJobIngestionService:
@@ -52,28 +61,26 @@ class LiveJobIngestionService:
         uow_factory: Callable[[], UnitOfWork] = UnitOfWork,
     ) -> LiveSourceIngestionResult:
         fetched = fetch_result or adapter.fetch_with_metadata()
-        records = fetched.records
+        records = scoped_records(fetched.records)
+        countries = Counter(geography(r.locations) for r in records)
         from backend.app.core.config import settings
         from backend.app.services.source_intelligence import enqueue_urls, preserve_fetch
 
         preserve_fetch(adapter, uow_factory)
-        import hashlib
-        import json
-
-        content_hash = (
-            None
-            if fetched.not_modified
-            else hashlib.sha256(
-                json.dumps(
-                    sorted(
-                        (record.model_dump(mode="json") for record in records),
-                        key=lambda row: row["external_id"],
-                    ),
-                    sort_keys=True,
-                    separators=(",", ":"),
-                ).encode()
-            ).hexdigest()
+        fingerprints = tuple(
+            sorted(
+                (
+                    record.external_id,
+                    hashlib.sha256(
+                        json.dumps(
+                            record.model_dump(mode="json"), sort_keys=True, separators=(",", ":")
+                        ).encode()
+                    ).hexdigest(),
+                )
+                for record in records
+            )
         )
+        content_hash = None if fetched.not_modified else scoped_content_hash(fingerprints)
         if records:
             with uow_factory() as uow:
                 for role in sorted({record.role for record in records}):
@@ -121,6 +128,10 @@ class LiveJobIngestionService:
             malformed=fetched.skipped_records,
             rejected=rejected,
             filtered=fetched.filtered_records,
+            scope_filtered=len(fetched.records) - len(records),
+            jobs_ca=countries["CA"],
+            jobs_us=countries["US"],
+            jobs_north_america=countries["NORTH_AMERICA"],
             not_modified=fetched.not_modified,
             http_status=fetched.http_status,
             etag=fetched.etag,
@@ -132,7 +143,15 @@ class LiveJobIngestionService:
             internship_or_coop_contributions=internship_or_coop_contributions,
             official_apply_urls=official_apply_urls,
             content_hash=content_hash,
+            content_fingerprints=fingerprints,
         )
+
+
+def scoped_content_hash(fingerprints):
+    """One bounded accepted-record signal, independent of provider batch boundaries."""
+    return hashlib.sha256(
+        json.dumps(sorted(fingerprints), separators=(",", ":")).encode()
+    ).hexdigest()
 
 
 __all__ = ["LiveJobIngestionService", "LiveSourceIngestionResult"]

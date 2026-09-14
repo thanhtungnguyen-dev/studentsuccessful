@@ -7,6 +7,7 @@ from backend.app.ingestion.aggregators import (
     StructuredObservationAdapter,
     load_observations,
 )
+from backend.app.ingestion.job_scope import scoped_records
 from backend.app.ingestion.source_detection import detect_source
 from backend.app.repositories.live_job_ingestion import LiveJobIngestionRepository
 from backend.app.services.job_ingestion import JobIngestionService, normalize_company_identity
@@ -14,7 +15,8 @@ from backend.app.services.source_intelligence import enqueue_urls
 
 
 def import_observations(path, *, uow_factory=UnitOfWork):
-    records = load_observations(path)
+    supplied = load_observations(path)
+    records = scoped_records(supplied)
     registry = SourceAdapterRegistry(StructuredObservationAdapter(key) for key in SOURCES)
     count = 0
     for record in records:
@@ -36,4 +38,4 @@ def import_observations(path, *, uow_factory=UnitOfWork):
                 record.adapter_key,
                 uow_factory,
             )
-    return {"observations": count}
+    return {"observations": count, "scope_filtered": len(supplied) - len(records)}

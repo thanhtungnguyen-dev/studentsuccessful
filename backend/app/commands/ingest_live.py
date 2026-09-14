@@ -83,6 +83,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(
             f"source={result.source_key} family={result.family} fetched={result.fetched} "
             f"parsed={result.parsed} ingested={result.ingested} malformed={result.malformed} "
+            f"scope_filtered={result.scope_filtered} CA={result.jobs_ca} US={result.jobs_us} NA={result.jobs_north_america} "
             f"rejected={result.rejected} filtered={result.filtered} "
             f"new_canonical={result.new_canonical_jobs} "
             f"duplicates={result.duplicate_contributions}"

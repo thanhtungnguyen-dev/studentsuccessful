@@ -68,6 +68,11 @@ def effective_sources(seeds, uow_factory=UnitOfWork, *, include_discovered=True)
 
 
 def enqueue_urls(records, parent_source, uow_factory=UnitOfWork):
+    from backend.app.ingestion.job_scope import scoped_records
+
+    records = scoped_records(records)
+    if not records:
+        return
     with uow_factory() as uow:
         uow.session.execute(text("SELECT pg_advisory_xact_lock(260002)"))
         # Bound historical suppression while allowing the network to expand after restart.

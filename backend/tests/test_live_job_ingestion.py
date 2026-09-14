@@ -100,7 +100,7 @@ def ashby_payload(*jobs: object) -> dict[str, object]:
 def ashby_job(**changes) -> dict[str, object]:
     value: dict[str, object] = {
         "id": "ashby-101",
-        "title": "Product Intern",
+        "title": "Platform Engineering Intern",
         "jobUrl": "https://jobs.ashbyhq.com/acme/ashby-101",
         "applyUrl": "https://jobs.ashbyhq.com/acme/ashby-101/apply",
         "descriptionPlain": "Help ship a product.",

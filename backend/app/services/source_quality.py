@@ -3,6 +3,7 @@
 from sqlalchemy import func, select
 
 from backend.app.models.base import utc_now
+from backend.app.models.intelligence import SourceRegistry
 from backend.app.models.job import (
     JobSourceObservation,
     JobSourceRecord,
@@ -150,6 +151,8 @@ def quality_report(session):
     )
     return {
         "sources": reports,
+        "sources_total": session.scalar(select(func.count()).select_from(SourceRegistry)),
+        "sources_by_provider": dict(session.execute(select(SourceRegistry.provider, func.count()).group_by(SourceRegistry.provider)).all()),
         "observation_authority": authority,
         "inventory": {
             "canonical_jobs": total,

@@ -26,6 +26,7 @@ from backend.app.services.job_ingestion import JobIngestionValidationError
 from backend.app.services.live_job_ingestion import (
     LiveJobIngestionService,
     LiveSourceIngestionResult,
+    scoped_content_hash,
 )
 
 DEFAULT_POLL_INTERVAL_SECONDS = {
@@ -360,7 +361,7 @@ class LiveCollectionService:
                     combined = result
                 else:
                     counters = (
-                        "fetched", "parsed", "ingested", "malformed", "rejected", "filtered",
+                        "fetched", "parsed", "ingested", "malformed", "rejected", "filtered", "scope_filtered", "jobs_ca", "jobs_us", "jobs_north_america",
                         "new_canonical_jobs", "duplicate_contributions",
                         "internship_or_coop_contributions", "official_apply_urls",
                     )
@@ -370,9 +371,8 @@ class LiveCollectionService:
                            for name in counters},
                         complete_listing=combined.complete_listing and result.complete_listing,
                         observed_external_ids=combined.observed_external_ids + result.observed_external_ids,
-                        content_hash=hashlib.sha256(
-                            ((combined.content_hash or "") + (result.content_hash or "")).encode()
-                        ).hexdigest(),
+                        content_fingerprints=combined.content_fingerprints + result.content_fingerprints,
+                        content_hash=scoped_content_hash(combined.content_fingerprints + result.content_fingerprints),
                     )
                 if fetched.continuation is not None:
                     # Advance only AFTER committed ingestion. Crash before this update
