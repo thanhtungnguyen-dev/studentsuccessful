@@ -2,7 +2,7 @@ name: Job Collector
 
 on:
   schedule:
-    - cron: "3,13,23,33,43,53 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 concurrency:
@@ -31,4 +31,5 @@ jobs:
       - name: Collect due jobs
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          LIVE_COLLECTOR_CONCURRENCY: "16"
         run: python -m backend.app.commands.collect_live once --all
