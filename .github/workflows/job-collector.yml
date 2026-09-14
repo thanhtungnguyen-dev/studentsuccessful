@@ -27,12 +27,12 @@ jobs:
       - name: Install dependencies
         run: pip install -r backend/requirements.txt
 
-      - name: Check database migration
+      - name: Upgrade database
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
+          alembic -c backend/alembic.ini upgrade head
           alembic -c backend/alembic.ini current
-          alembic -c backend/alembic.ini heads
 
       - name: Collect due jobs
         env:
