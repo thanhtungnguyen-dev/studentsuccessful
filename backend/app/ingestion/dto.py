@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Literal
 
-from pydantic import ConfigDict, Field
+from pydantic import ConfigDict, Field, field_validator
 
 from backend.app.schemas.common import StrictBaseModel
 
@@ -34,6 +34,29 @@ class ExternalJobEligibilityRequirement(_ExternalDTO):
     description: str | None = None
 
 
+class ExternalJobMetadata(_ExternalDTO):
+    """Explicit supplemental evidence, never inferred from vague listing text."""
+
+    deadline: str | None = Field(default=None, max_length=100)
+    term: str | None = Field(default=None, max_length=100)
+    season: str | None = Field(default=None, max_length=100)
+    graduation_eligibility: str | None = Field(default=None, max_length=500)
+    salary: str | None = Field(default=None, max_length=500)
+    sponsorship: str | None = Field(default=None, max_length=500)
+    work_authorization: str | None = Field(default=None, max_length=500)
+    duration: str | None = Field(default=None, max_length=100)
+    posted_text: str | None = Field(default=None, max_length=100)
+
+    @field_validator("*", mode="before")
+    @classmethod
+    def missing_value(cls, value):
+        if isinstance(value, str):
+            value = value.strip()
+            if value.casefold() in {"", "unknown", "unspecified", "n/a"}:
+                return None
+        return value
+
+
 class ExternalJobDTO(_ExternalDTO):
     """Whitelisted input for an external listing.
 
@@ -41,6 +64,7 @@ class ExternalJobDTO(_ExternalDTO):
     constructs both from the validated, normalized facts it owns.
     """
 
+    metadata: ExternalJobMetadata | None = None
     adapter_key: str
     external_id: str
     source_url: str

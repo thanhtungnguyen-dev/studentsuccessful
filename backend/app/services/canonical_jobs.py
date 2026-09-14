@@ -32,8 +32,8 @@ if TYPE_CHECKING:
 
 
 _AUTHORITY_RANK = {
-    JobSourceAuthority.OFFICIAL_COMPANY: 0,
-    JobSourceAuthority.OFFICIAL_ATS: 1,
+    JobSourceAuthority.OFFICIAL_COMPANY: 1,
+    JobSourceAuthority.OFFICIAL_ATS: 0,
     JobSourceAuthority.TRUSTED_STRUCTURED: 2,
     JobSourceAuthority.TRUSTED_AGGREGATOR: 3,
     JobSourceAuthority.UNKNOWN: 4,
@@ -66,6 +66,14 @@ def canonical_url_fingerprint(value: str) -> str:
         if not key.casefold().startswith("utm_") and key.casefold() not in _TRACKING_QUERY_KEYS
     ]
     path = parsed.path.rstrip("/")
+    if hostname == "job-boards.greenhouse.io":
+        hostname = "boards.greenhouse.io"
+    if (
+        hostname == "jobs.ashbyhq.com"
+        and len(path.split("/")) == 4
+        and path.endswith("/application")
+    ):
+        path = path[:-12]
     if (
         hostname in {"jobs.lever.co", "jobs.eu.lever.co"}
         and len(path.split("/")) == 4
@@ -111,13 +119,16 @@ def _fingerprint(value: str) -> str:
     """Return a portable 64-character deterministic key for indexed identity."""
 
     encoded = value.encode("utf-8")
-    return hashlib.md5(encoded).hexdigest() + hashlib.md5(
-        b"phase20:" + encoded
-    ).hexdigest()
+    return hashlib.md5(encoded).hexdigest() + hashlib.md5(b"phase20:" + encoded).hexdigest()
 
 
 def _projection(item: PreparedJob) -> dict[str, object]:
     return {
+        **(
+            {"metadata": item.dto.metadata.model_dump(exclude_none=True)}
+            if item.dto.metadata is not None
+            else {}
+        ),
         "locations": list(item.dto.locations),
         "industry_ids": [str(value) for value in item.industry_ids],
         "skills": [
@@ -149,7 +160,9 @@ def _projection(item: PreparedJob) -> dict[str, object]:
 
 
 def _authority_rank(observation: JobSourceObservation) -> int:
-    return _AUTHORITY_RANK.get(observation.source_authority, _AUTHORITY_RANK[JobSourceAuthority.UNKNOWN])
+    return _AUTHORITY_RANK.get(
+        observation.source_authority, _AUTHORITY_RANK[JobSourceAuthority.UNKNOWN]
+    )
 
 
 def _ranking_key(observation: JobSourceObservation) -> tuple[int, int, float, str]:
@@ -235,6 +248,7 @@ class CanonicalJobService:
                 exact_fingerprint=exact_fingerprint,
                 repository=repository,
                 incoming_url=item.dto.application_url,
+                incoming_secondary=adapter_is_secondary(item.dto.adapter_key),
             )
             if canonical_job is None:
                 canonical_created = True
@@ -298,6 +312,9 @@ class CanonicalJobService:
     ) -> None:
         """Apply absence evidence only after a complete, successful source listing."""
 
+        # Structured imports supply positive evidence, never complete inventories.
+        if source_adapter in {"linkedin", "indeed", "intern_insider"}:
+            return
         affected_canonical_ids: set[object] = set()
         for observation in repository.observations_absent_from_successful_source_refresh_for_update(
             source_adapter,
@@ -335,9 +352,12 @@ class CanonicalJobService:
             if observation.last_verified_at
         )
 
+        lifecycle_observations = (
+            tuple(o for o in observations if _authority_rank(o) <= 1) or observations
+        )
+
         explicit_authoritative_closure = any(
-            observation.explicitly_closed
-            and _authority_rank(observation) <= _AUTHORITY_RANK[JobSourceAuthority.OFFICIAL_ATS]
+            observation.explicitly_closed and _authority_rank(observation) <= 1
             for observation in observations
         )
         supporting = tuple(
@@ -354,7 +374,11 @@ class CanonicalJobService:
         if explicit_authoritative_closure:
             CanonicalJobService._set_lifecycle(canonical_job, JobLifecycle.CLOSED, now)
             return
-        if supporting:
+        lifecycle_supporting = any(
+            not o.explicitly_closed and o.consecutive_absent_successes == 0
+            for o in lifecycle_observations
+        )
+        if supporting and lifecycle_supporting:
             CanonicalJobService._apply_resolved_presentation(
                 canonical_job, supporting, session, now
             )
@@ -364,7 +388,7 @@ class CanonicalJobService:
         close_after = max(2, settings.JOB_CLOSE_AFTER_SUCCESSFUL_ABSENCES)
         all_absent_after_grace = all(
             observation.consecutive_absent_successes >= close_after
-            for observation in observations
+            for observation in lifecycle_observations
         )
         CanonicalJobService._set_lifecycle(
             canonical_job,
@@ -381,6 +405,7 @@ class CanonicalJobService:
         exact_fingerprint: str | None,
         repository: JobIngestionRepository,
         incoming_url: str | None = None,
+        incoming_secondary: bool = False,
     ) -> NormalizedJob | None:
         scores: dict[object, int] = {}
         for candidate in candidates:
@@ -393,10 +418,26 @@ class CanonicalJobService:
                 right = detect_source(incoming_url, "Identity") if incoming_url else None
             except ValueError:
                 left = right = None
-            known_left = left or urlsplit(candidate.application_url).hostname == "apply.workable.com"
-            known_right = right or incoming_url and urlsplit(incoming_url).hostname == "apply.workable.com"
-            if known_left and known_right and canonical_url_fingerprint(candidate.application_url) != application_fingerprint:
+            known_left = (
+                left or urlsplit(candidate.application_url).hostname == "apply.workable.com"
+            )
+            known_right = (
+                right or incoming_url and urlsplit(incoming_url).hostname == "apply.workable.com"
+            )
+            if (
+                known_left
+                and known_right
+                and canonical_url_fingerprint(candidate.application_url) != application_fingerprint
+            ):
                 continue
+            from backend.app.models.job import JobSourceRecord
+
+            candidate_source = repository.session.get(
+                JobSourceRecord, candidate.job_source_record_id
+            )
+            candidate_secondary = candidate_source and adapter_is_secondary(
+                candidate_source.source_adapter
+            )
             score = 0
             if candidate.application_url_fingerprint == application_fingerprint:
                 score = max(score, 300)
@@ -404,6 +445,8 @@ class CanonicalJobService:
                 score = max(score, 200)
             if (
                 exact_fingerprint is not None
+                and not incoming_secondary
+                and not candidate_secondary
                 and candidate.company_title_location_fingerprint == exact_fingerprint
             ):
                 score = max(score, 100)
@@ -498,8 +541,8 @@ class CanonicalJobService:
         application_source = min(
             observations,
             key=lambda observation: (
-                CanonicalJobService._apply_quality(observation),
                 _authority_rank(observation),
+                CanonicalJobService._apply_quality(observation),
                 _ranking_key(observation),
             ),
         )
@@ -560,6 +603,8 @@ class CanonicalJobService:
                 provenance[field] = str(owner.id)
         if projection_source:
             provenance["requirements_and_locations"] = str(projection_source.id)
+        for field, value in supplemental_metadata(observations).items():
+            provenance["metadata." + field] = value["observation_id"]
         canonical_job.field_provenance = provenance
         canonical_job.company_id = primary.company_id
         canonical_job.role_id = primary.role_id
@@ -590,11 +635,12 @@ class CanonicalJobService:
 
     @staticmethod
     def _apply_quality(observation: JobSourceObservation) -> int:
-        if _authority_rank(observation) <= _AUTHORITY_RANK[JobSourceAuthority.OFFICIAL_ATS]:
-            return 0 if (
-                observation.application_url_fingerprint
-                != observation.source_url_fingerprint
-            ) else 1
+        if _authority_rank(observation) <= _AUTHORITY_RANK[JobSourceAuthority.OFFICIAL_COMPANY]:
+            return (
+                0
+                if (observation.application_url_fingerprint != observation.source_url_fingerprint)
+                else 1
+            )
         if observation.source_authority == JobSourceAuthority.TRUSTED_STRUCTURED:
             return 3
         if observation.source_authority == JobSourceAuthority.TRUSTED_AGGREGATOR:
@@ -677,9 +723,7 @@ class CanonicalJobService:
                         else None
                     ),
                     "target_grad_end": (
-                        row.target_grad_end.isoformat()
-                        if row.target_grad_end is not None
-                        else None
+                        row.target_grad_end.isoformat() if row.target_grad_end is not None else None
                     ),
                 }
                 for row in session.execute(
@@ -830,3 +874,18 @@ __all__ = [
     "company_title_location_fingerprint",
     "normalize_source_authority",
 ]
+
+
+def adapter_is_secondary(key):
+    return key in {"linkedin", "indeed", "intern_insider"}
+
+
+def supplemental_metadata(observations):
+    """Resolve explicit supplemental values with source-level provenance."""
+    result = {}
+    for observation in sorted(observations, key=_ranking_key):
+        metadata = (observation.fact_projection or {}).get("metadata", {})
+        for field, value in metadata.items():
+            if value and field not in result:
+                result[field] = {"value": value, "observation_id": str(observation.id)}
+    return result
