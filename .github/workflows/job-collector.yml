@@ -31,5 +31,5 @@ jobs:
       - name: Collect due jobs
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          LIVE_COLLECTOR_CONCURRENCY: "16"
+          LIVE_COLLECTOR_CONCURRENCY: "8"
         run: python -m backend.app.commands.collect_live once --all
