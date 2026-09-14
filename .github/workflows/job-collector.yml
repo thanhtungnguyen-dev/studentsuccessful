@@ -2,8 +2,14 @@ name: Job Collector
 
 on:
   schedule:
-    - cron: "2-57/5 * * * *"
+    # Try to keep a replacement worker queued.
+    # Offset minutes reduce top-of-hour scheduling congestion.
+    - cron: "17,47 * * * *"
+
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 concurrency:
   group: job-collector
@@ -12,7 +18,9 @@ concurrency:
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+
+    # GitHub-hosted job maximum.
+    timeout-minutes: 360
 
     steps:
       - name: Checkout
@@ -28,8 +36,51 @@ jobs:
       - name: Install dependencies
         run: pip install -r backend/requirements.production.txt
 
-      - name: Collect due jobs
+      - name: Run continuous job collector
+        shell: bash
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          LIVE_COLLECTOR_CONCURRENCY: "8"
-        run: python -m backend.app.commands.collect_live once --all
+
+          # Maximum supported by LiveCollectionService.
+          LIVE_COLLECTOR_CONCURRENCY: "16"
+
+          # Stream logs immediately.
+          PYTHONUNBUFFERED: "1"
+
+        run: |
+          set +e
+
+          echo "Starting continuous StudentSuccessful collector..."
+          echo "Concurrency: 16 sources"
+          echo "Worker runtime: up to 350 minutes"
+
+          timeout \
+            --signal=TERM \
+            --kill-after=30s \
+            350m \
+            python -m backend.app.commands.collect_live run
+
+          code=$?
+
+          echo "Collector exited with code: $code"
+
+          # Normal exit.
+          if [ "$code" -eq 0 ]; then
+            echo "Collector exited normally."
+            exit 0
+          fi
+
+          # Expected worker rotation after 350 minutes.
+          if [ "$code" -eq 124 ]; then
+            echo "Collector completed its scheduled 350-minute rotation."
+            exit 0
+          fi
+
+          # Graceful SIGTERM shutdown.
+          if [ "$code" -eq 143 ]; then
+            echo "Collector stopped cleanly."
+            exit 0
+          fi
+
+          echo "Collector stopped unexpectedly."
+          exit "$code"
