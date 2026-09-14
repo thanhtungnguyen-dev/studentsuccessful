@@ -289,6 +289,8 @@ class JobIngestionService:
         )
         payload, payload_hash = _canonical_json(
             {
+                **({"metadata": record.metadata.model_dump(exclude_none=True)}
+                   if record.metadata is not None else {}),
                 "adapter_key": adapter_key,
                 "application_url": application_url,
                 "career_level": career_level,
@@ -318,6 +320,7 @@ class JobIngestionService:
             }
         )
         normalized = ExternalJobDTO(
+            metadata=record.metadata,
             adapter_key=adapter_key, external_id=external_id, source_url=source_url,
             application_url=application_url, company=company.name, title=title, role=role.name,
             employment_type=employment_type, career_level=career_level, work_mode=work_mode,

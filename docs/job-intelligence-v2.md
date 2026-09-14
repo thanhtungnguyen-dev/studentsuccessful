@@ -254,3 +254,71 @@ single detail offline without fetching a list or invoking lifecycle writes.
 Calibration reports retrieval strategy and continuation, retaining its five-job
 sample budget. Run only selected source fixtures when investigating large boards;
 a sampled partial result is never a valid-empty board or a complete inventory.
+
+
+## Official source seeds and structured secondary observations
+
+`backend/data/job_source_seeds.json` is the single explicit import corpus. Board
+identities come from existing calibration sources and employer links in the
+SimplifyJobs internship/new-grad lists; each row retains its evidence reference.
+Geography describes an explicitly listed location, not employer headquarters;
+unresolved locations remain Other/Unknown. Historical links are not a promise
+that every board is currently active. Static validation does not fetch boards.
+
+Run from the repository root against the intended local/test database:
+
+```sh
+python -m backend.app.commands.job_intelligence seeds-validate
+python -m backend.app.commands.job_intelligence seeds-import --dry-run
+python -m backend.app.commands.job_intelligence seeds-import
+python -m backend.app.commands.job_intelligence seeds-verify --limit 30 --timeout 10
+python -m backend.app.commands.job_intelligence report
+```
+
+Import uses provider + normalized board identity, including discovered boards.
+It preserves existing source keys, enablement, leases, health and polling state;
+only company display metadata is updated. Invalid corpora fail before writes.
+The collector reads the persisted registry after explicit import; it does not
+parse/reimport the corpus on every wake. Explicit isolated-source runs retain
+their existing `include_discovered=False` scope. Verification uses a deterministic
+provider-diverse sample, at most 50 boards, two concurrent probes and the existing
+five-job calibration bound. Failures are diagnostics and do not change state.
+
+LinkedIn, Indeed and Intern Insider share one operator-supplied JSON boundary:
+
+```sh
+python -m backend.app.commands.job_intelligence observations-import --fixture observations.json
+python -m backend.app.commands.job_intelligence job-metadata --job CANONICAL_JOB_UUID
+```
+
+The input is an array of 1-250 observations (maximum 5 MiB). Required fields:
+`source` (`linkedin`, `indeed`, `intern_insider`), stable `external_id`,
+`listing_url`, `company`, `title`. Optional fields: `apply_url`, `location`,
+`employment_type`, `work_mode`, `description`, offset-qualified `posted_at`,
+and `metadata`. Employment/work-mode values use existing ingestion enums.
+`metadata` accepts explicit `deadline`, `term`, `season`,
+`graduation_eligibility`, `salary`, `sponsorship`, `work_authorization`,
+`duration`, and `posted_text`. Vague dates belong in `posted_text`, not a fabricated
+exact timestamp. Empty/UNKNOWN values stay missing; eligibility is never inferred.
+Intern Insider is an input-neutral operator assertion, not a verified website
+identity. No live aggregator acquisition, login, redirect resolver or scraper is
+included. Supply the resolved official posting URL; a bare ATS board is rejected.
+
+Imports are positive-only and idempotent by source + listing ID. Existing raw
+snapshots and independent observations retain listing URLs/timestamps; supported
+ATS apply URLs enqueue canonical board URLs through existing bounded discovery.
+The worker subsequently verifies/registers unknown boards when discovery is enabled.
+Authority is official ATS > official career page > LinkedIn/Indeed > Intern
+Insider > unknown. Stronger explicit values win; missing supplemental values can
+use weaker evidence with observation-ID provenance. Supplemental values live in
+existing observation JSON and can be inspected with `job-metadata`; this does not
+add public API fields or frontend functionality. Distinct metadata provenance is
+also retained in canonical field provenance. Official DTO producers can supply
+explicit metadata; this pass does not extract new fields from provider prose.
+
+Canonical matching uses strong normalized apply/listing identity for secondary
+sources, never company/title alone. Known conflicting ATS posting URLs stay
+separate. Greenhouse hostname variants and Lever/Ashby application suffixes share
+identity. Aggregator absence never supplies closure evidence; secondary positives
+cannot reopen officially closed/absent jobs. Existing official reconciliation
+thresholds still apply. No schema changes or automatic production imports.

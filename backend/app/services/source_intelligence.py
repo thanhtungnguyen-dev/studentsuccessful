@@ -55,10 +55,7 @@ def effective_sources(seeds, uow_factory=UnitOfWork, *, include_discovered=True)
                 )
         if include_discovered:
             for row in uow.session.scalars(
-                select(SourceRegistry)
-                .where(SourceRegistry.origin == "DISCOVERED")
-                .order_by(SourceRegistry.source_key)
-                .limit(1000)
+                select(SourceRegistry).order_by(SourceRegistry.source_key).limit(1000)
             ):
                 config = LiveJobSourceConfig.model_validate(row.configuration).model_copy(
                     update={"enabled": row.enabled}
