@@ -1,6 +1,8 @@
 "use client";
+import { LoadingState } from "../ui/LoadingState";
 
 import Link from "next/link";
+import { PageHeader } from "../ui/PageHeader";
 import { ReturnToReview } from "../onboarding/ReturnToReview";
 import { useEffect, useState, type FormEvent } from "react";
 import { apiClient, ApiError, authErrorMessage, type Employment } from "../../lib/api/client";
@@ -11,9 +13,8 @@ export function EmploymentPage() {
   const { user, error, refresh } = useAuth();
   return <main className="auth-shell employment-shell">
     <Link href="/" className="brand">StudentSuccessful</Link><ReturnToReview />
-    <h1 className="profile-title">Employment</h1>
-    <p className="muted">Your work-history facts, entered by you. Employment location does not set job-search preferences.</p>
-    {user === undefined ? (error ? <div><p role="alert">{error}</p><button className="primary" onClick={() => { void refresh().catch(() => {}); }}>Try again</button></div> : <p role="status">Checking your session…</p>)
+    <PageHeader title="Employment" description="Your work-history facts, entered by you. Employment location does not set job-search preferences." />
+    {user === undefined ? (error ? <div><p role="alert">{error}</p><button className="primary" onClick={() => { void refresh().catch(() => {}); }}>Try again</button></div> : <LoadingState label="Checking your session…" />)
       : user === null ? <p className="auth-footer">Please <Link href="/login">Login</Link> to view employment.</p>
       : <EmploymentContent key={user.id} />}
   </main>;
@@ -61,7 +62,7 @@ function EmploymentContent() {
   return <>
     {error && <div><p className="auth-error" role="alert">{error}</p><button className="secondary" onClick={() => { setEditor(null); setDeleting(null); setAttempt((value) => value + 1); }}>Reload list</button></div>}
     {success && <p className="profile-success" role="status">{success}</p>}
-    {records === null && !error && <p role="status">Loading employment…</p>}
+    {records === null && !error && <LoadingState label="Loading employment…" />}
     {records !== null && <>
       {editor ? <EmploymentForm key={editor === "new" ? "new" : editor.id} record={editor === "new" ? undefined : editor} onSave={saved} onCancel={() => setEditor(null)} />
         : <button className="primary employment-add" disabled={busy || deleting !== null} onClick={() => { setEditor("new"); setSuccess(""); }}>Add employment</button>}

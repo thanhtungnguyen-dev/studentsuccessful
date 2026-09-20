@@ -1,4 +1,6 @@
 "use client";
+import { PageHeader } from "../ui/PageHeader";
+import { LoadingState } from "../ui/LoadingState";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -95,7 +97,7 @@ export function ResumeAlignmentContent({ alignment }: { alignment: ResumeAlignme
   return (
     <>
       <section className="auth-card dashboard-card alignment-introduction">
-        <h1 className="profile-title">Resume alignment</h1>
+        <PageHeader title="Resume alignment" />
         <p className="fit-job">{alignment.job_title}{alignment.company_name ? ` · ${alignment.company_name}` : ""}</p>
         <p className="alignment-version"><strong>Selected resume:</strong> {alignment.resume_title}, version {alignment.resume_version_number}</p>
         <p className="muted">This view compares one resume version with explicit job requirements. It records where evidence appears; it does not assess ability, predict hiring outcomes, or recommend claims to add.</p>
@@ -136,7 +138,7 @@ export function ResumeAlignmentContent({ alignment }: { alignment: ResumeAlignme
   );
 }
 
-export function ResumeAlignmentLoading() { return <p role="status">Loading resume alignment…</p>; }
+export function ResumeAlignmentLoading() { return <LoadingState label="Loading resume alignment…" />; }
 
 export function ResumeAlignmentFailure({ retry, message }: { retry: () => void; message: string }) {
   return <section className="auth-card dashboard-card"><p role="alert" className="auth-error">Could not load resume alignment. {message}</p><button className="secondary" onClick={retry}>Retry resume alignment</button></section>;
@@ -232,11 +234,11 @@ export function ResumeAlignmentPage({ jobId }: { jobId: string }) {
       <Link href="/" className="brand">StudentSuccessful</Link>
       <p className="fit-back"><Link href="/jobs">Back to jobs</Link></p>
       {sessionError ? <p role="alert" className="auth-error">{sessionError}</p>
-        : user === undefined ? <p role="status">Checking your session…</p>
+        : user === undefined ? <LoadingState label="Checking your session…" />
           : user === null ? <p>Please <Link href="/login">Login</Link> to view resume alignment.</p>
             : choicesError ? <ResumeAlignmentFailure message={choicesError} retry={() => setChoicesAttempt((value) => value + 1)} />
               : choices === null ? <ResumeAlignmentLoading />
-                : choices.length === 0 ? <section className="auth-card dashboard-card"><h1 className="profile-title">Resume alignment</h1><p className="muted">Upload a resume version before viewing alignment.</p><Link className="secondary" href="/resumes">Manage resumes</Link></section>
+                : choices.length === 0 ? <section className="auth-card dashboard-card"><PageHeader title="Resume alignment" /><p className="muted">Upload a resume version before viewing alignment.</p><Link className="secondary" href="/resumes">Manage resumes</Link></section>
                   : <>
                     <section className="auth-card dashboard-card alignment-selector">
                       <label htmlFor="resume-version-select">Choose a resume version</label>

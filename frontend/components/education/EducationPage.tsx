@@ -1,6 +1,8 @@
 "use client";
+import { LoadingState } from "../ui/LoadingState";
 
 import Link from "next/link";
+import { PageHeader } from "../ui/PageHeader";
 import { ReturnToReview } from "../onboarding/ReturnToReview";
 import { useEffect, useState, type FormEvent } from "react";
 import { apiClient, ApiError, authErrorMessage, type Education } from "../../lib/api/client";
@@ -11,9 +13,8 @@ export function EducationPage() {
   const { user, error, refresh } = useAuth();
   return <main className="auth-shell education-shell">
     <Link href="/" className="brand">StudentSuccessful</Link><ReturnToReview />
-    <h1 className="profile-title">Education</h1>
-    <p className="muted">Your academic facts, entered by you. GPA stays on its original scale.</p>
-    {user === undefined ? (error ? <div><p role="alert">{error}</p><button className="primary" onClick={() => { void refresh().catch(() => {}); }}>Try again</button></div> : <p role="status">Checking your session…</p>)
+    <PageHeader title="Education" description="Your academic facts, entered by you. GPA stays on its original scale." />
+    {user === undefined ? (error ? <div><p role="alert">{error}</p><button className="primary" onClick={() => { void refresh().catch(() => {}); }}>Try again</button></div> : <LoadingState label="Checking your session…" />)
       : user === null ? <p className="auth-footer">Please <Link href="/login">Login</Link> to view education.</p>
       : <EducationContent key={user.id} />}
   </main>;
@@ -61,7 +62,7 @@ function EducationContent() {
   return <>
     {error && <div><p className="auth-error" role="alert">{error}</p><button className="secondary" onClick={() => { setEditor(null); setDeleting(null); setAttempt((value) => value + 1); }}>Reload list</button></div>}
     {success && <p className="profile-success" role="status">{success}</p>}
-    {records === null && !error && <p role="status">Loading education…</p>}
+    {records === null && !error && <LoadingState label="Loading education…" />}
     {records !== null && <>
       {editor ? <EducationForm key={editor === "new" ? "new" : editor.id} record={editor === "new" ? undefined : editor} onSave={saved} onCancel={() => setEditor(null)} />
         : <button className="primary education-add" disabled={busy || deleting !== null} onClick={() => { setEditor("new"); setSuccess(""); }}>Add education</button>}

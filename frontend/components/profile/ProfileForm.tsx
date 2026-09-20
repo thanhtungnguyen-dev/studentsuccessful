@@ -1,6 +1,8 @@
 "use client";
+import { LoadingState } from "../ui/LoadingState";
 
 import Link from "next/link";
+import { PageHeader } from "../ui/PageHeader";
 import { ReturnToReview } from "../onboarding/ReturnToReview";
 import { useEffect, useState, type FormEvent } from "react";
 import { apiClient, ApiError, authErrorMessage } from "../../lib/api/client";
@@ -11,9 +13,8 @@ export function ProfilePage() {
   const { user, error, refresh } = useAuth();
   return <main className="auth-shell profile-shell">
     <Link href="/" className="brand">StudentSuccessful</Link><ReturnToReview />
-    <h1 className="profile-title">Application Profile</h1>
-    <p className="muted">Facts you choose to use on applications. These do not set your job-search preferences.</p>
-    {user === undefined ? (error ? <div><p role="alert">{error}</p><button className="primary" onClick={() => { void refresh().catch(() => {}); }}>Try again</button></div> : <p role="status">Checking your session…</p>)
+    <PageHeader title="Application Profile" description="Facts you choose to use on applications. These do not set your job-search preferences." />
+    {user === undefined ? (error ? <div><p role="alert">{error}</p><button className="primary" onClick={() => { void refresh().catch(() => {}); }}>Try again</button></div> : <LoadingState label="Checking your session…" />)
       : user === null ? <p className="auth-footer">Please <Link href="/login">Login</Link> to view your profile.</p>
       : <ProfileForm key={user.id} />}
   </main>;
@@ -62,7 +63,7 @@ function ProfileForm() {
     } finally { setBusy(false); }
   }
 
-  if (!values) return error ? <div className="auth-card"><p role="alert" className="auth-error">{error}</p><button className="primary" onClick={() => setAttempt((value) => value + 1)}>Retry loading</button></div> : <p role="status">Loading profile…</p>;
+  if (!values) return error ? <div className="auth-card"><p role="alert" className="auth-error">{error}</p><button className="primary" onClick={() => setAttempt((value) => value + 1)}>Retry loading</button></div> : <LoadingState label="Loading profile…" />;
   return <form onSubmit={save} className="auth-card profile-form" aria-busy={busy}>
     <p className="muted">Legal first and last names are required. Everything else is optional. Clear an optional field to remove it.</p>
     {profileSections.map((section) => <fieldset key={section.title} disabled={busy}>

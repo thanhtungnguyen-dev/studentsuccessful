@@ -1,6 +1,8 @@
 "use client";
+import { LoadingState } from "../ui/LoadingState";
 
 import Link from "next/link";
+import { PageHeader } from "../ui/PageHeader";
 import { ReturnToReview } from "../onboarding/ReturnToReview";
 import { useEffect, useState, type FormEvent } from "react";
 import { apiClient, ApiError, authErrorMessage, type WorkAuthorization } from "../../lib/api/client";
@@ -11,9 +13,8 @@ export function WorkAuthorizationPage() {
   const { user, error, refresh } = useAuth();
   return <main className="auth-shell work-authorization-shell">
     <Link href="/" className="brand">StudentSuccessful</Link><ReturnToReview />
-    <h1 className="profile-title">Work Authorization</h1>
-    <p className="muted">Enter your authorization facts for each country. Country and status do not set job-search preferences or determine sponsorship answers.</p>
-    {user === undefined ? (error ? <div><p role="alert">{error}</p><button className="primary" onClick={() => { void refresh().catch(() => {}); }}>Try again</button></div> : <p role="status">Checking your session…</p>)
+    <PageHeader title="Work Authorization" description="Enter your authorization facts for each country. Country and status do not set job-search preferences or determine sponsorship answers." />
+    {user === undefined ? (error ? <div><p role="alert">{error}</p><button className="primary" onClick={() => { void refresh().catch(() => {}); }}>Try again</button></div> : <LoadingState label="Checking your session…" />)
       : user === null ? <p className="auth-footer">Please <Link href="/login">Login</Link> to view work authorization.</p>
       : <WorkAuthorizationContent key={user.id} />}
   </main>;
@@ -61,7 +62,7 @@ function WorkAuthorizationContent() {
   return <>
     {error && <div><p className="auth-error" role="alert">{error}</p><button className="secondary" onClick={() => { setEditor(null); setDeleting(null); setAttempt((value) => value + 1); }}>Reload list</button></div>}
     {success && <p className="profile-success" role="status">{success}</p>}
-    {records === null && !error && <p role="status">Loading work authorization…</p>}
+    {records === null && !error && <LoadingState label="Loading work authorization…" />}
     {records !== null && <>
       {editor ? <WorkAuthorizationForm key={editor === "new" ? "new" : editor.id} record={editor === "new" ? undefined : editor} onSave={saved} onCancel={() => setEditor(null)} />
         : <button className="primary work-authorization-add" disabled={busy || deleting !== null} onClick={() => { setEditor("new"); setSuccess(""); }}>Add country authorization</button>}

@@ -1,4 +1,5 @@
 "use client";
+import { LoadingState } from "../ui/LoadingState";
 import {useEffect,useRef,useState} from "react";
 import {apiClient,ApiError,authErrorMessage,type Artifact,type ArtifactCreate} from "../../lib/api/client";
 import {artifactPayload} from "../../lib/artifacts/form";
@@ -16,7 +17,7 @@ function ArtifactContent(){
  async function remove(){if(!items||!deleting||pending.current)return;pending.current=true;setBusy(true);setError("");setSuccess("");try{await apiClient.deleteArtifact(deleting);setItems(items.filter(item=>item.id!==deleting));setDeleting(null);setSuccess("Resume link removed.");}catch(error){failure(error);}finally{pending.current=false;setBusy(false);}}
  return <><p className="muted">Save links to your Resumes. StudentSuccessful stores the title and link, not the file. Your provider controls file access and availability. Resume links do not update your profile, Skills or Projects.</p>
  {error&&<p role="alert" className="auth-error">{error}</p>}{success&&<p role="status" className="profile-success">{success}</p>}
- {items===null ? error ? <button className="secondary" onClick={()=>setAttempt(x=>x+1)}>Retry Resume links</button> : <p role="status">Loading Resume links…</p> : <>
+ {items===null ? error ? <button className="secondary" onClick={()=>setAttempt(x=>x+1)}>Retry Resume links</button> : <LoadingState label="Loading Resume links…" /> : <>
  {!editing&&!deleting&&<button className="primary education-add" onClick={()=>{setEditing("new");setForm(empty());setError("");setSuccess("");}}>Add Resume</button>}
  {editing&&<form className="auth-card education-form" onSubmit={event=>{event.preventDefault();void save();}} noValidate><h2>{editing==="new"?"Add Resume link":"Edit Resume link"}</h2><fieldset disabled={busy}>
  <label htmlFor="artifact-title">Resume title</label><input id="artifact-title" value={form.title} maxLength={150} required onChange={event=>setForm({...form,title:event.target.value})}/>

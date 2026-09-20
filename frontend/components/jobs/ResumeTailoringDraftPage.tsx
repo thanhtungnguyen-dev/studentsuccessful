@@ -1,4 +1,6 @@
 "use client";
+import { PageHeader } from "../ui/PageHeader";
+import { LoadingState } from "../ui/LoadingState";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -139,7 +141,7 @@ export function ResumeTailoringDraftContent({ draft }: { draft: ResumeTailoringD
   return (
     <>
       <section className="auth-card dashboard-card draft-introduction">
-        <h1 className="profile-title">Resume Tailoring Draft</h1>
+        <PageHeader title="Resume Tailoring Draft" />
         <p className="fit-job">{draft.job_title}{draft.company_name ? ` · ${draft.company_name}` : ""}</p>
         <p className="draft-version"><strong>Selected resume:</strong> {draft.resume_title}, version {draft.resume_version_number}</p>
         <p className="draft-warning"><strong>DRAFT — REVIEW BEFORE USE</strong></p>
@@ -192,7 +194,7 @@ export function ResumeTailoringDraftContent({ draft }: { draft: ResumeTailoringD
 }
 
 export function ResumeTailoringDraftLoading() {
-  return <p role="status">Loading resume tailoring draft…</p>;
+  return <LoadingState label="Loading resume tailoring draft…" />;
 }
 
 export function ResumeTailoringDraftFailure({
@@ -300,11 +302,11 @@ export function ResumeTailoringDraftPage({ jobId }: { jobId: string }) {
       <Link href="/" className="brand">StudentSuccessful</Link>
       <p className="fit-back"><Link href="/jobs">Back to jobs</Link></p>
       {sessionError ? <p role="alert" className="auth-error">{sessionError}</p>
-        : user === undefined ? <p role="status">Checking your session…</p>
+        : user === undefined ? <LoadingState label="Checking your session…" />
           : user === null ? <p>Please <Link href="/login">Login</Link> to view a resume tailoring draft.</p>
             : choicesError ? <ResumeTailoringDraftFailure message={choicesError} retry={() => setChoicesAttempt((value) => value + 1)} />
               : choices === null ? <ResumeTailoringDraftLoading />
-                : choices.length === 0 ? <section className="auth-card dashboard-card"><h1 className="profile-title">Resume Tailoring Draft</h1><p className="muted">Upload a resume version before viewing a draft.</p><Link className="secondary" href="/resumes">Manage resumes</Link></section>
+                : choices.length === 0 ? <section className="auth-card dashboard-card"><PageHeader title="Resume Tailoring Draft" /><p className="muted">Upload a resume version before viewing a draft.</p><Link className="secondary" href="/resumes">Manage resumes</Link></section>
                   : <>
                     <section className="auth-card dashboard-card draft-selector">
                       <label htmlFor="resume-version-select">Choose a resume version</label>

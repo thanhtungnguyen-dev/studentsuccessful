@@ -1,4 +1,6 @@
 "use client";
+import { PageHeader } from "../ui/PageHeader";
+import { LoadingState } from "../ui/LoadingState";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -112,7 +114,7 @@ export function ResumeImprovementPlanContent({ plan }: { plan: ResumeImprovement
   return (
     <>
       <section className="auth-card dashboard-card plan-introduction">
-        <h1 className="profile-title">Resume Improvement Plan</h1>
+        <PageHeader title="Resume Improvement Plan" />
         <p className="fit-job">{plan.job_title}{plan.company_name ? ` · ${plan.company_name}` : ""}</p>
         <p className="plan-version"><strong>Selected resume:</strong> {plan.resume_title}, version {plan.resume_version_number}</p>
         <p className="muted">This plan lists conservative actions based only on recorded evidence. It does not generate resume text, assess ability, or predict hiring outcomes.</p>
@@ -157,7 +159,7 @@ export function ResumeImprovementPlanContent({ plan }: { plan: ResumeImprovement
   );
 }
 
-export function ResumeImprovementPlanLoading() { return <p role="status">Loading resume improvement plan…</p>; }
+export function ResumeImprovementPlanLoading() { return <LoadingState label="Loading resume improvement plan…" />; }
 
 export function ResumeImprovementPlanFailure({ retry, message }: { retry: () => void; message: string }) {
   return <section className="auth-card dashboard-card"><p role="alert" className="auth-error">Could not load resume improvement plan. {message}</p><button className="secondary" onClick={retry}>Retry resume improvement plan</button></section>;
@@ -253,11 +255,11 @@ export function ResumeImprovementPlanPage({ jobId }: { jobId: string }) {
       <Link href="/" className="brand">StudentSuccessful</Link>
       <p className="fit-back"><Link href="/jobs">Back to jobs</Link></p>
       {sessionError ? <p role="alert" className="auth-error">{sessionError}</p>
-        : user === undefined ? <p role="status">Checking your session…</p>
+        : user === undefined ? <LoadingState label="Checking your session…" />
           : user === null ? <p>Please <Link href="/login">Login</Link> to view a resume improvement plan.</p>
             : choicesError ? <ResumeImprovementPlanFailure message={choicesError} retry={() => setChoicesAttempt((value) => value + 1)} />
               : choices === null ? <ResumeImprovementPlanLoading />
-                : choices.length === 0 ? <section className="auth-card dashboard-card"><h1 className="profile-title">Resume Improvement Plan</h1><p className="muted">Upload a resume version before viewing a plan.</p><Link className="secondary" href="/resumes">Manage resumes</Link></section>
+                : choices.length === 0 ? <section className="auth-card dashboard-card"><PageHeader title="Resume Improvement Plan" /><p className="muted">Upload a resume version before viewing a plan.</p><Link className="secondary" href="/resumes">Manage resumes</Link></section>
                   : <>
                     <section className="auth-card dashboard-card plan-selector">
                       <label htmlFor="resume-version-select">Choose a resume version</label>

@@ -1,4 +1,6 @@
 "use client";
+import { PageHeader } from "../ui/PageHeader";
+import { LoadingState } from "../ui/LoadingState";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -111,7 +113,7 @@ export function SkillGapContent({ analysis }: { analysis: SkillGapAnalysis }) {
   return (
     <>
       <section className="auth-card dashboard-card gap-introduction">
-        <h1 className="profile-title">Skill gap analysis</h1>
+        <PageHeader title="Skill gap analysis" />
         <p className="fit-job">{analysis.job_title}{analysis.company_name ? ` · ${analysis.company_name}` : ""}</p>
         <p className="gap-version"><strong>Selected resume:</strong> {analysis.resume_title}, version {analysis.resume_version_number}</p>
         <p className="muted">This view groups explicit job requirements by recorded evidence. It does not assess ability, predict hiring outcomes, or recommend changes.</p>
@@ -156,7 +158,7 @@ export function SkillGapContent({ analysis }: { analysis: SkillGapAnalysis }) {
   );
 }
 
-export function SkillGapLoading() { return <p role="status">Loading skill gap analysis…</p>; }
+export function SkillGapLoading() { return <LoadingState label="Loading skill gap analysis…" />; }
 
 export function SkillGapFailure({ retry, message }: { retry: () => void; message: string }) {
   return <section className="auth-card dashboard-card"><p role="alert" className="auth-error">Could not load skill gap analysis. {message}</p><button className="secondary" onClick={retry}>Retry skill gap analysis</button></section>;
@@ -252,11 +254,11 @@ export function SkillGapPage({ jobId }: { jobId: string }) {
       <Link href="/" className="brand">StudentSuccessful</Link>
       <p className="fit-back"><Link href="/jobs">Back to jobs</Link></p>
       {sessionError ? <p role="alert" className="auth-error">{sessionError}</p>
-        : user === undefined ? <p role="status">Checking your session…</p>
+        : user === undefined ? <LoadingState label="Checking your session…" />
           : user === null ? <p>Please <Link href="/login">Login</Link> to view skill gap analysis.</p>
             : choicesError ? <SkillGapFailure message={choicesError} retry={() => setChoicesAttempt((value) => value + 1)} />
               : choices === null ? <SkillGapLoading />
-                : choices.length === 0 ? <section className="auth-card dashboard-card"><h1 className="profile-title">Skill gap analysis</h1><p className="muted">Upload a resume version before viewing skill gaps.</p><Link className="secondary" href="/resumes">Manage resumes</Link></section>
+                : choices.length === 0 ? <section className="auth-card dashboard-card"><PageHeader title="Skill gap analysis" /><p className="muted">Upload a resume version before viewing skill gaps.</p><Link className="secondary" href="/resumes">Manage resumes</Link></section>
                   : <>
                     <section className="auth-card dashboard-card gap-selector">
                       <label htmlFor="resume-version-select">Choose a resume version</label>

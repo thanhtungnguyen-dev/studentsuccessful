@@ -1,6 +1,8 @@
 "use client";
+import { LoadingState } from "../ui/LoadingState";
 
 import Link from "next/link";
+import { PageHeader } from "../ui/PageHeader";
 import { useEffect, useState } from "react";
 import { ApiError, apiClient, authErrorMessage, type CandidateProfile } from "../../lib/api/client";
 import { useAuth } from "../auth/AuthProvider";
@@ -101,7 +103,7 @@ export function CandidateProfilePage() {
     return () => { active = false; };
   }, [attempt, refresh, user]);
 
-  return <main className="auth-shell dashboard-shell"><Link href="/" className="brand">StudentSuccessful</Link><h1 className="profile-title">Candidate Profile</h1><p className="muted">A source-aware view of saved facts, project use, and detected resume references.</p>
-    {sessionError ? <p role="alert" className="auth-error">{sessionError}</p> : user === undefined ? <p role="status">Checking your session…</p> : user === null ? <p>Please <Link href="/login">Login</Link> to view your Candidate Profile.</p> : state.status === "loading" ? <p role="status">Loading Candidate Profile…</p> : state.status === "error" ? <><p role="alert" className="auth-error">Could not load Candidate Profile. {state.message}</p><button className="secondary" onClick={() => setAttempt(value => value + 1)}>Retry Candidate Profile</button></> : <CandidateSections data={state.data} />}
+  return <main className="auth-shell dashboard-shell"><Link href="/" className="brand">StudentSuccessful</Link><PageHeader title="Candidate Profile" description="A source-aware view of saved facts, project use, and detected resume references." />
+    {sessionError ? <p role="alert" className="auth-error">{sessionError}</p> : user === undefined ? <LoadingState label="Checking your session…" /> : user === null ? <p>Please <Link href="/login">Login</Link> to view your Candidate Profile.</p> : state.status === "loading" ? <LoadingState label="Loading Candidate Profile…" /> : state.status === "error" ? <><p role="alert" className="auth-error">Could not load Candidate Profile. {state.message}</p><button className="secondary" onClick={() => setAttempt(value => value + 1)}>Retry Candidate Profile</button></> : <CandidateSections data={state.data} />}
   </main>;
 }

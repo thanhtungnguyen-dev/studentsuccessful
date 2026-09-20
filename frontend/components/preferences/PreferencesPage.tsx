@@ -1,5 +1,7 @@
 "use client";
+import { LoadingState } from "../ui/LoadingState";
 import Link from "next/link";
+import { PageHeader } from "../ui/PageHeader";
 import { ReturnToReview } from "../onboarding/ReturnToReview";
 import { useEffect, useState, type FormEvent } from "react";
 import { apiClient, ApiError, authErrorMessage, type Preferences } from "../../lib/api/client";
@@ -9,9 +11,8 @@ import { useAuth } from "../auth/AuthProvider";
 type Options = Record<typeof GROUPS[number]["key"], Array<{ id: string; name: string }>>;
 export function PreferencesPage() {
   const { user, error, refresh } = useAuth();
-  return <main className="auth-shell preferences-shell"><Link href="/" className="brand">StudentSuccessful</Link><ReturnToReview /><h1 className="profile-title">Career Preferences</h1>
-    <p className="muted">Choose what you want. Technology interests are preferences, not claims about your skills.</p>
-    {user === undefined ? error ? <><p role="alert">{error}</p><button onClick={() => void refresh().catch(() => {})}>Retry</button></> : <p role="status">Checking your session…</p>
+  return <main className="auth-shell preferences-shell"><Link href="/" className="brand">StudentSuccessful</Link><ReturnToReview /><PageHeader title="Career Preferences" description="Choose what you want. Technology interests are preferences, not claims about your skills." />
+    {user === undefined ? error ? <><p role="alert">{error}</p><button onClick={() => void refresh().catch(() => {})}>Retry</button></> : <LoadingState label="Checking your session…" />
       : user === null ? <p>Please <Link href="/login">Login</Link> to view preferences.</p> : <PreferencesForm key={user.id} />}
   </main>;
 }
@@ -37,7 +38,7 @@ function PreferencesForm() {
     catch(error) { setError(authErrorMessage(error)); if (error instanceof ApiError && error.status === 401) void refresh().catch(() => {}); }
     finally { setBusy(false); }
   }
-  if (!values || !options) return error ? <><p role="alert" className="auth-error">{error}</p><button className="secondary" onClick={() => setAttempt(x => x + 1)}>Retry loading</button></> : <p role="status">Loading preferences and catalogs…</p>;
+  if (!values || !options) return error ? <><p role="alert" className="auth-error">{error}</p><button className="secondary" onClick={() => setAttempt(x => x + 1)}>Retry loading</button></> : <LoadingState label="Loading preferences and catalogs…" />;
   return <form className="preferences-form" onSubmit={save} aria-busy={busy}>
     <fieldset disabled={busy}>
       {GROUPS.map(group => <section className="auth-card preference-group" key={group.key}>

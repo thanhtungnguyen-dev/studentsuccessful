@@ -1,4 +1,6 @@
 "use client";
+import { PageHeader } from "../ui/PageHeader";
+import { LoadingState } from "../ui/LoadingState";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -72,7 +74,7 @@ export function FitAnalysisContent({ analysis }: { analysis: FitAnalysis }) {
   return (
     <>
       <section className="auth-card dashboard-card fit-introduction">
-        <h1 className="profile-title">Fit analysis</h1>
+        <PageHeader title="Fit analysis" />
         <p className="fit-job">{analysis.job_title}{analysis.company_name ? ` · ${analysis.company_name}` : ""}</p>
         <p className="muted">This view compares stated job requirements with recorded candidate information. It does not assess ability, predict hiring outcomes, or make a recommendation.</p>
       </section>
@@ -106,7 +108,7 @@ export function FitAnalysisContent({ analysis }: { analysis: FitAnalysis }) {
   );
 }
 
-export function FitAnalysisLoading() { return <p role="status">Loading fit analysis…</p>; }
+export function FitAnalysisLoading() { return <LoadingState label="Loading fit analysis…" />; }
 
 export function FitAnalysisFailure({ retry, message }: { retry: () => void; message: string }) {
   return <section className="auth-card dashboard-card"><p role="alert" className="auth-error">Could not load fit analysis. {message}</p><button className="secondary" onClick={retry}>Retry fit analysis</button></section>;
@@ -142,7 +144,7 @@ export function FitAnalysisPage({ jobId }: { jobId: string }) {
       <Link href="/" className="brand">StudentSuccessful</Link>
       <p className="fit-back"><Link href="/jobs">Back to jobs</Link></p>
       {sessionError ? <p role="alert" className="auth-error">{sessionError}</p>
-        : user === undefined ? <p role="status">Checking your session…</p>
+        : user === undefined ? <LoadingState label="Checking your session…" />
           : user === null ? <p>Please <Link href="/login">Login</Link> to view a fit analysis.</p>
             : analysis ? <FitAnalysisContent analysis={analysis} />
               : error ? <FitAnalysisFailure message={error} retry={() => setAttempt((value) => value + 1)} />

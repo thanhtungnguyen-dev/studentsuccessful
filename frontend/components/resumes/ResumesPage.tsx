@@ -1,4 +1,5 @@
 "use client";
+import { LoadingState } from "../ui/LoadingState";
 
 import { useEffect, useRef, useState } from "react";
 import { ApiError, apiClient, authErrorMessage, type Resume, type ResumeEvidence, type ResumeExtractedText, type ResumeVersion } from "../../lib/api/client";
@@ -30,10 +31,10 @@ function extractedText(value: ResumeExtractedText | null): string {
 export function EvidencePanel({ analysis }: { analysis: Analysis }) {
   if (analysis.state === "loading") return <p className="muted" role="status">Loading detected resume evidence…</p>;
   if (analysis.state === "error") return <p className="muted">Detected resume evidence could not be loaded. Retry parsing to refresh it.</p>;
-  return <section className="resume-evidence"><h4>Detected from this resume</h4><p className="muted">These are parser-detected references from this file, not confirmed skills or profile claims.</p>
+  return <details className="resume-evidence"><summary>Detected evidence &amp; extracted text</summary><h4>Detected from this resume</h4><p className="muted">These are parser-detected references from this file, not confirmed skills or profile claims.</p>
     {analysis.evidence.length ? <ul>{analysis.evidence.map(item => { const row = record(item), skills = evidenceSkills(item); return <li key={valueText(row.id) || valueText(row.bullet_text)}><strong>{valueText(row.section_header) || valueText(row.category) || "Other"}</strong><p>{valueText(row.bullet_text)}</p>{skills.length ? <p className="muted">Recognized skill evidence: {skills.join(", ")}</p> : null}</li>; })}</ul> : <p className="muted">No structured evidence was detected from this resume.</p>}
     {extractedText(analysis.text) ? <details><summary>Raw extracted text</summary><pre>{extractedText(analysis.text)}</pre></details> : null}
-  </section>;
+  </details>;
 }
 
 export function ResumeSummary({ items }: { items: Resume[] }) {
@@ -166,7 +167,7 @@ function ResumeContent() {
   return <>
     <p className="muted">Upload and keep versions of files StudentSuccessful manages. Career Artifacts remain separate external links; neither area changes the other.</p>
     {error && <p role="alert" className="auth-error">{error}</p>}{success && <p role="status" className="profile-success">{success}</p>}
-    {items === null ? error ? <button className="secondary" onClick={() => setAttempt(value => value + 1)}>Retry resumes</button> : <p role="status">Loading resumes…</p> : <>
+    {items === null ? error ? <button className="secondary" onClick={() => setAttempt(value => value + 1)}>Retry resumes</button> : <LoadingState label="Loading resumes…" /> : <>
       {!editing && !deletingFamily && !deletingVersion && !uploadingFor && <button className="primary education-add" onClick={() => { setEditing("new"); setTitle(""); setError(""); setSuccess(""); }}>Create resume family</button>}
       {editing && <form className="auth-card education-form" onSubmit={event => { event.preventDefault(); void saveFamily(); }} noValidate><h2>{editing === "new" ? "Create resume family" : "Rename resume family"}</h2><fieldset disabled={busy}>
         <label htmlFor="resume-title">Resume title</label><input id="resume-title" value={title} maxLength={150} required onChange={event => setTitle(event.target.value)} />

@@ -1,4 +1,5 @@
 "use client";
+import { LoadingState } from "../ui/LoadingState";
 import {useEffect,useRef,useState} from "react";
 import {apiClient,ApiError,authErrorMessage,type Project,type ProjectCreate} from "../../lib/api/client";
 import {loadProjects,projectPayload} from "../../lib/portfolio/form";
@@ -16,7 +17,7 @@ function ProjectsContent(){
  async function remove(){if(!data||!deleting||pending.current)return;pending.current=true;setBusy(true);setError("");setSuccess("");try{await apiClient.deleteProject(deleting);setData({...data,projects:data.projects.filter(x=>x.id!==deleting)});setDeleting(null);setSuccess("Project deleted.");}catch(error){failure(error);}finally{pending.current=false;setBusy(false);}}
  return <><p className="muted">Projects you created. Technologies apply to each project and do not automatically become user-level Skills.</p>
  {error&&<p role="alert" className="auth-error">{error}</p>}{success&&<p role="status" className="profile-success">{success}</p>}
- {!data ? error ? <button className="secondary" onClick={()=>setAttempt(x=>x+1)}>Retry Projects</button> : <p role="status">Loading projects…</p> : <>
+ {!data ? error ? <button className="secondary" onClick={()=>setAttempt(x=>x+1)}>Retry Projects</button> : <LoadingState label="Loading projects…" /> : <>
  {!editing&&!deleting&&<button className="primary education-add" onClick={()=>{setForm(empty());setEditing("new");setError("");setSuccess("");}}>Add project</button>}
  {editing&&<form className="auth-card education-form" onSubmit={event=>{event.preventDefault();void save();}} noValidate><h2>{editing==="new"?"Add project":"Edit project"}</h2><fieldset disabled={busy}>
  <label>Title<input value={form.title} maxLength={150} required onChange={event=>setForm({...form,title:event.target.value})}/></label>

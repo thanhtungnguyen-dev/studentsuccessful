@@ -31,7 +31,7 @@ test("real registration, refresh, shared tabs, CSRF logout, and login", async ({
   await page.getByLabel("Confirm password").fill("mismatch");
 
   await page
-    .getByRole("button", { name: "Register", exact: true })
+    .getByRole("button", { name: "Create account", exact: true })
     .click();
 
   await expect(
@@ -41,7 +41,7 @@ test("real registration, refresh, shared tabs, CSRF logout, and login", async ({
   await page.getByLabel("Confirm password").fill(password);
 
   await page
-    .getByRole("button", { name: "Register", exact: true })
+    .getByRole("button", { name: "Create account", exact: true })
     .click();
 
   await expect(page).toHaveURL(
@@ -173,7 +173,7 @@ test("real registration, refresh, shared tabs, CSRF logout, and login", async ({
 
   await page
     .getByRole("button", {
-      name: "Login",
+      name: "Sign in",
       exact: true,
     })
     .click();
@@ -188,7 +188,7 @@ test("real registration, refresh, shared tabs, CSRF logout, and login", async ({
 
   await page
     .getByRole("button", {
-      name: "Login",
+      name: "Sign in",
       exact: true,
     })
     .click();
@@ -219,7 +219,7 @@ test("real registration, refresh, shared tabs, CSRF logout, and login", async ({
 
   await page
     .getByRole("button", {
-      name: "Register",
+      name: "Create account",
       exact: true,
     })
     .click();

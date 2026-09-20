@@ -98,7 +98,7 @@ it("does not render dashboard data for anonymous, unknown or failed sessions", (
 
 it("gives each career destination one semantic link without nested controls", () => {
  const html=render(h(Dashboard));
- const cards=html.slice(html.indexOf('class="career-actions"'),html.indexOf('class="overview-group"'));
+ const cards=html.slice(html.indexOf('class="career-actions"'),html.indexOf('aria-labelledby="profile-overview-title"'));
  expect(cards.match(/<a /g)).toHaveLength(3);
  expect(cards).not.toContain('<button');
  for(const label of ['Browse Jobs','View Candidate Profile','View Applications'])expect(cards).toContain(`aria-label="${label}"`);

@@ -34,7 +34,7 @@ export function WorkspaceNavigation({ pathname, onNavigate }: { pathname: string
     <p className="nav-caption">Main</p><div className="nav-group">{links(primary)}</div>
     <p className="nav-caption">Profile</p>
     <div className="nav-group">{links(profile.slice(0,5))}</div><p className="nav-caption">Portfolio</p><div className="nav-group">{links(profile.slice(5))}</div>
-    <p className="nav-caption">Job Tools</p><div className="nav-utilities"><Link href="/jobs?view=saved" onClick={onNavigate}>Saved Searches<ArrowUpRight size={14} aria-hidden="true" /></Link><Link href="/alerts" onClick={onNavigate}>Alerts<ArrowUpRight size={14} aria-hidden="true" /></Link></div>
+    <p className="nav-caption">Job Tools</p><div className="nav-utilities"><Link href="/jobs?view=saved" onClick={onNavigate}>Saved Searches<ArrowUpRight size={14} aria-hidden="true" /></Link><Link href="/alerts" aria-current={pathname === "/alerts" ? "page" : undefined} onClick={onNavigate}>Alerts<ArrowUpRight size={14} aria-hidden="true" /></Link></div>
   </nav>;
 }
 
@@ -59,6 +59,6 @@ export function AppShell({ children }: { children: ReactNode }) {
     }}>
       <div className="sheet-content"><div className="sheet-heading"><h2 id="navigation-title">Navigation</h2><button className="icon-button" aria-label="Close navigation" onClick={close}><X size={22} aria-hidden="true" /></button></div><WorkspaceNavigation pathname={pathname} onNavigate={close} /></div>
     </dialog>
-    <div id="workspace-content" className="workspace-content" tabIndex={-1}>{children}</div>
+    <div key={pathname} id="workspace-content" className="workspace-content" tabIndex={-1}>{children}</div>
   </div>;
 }

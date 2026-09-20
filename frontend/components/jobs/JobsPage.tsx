@@ -1,4 +1,6 @@
 "use client";
+import { PageHeader } from "../ui/PageHeader";
+import { LoadingState } from "../ui/LoadingState";
 
 import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
@@ -261,7 +263,7 @@ function JobActions({ job, onDetails, onSave, onHide, pending = false, tracked, 
   return (
     <div className="job-actions">
       {application ? (
-        <a className="secondary" href={application} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">
+        <a className="primary" href={application} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">
           Apply
         </a>
       ) : null}
@@ -428,7 +430,7 @@ export function SavedSearchControls({
           <p role="alert" className="auth-error">{error}</p>
           <button className="secondary" type="button" onClick={onRetry}>Retry saved searches</button>
         </div>
-      ) : searches === null ? <p role="status">Loading saved searches…</p>
+      ) : searches === null ? <LoadingState label="Loading saved searches…" />
         : searches.length ? (
           <ul className="saved-search-list">
             {searches.map((search) => (
@@ -850,10 +852,10 @@ export function JobsPage() {
 
   return (
     <main className="auth-shell dashboard-shell jobs-shell">
-      <header className="jobs-heading"><div><h1 className="profile-title">Jobs</h1><p className="muted">Discover opportunities that fit your goals.</p></div>
-      {user ? <button ref={savedTrigger} className="secondary" type="button" onClick={() => savedDialog.current?.showModal()}>Saved searches</button> : null}</header>
+      <PageHeader title="Jobs" description="Discover opportunities that fit your goals.">
+      {user ? <button ref={savedTrigger} className="secondary" type="button" onClick={() => savedDialog.current?.showModal()}>Saved searches</button> : null}</PageHeader>
       {sessionError ? <p role="alert" className="auth-error">{sessionError}</p>
-        : user === undefined ? <p role="status">Checking your session…</p>
+        : user === undefined ? <LoadingState label="Checking your session…" />
           : user === null ? <p>Please <Link href="/login">Login</Link> to browse jobs.</p>
             : (
               <>

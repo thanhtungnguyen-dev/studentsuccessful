@@ -1,6 +1,8 @@
 "use client";
+import { LoadingState } from "../ui/LoadingState";
 
 import Link from "next/link";
+import { PageHeader } from "../ui/PageHeader";
 import { useEffect, useState } from "react";
 
 import {
@@ -62,7 +64,7 @@ export function ApplicationCard({
           <h2>{application.job_title}</h2>
           <p className="muted">{application.company_name}</p>
         </div>
-        <p className="application-status">Status: {readableStatus(application.current_status)}</p>
+        <p className="application-status" data-status={application.current_status}>Status: {readableStatus(application.current_status)}</p>
       </header>
       <dl>
         <div><dt>Applied</dt><dd>{dateLabel(application.applied_at)}</dd></div>
@@ -93,6 +95,7 @@ export function ApplicationCard({
         <Link className="secondary" href="/jobs">View Jobs</Link>
         {apply ? <a className="secondary" href={apply} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">Apply</a> : null}
       </div>
+      <details className="application-disclosure"><summary>Private notes &amp; status history</summary>
       <label className="application-notes">
         Private note
         <textarea value={notes} maxLength={2000} disabled={pending} onChange={(event) => setNotes(event.currentTarget.value)} />
@@ -112,6 +115,7 @@ export function ApplicationCard({
           ))}
         </ol>
       </section>
+      </details>
     </article>
   );
 }
@@ -194,10 +198,9 @@ export function ApplicationsPage() {
   return (
     <main className="auth-shell dashboard-shell applications-shell">
       <Link href="/" className="brand">StudentSuccessful</Link>
-      <h1 className="profile-title">Applications</h1>
-      <p className="muted">Track applications only after you submit them yourself. Statuses are your private records.</p>
+      <PageHeader title="Applications" description="Track applications only after you submit them yourself. Statuses are your private records." />
       {sessionError ? <p role="alert" className="auth-error">{sessionError}</p>
-        : user === undefined ? <p role="status">Checking your session…</p>
+        : user === undefined ? <LoadingState label="Checking your session…" />
           : user === null ? <p>Please <Link href="/login">Login</Link> to view applications.</p>
             : (
               <>
@@ -221,7 +224,7 @@ export function ApplicationsPage() {
                       <p role="alert" className="auth-error">Could not load applications. {error}</p>
                       <button className="secondary" type="button" onClick={() => setAttempt((value) => value + 1)}>Retry applications</button>
                     </section>
-                  ) : <p role="status">Loading applications…</p>
+                  ) : <LoadingState label="Loading applications…" />
                 ) : !items.length ? (
                   <section className="auth-card dashboard-card">
                     <h2>No tracked applications</h2>

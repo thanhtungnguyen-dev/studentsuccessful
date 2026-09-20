@@ -1,4 +1,6 @@
 "use client";
+import { PageHeader } from "../ui/PageHeader";
+import { LoadingState } from "../ui/LoadingState";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -138,7 +140,7 @@ export function ResumeTailoringReviewContent({
   return (
     <>
       <section className="auth-card dashboard-card review-introduction">
-        <h1 className="profile-title">Resume Draft Review</h1>
+        <PageHeader title="Resume Draft Review" />
         <p className="fit-job">{review.job_title}{review.company_name ? ` · ${review.company_name}` : ""}</p>
         <p className="review-version"><strong>Selected resume:</strong> {review.resume_title}, version {review.resume_version_number}</p>
         <p className={finalized ? "review-status review-finalized-status" : "review-status"}>
@@ -302,11 +304,11 @@ export function ResumeTailoringReviewPage({ jobId }: { jobId: string }) {
       <Link href="/jobs" className="brand">StudentSuccessful</Link>
       <p className="fit-back"><Link href={`/jobs/${encodeURIComponent(jobId)}/resume-draft`}>Back to Resume Tailoring</Link></p>
       {sessionError ? <p role="alert" className="auth-error">{sessionError}</p>
-        : user === undefined ? <p role="status">Checking your session…</p>
+        : user === undefined ? <LoadingState label="Checking your session…" />
           : user === null ? <p>Please <Link href="/login">Login</Link> to review a resume draft.</p>
             : choicesError ? <section className="auth-card dashboard-card"><p role="alert" className="auth-error">Could not load resume versions. {choicesError}</p><button className="secondary" onClick={() => setChoicesAttempt((value) => value + 1)}>Retry resume versions</button></section>
-              : choices === null ? <p role="status">Loading resume versions…</p>
-                : choices.length === 0 ? <section className="auth-card dashboard-card"><h1 className="profile-title">Resume Draft Review</h1><p className="muted">Upload a resume version before reviewing a draft.</p><Link className="secondary" href="/resumes">Manage resumes</Link></section>
+              : choices === null ? <LoadingState label="Loading resume versions…" />
+                : choices.length === 0 ? <section className="auth-card dashboard-card"><PageHeader title="Resume Draft Review" /><p className="muted">Upload a resume version before reviewing a draft.</p><Link className="secondary" href="/resumes">Manage resumes</Link></section>
                   : <>
                     <section className="auth-card dashboard-card review-selector">
                       <label htmlFor="review-resume-version-select">Choose a resume version</label>
@@ -316,8 +318,8 @@ export function ResumeTailoringReviewPage({ jobId }: { jobId: string }) {
                     </section>
                     {reviewError && <section className="auth-card dashboard-card"><p role="alert" className="auth-error">{reviewError}</p><button className="secondary" disabled={busy} onClick={() => setReviewAttempt((value) => value + 1)}>Reload review</button></section>}
                     {review ? <ResumeTailoringReviewContent review={review} busy={busy} onUpdate={updateItem} onFinalize={finalizeReview} />
-                      : reviewMissing ? <section className="auth-card dashboard-card review-start"><h1 className="profile-title">Resume Draft Review</h1><p>This creates a saved snapshot of the current evidence-backed Phase 16 suggestions for the selected resume version.</p><p className="muted">It does not create a ResumeVersion or change candidate evidence.</p><button type="button" disabled={busy} onClick={() => void createReview()}>Start review</button></section>
-                        : !reviewError && <p role="status">Loading saved review…</p>}
+                      : reviewMissing ? <section className="auth-card dashboard-card review-start"><PageHeader title="Resume Draft Review" /><p>This creates a saved snapshot of the current evidence-backed Phase 16 suggestions for the selected resume version.</p><p className="muted">It does not create a ResumeVersion or change candidate evidence.</p><button type="button" disabled={busy} onClick={() => void createReview()}>Start review</button></section>
+                        : !reviewError && <LoadingState label="Loading saved review…" />}
                   </>}
     </main>
   );

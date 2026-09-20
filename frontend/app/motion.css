@@ -1,0 +1,10 @@
+/* Progressive enhancement: no initial opacity:0 or hidden content. */
+@keyframes page-entry { from { opacity: .65; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+@keyframes reveal-entry { from { opacity: 0; transform: translateY(var(--reveal-distance, 10px)); } to { opacity: 1; transform: none; } }
+.reveal[data-direction="down"] { --reveal-distance: -10px; }
+.reveal[data-direction="none"] { --reveal-distance: 0px; }
+.reveal.is-revealed { animation: reveal-entry 450ms var(--motion-ease) var(--reveal-delay, 0ms) backwards; }
+@media (prefers-reduced-motion: reduce) {
+ *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+ .reveal, .workspace-content > main { transform: none !important; }
+}

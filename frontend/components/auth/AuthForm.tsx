@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { ArrowRight, Search, ChartNoAxesCombined, ListChecks } from "lucide-react";
+import { Reveal } from "../ui/Reveal";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { apiClient, authErrorMessage } from "../../lib/api/client";
@@ -9,7 +11,7 @@ import { useAuth } from "./AuthProvider";
 
 export function AuthForm({ mode }: { mode: "register" | "login" }) {
   const registering = mode === "register";
-  const title = registering ? "Register" : "Login";
+  const title = registering ? "Create account" : "Sign in";
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const { refresh } = useAuth();
@@ -40,11 +42,27 @@ export function AuthForm({ mode }: { mode: "register" | "login" }) {
     finally { setBusy(false); }
   }
 
-  return <main className="auth-shell">
-    <Link href="/" className="brand">StudentSuccessful</Link>
-    <section className="auth-card" aria-labelledby="form-title">
-      <h1 id="form-title">{title}</h1>
-      <p className="muted">{registering ? "Create your account." : "Welcome back. Sign in to your account."}</p>
+  return <main className="auth-layout">
+    <aside className="auth-story">
+      <Link href="/" className="workspace-brand"><span className="brand-monogram" aria-hidden="true">S</span>StudentSuccessful</Link>
+      <Reveal className="auth-story-copy">
+        <p className="eyebrow">YOUR NEXT CHAPTER STARTS HERE</p>
+        <h2>Build your career<br />with clarity.</h2>
+        <p>Discover opportunities, understand your fit, and stay organized throughout your job search.</p>
+        <ul className="auth-benefits">
+          <li><Search size={20} aria-hidden="true" />Discover relevant opportunities</li>
+          <li><ChartNoAxesCombined size={20} aria-hidden="true" />Understand candidate-job fit</li>
+          <li><ListChecks size={20} aria-hidden="true" />Track every application</li>
+        </ul>
+      </Reveal>
+      <p className="auth-story-note">A thoughtful workspace for your next move.</p>
+    </aside>
+    <div className="auth-form-panel">
+    <Link href="/" className="workspace-brand auth-mobile-brand"><span className="brand-monogram" aria-hidden="true">S</span>StudentSuccessful</Link>
+    <Reveal as="section" className="auth-card auth-form-card" aria-labelledby="form-title">
+      <p className="eyebrow">{registering ? "GET STARTED" : "GOOD TO SEE YOU AGAIN"}</p>
+      <h1 id="form-title">{registering ? "Create your account" : "Welcome back"}</h1>
+      <p className="muted">{registering ? "Bring your experience and opportunities together." : "Continue your career journey."}</p>
       <form onSubmit={submit} noValidate aria-busy={busy}>
         <fieldset disabled={busy}>
           <label htmlFor="email">Email</label>
@@ -57,10 +75,12 @@ export function AuthForm({ mode }: { mode: "register" | "login" }) {
             <input id="confirmation" name="confirmation" type="password" autoComplete="new-password" required />
           </>}
           {error && <p role="alert" className="auth-error">{error}</p>}
-          <button type="submit" className="primary">{busy ? "Please wait…" : title}</button>
+          <button type="submit" className="primary">{busy ? "Please wait…" : <>{title}<ArrowRight size={17} aria-hidden="true" /></>}</button>
         </fieldset>
       </form>
-      <p className="auth-footer">{registering ? "Already have an account? " : "New here? "}<Link href={registering ? "/login" : "/register"}>{registering ? "Login" : "Register"}</Link></p>
-    </section>
+      <p className="auth-footer">{registering ? "Already have an account? " : "New here? "}<Link href={registering ? "/login" : "/register"}>{registering ? "Sign in" : "Create an account"}</Link></p>
+    </Reveal>
+    <p className="auth-form-note">Your experience. Your goals. Your next step.</p>
+    </div>
   </main>;
 }

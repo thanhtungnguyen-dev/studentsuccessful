@@ -1,6 +1,8 @@
 "use client";
+import { LoadingState } from "../ui/LoadingState";
 
 import Link from "next/link";
+import { PageHeader } from "../ui/PageHeader";
 import { useEffect, useMemo, useState } from "react";
 
 import {
@@ -214,17 +216,16 @@ export function AlertsPage() {
   return (
     <main className="auth-shell dashboard-shell alerts-shell">
       <Link href="/" className="brand">StudentSuccessful</Link>
-      <h1 className="profile-title">Alerts</h1>
-      <p className="muted">New canonical jobs matched by your alert-enabled saved searches.</p>
+      <PageHeader title="Alerts" description="New canonical jobs matched by your alert-enabled saved searches." />
       {sessionError ? <p role="alert" className="auth-error">{sessionError}</p>
-        : user === undefined ? <p role="status">Checking your session…</p>
+        : user === undefined ? <LoadingState label="Checking your session…" />
           : user === null ? <p>Please <Link href="/login">Login</Link> to view alerts.</p>
             : error && inbox === null ? (
               <section className="auth-card dashboard-card">
                 <p role="alert" className="auth-error">Could not load alerts. {error}</p>
                 <button className="secondary" type="button" onClick={() => setAttempt((value) => value + 1)}>Retry alerts</button>
               </section>
-            ) : inbox === null ? <p role="status">Loading alerts…</p>
+            ) : inbox === null ? <LoadingState label="Loading alerts…" />
               : (
                 <>
                   {error ? <p role="alert" className="auth-error">{error}</p> : null}
@@ -243,7 +244,7 @@ export function AlertsPage() {
                         const alert = inbox.items.find((item) => item.id === selectedAlertId);
                         if (alert) void viewAlert(alert);
                       }} />
-                        : detail ? <JobDetail job={detail} /> : <p role="status">Loading job details…</p>}
+                        : detail ? <JobDetail job={detail} /> : <LoadingState label="Loading job details…" />}
                     </section>
                   ) : null}
                 </>
