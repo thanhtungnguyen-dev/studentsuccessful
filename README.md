@@ -31,7 +31,7 @@ This is the core interaction the redesigned dashboard now emphasizes: the next u
 
 ## Screenshots
 
-Screenshots are captured from the running Next.js application, not design mockups. They are refreshed from the actual frontend whenever this README changes.
+Screenshots are captured from the running Next.js application at desktop and mobile sizes, not design mockups. The screenshot workflow checks route rendering and selected interactions before updating these images.
 
 | Landing page | Career workspace |
 |:--:|:--:|
