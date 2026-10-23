@@ -82,26 +82,44 @@ export function FitAnalysisContent({ analysis }: { analysis: FitAnalysis }) {
         <div className="analysis-job-identity"><CompanyLogo company={analysis.company_name || "Employer"} size="large" /><div><p className="analysis-job-company">{analysis.company_name || "Employer"}</p><p className="fit-job">{analysis.job_title}</p></div></div>
         <p className="muted">Compare a role's requirements with your saved skills and experience. This checks recorded evidence, not hiring chances.</p>
       </section>
-      <div className="fit-layout">
-        <RequirementGroup
-          title="Recorded evidence"
-          intro="These requirements have supporting records in your profile or resumes."
-          requirements={analysis.matched ?? []}
-          empty="No job requirements have recorded candidate evidence."
-        />
-        <RequirementGroup
-          title="No recorded evidence"
-          intro="Nothing in your saved records supports these requirements yet."
-          requirements={analysis.missing ?? []}
-          empty="No requirements are in this group."
-        />
-        <RequirementGroup
-          title="Unknown"
-          intro="Review education and eligibility requirements yourself."
-          requirements={analysis.unknown ?? []}
-          empty="No requirements are unknown."
-        />
+      <div className="analysis-overview" aria-label="Requirement counts">
+        <span><strong>{analysis.matched?.length ?? 0}</strong> recorded evidence</span>
+        <span><strong>{analysis.missing?.length ?? 0}</strong> no recorded evidence</span>
+        <span><strong>{analysis.unknown?.length ?? 0}</strong> unknown</span>
       </div>
+      {((analysis.matched?.length ?? 0) + (analysis.missing?.length ?? 0) + (analysis.unknown?.length ?? 0)) === 0 ? (
+        <p className="analysis-zero">No requirements are recorded for this role yet.</p>
+      ) : (
+        <div className="fit-layout">
+          {(analysis.matched?.length ?? 0) > 0 && (
+            <RequirementGroup
+              title="Recorded evidence"
+              intro="These requirements have supporting records in your profile or resumes."
+              requirements={analysis.matched ?? []}
+              empty="No job requirements have recorded candidate evidence."
+              
+            />
+          )}
+          {(analysis.missing?.length ?? 0) > 0 && (
+            <RequirementGroup
+              title="No recorded evidence"
+              intro="Nothing in your saved records supports these requirements yet."
+              requirements={analysis.missing ?? []}
+              empty="No requirements are in this group."
+              
+            />
+          )}
+          {(analysis.unknown?.length ?? 0) > 0 && (
+            <RequirementGroup
+              title="Unknown"
+              intro="Review education and eligibility requirements yourself."
+              requirements={analysis.unknown ?? []}
+              empty="No requirements are unknown."
+              
+            />
+          )}
+        </div>
+      )}
       {analysis.limitations.length > 0 && (
         <section className="auth-card dashboard-card fit-limitations">
           <h2>Analysis limitations</h2>

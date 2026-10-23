@@ -106,32 +106,54 @@ export function ResumeAlignmentContent({ alignment }: { alignment: ResumeAlignme
         <p className="alignment-version"><strong>Selected resume:</strong> {alignment.resume_title}, version {alignment.resume_version_number}</p>
         <p className="muted">See which requirements are supported by the selected resume. Missing evidence does not mean you lack the skill.</p>
       </section>
-      <div className="alignment-layout">
-        <AlignmentGroup
-          title="Shown on this resume"
-          intro="These requirements have evidence in this resume version."
-          requirements={alignment.shown_on_resume ?? []}
-          empty="No job requirements have accepted evidence on this resume version."
-        />
-        <AlignmentGroup
-          title="Candidate evidence not shown"
-          intro="Recorded candidate evidence exists, but it is not shown in this resume version."
-          requirements={alignment.candidate_evidence_not_shown ?? []}
-          empty="No requirements are in this group."
-        />
-        <AlignmentGroup
-          title="No recorded evidence"
-          intro="No supporting record was found in the selected resume or your saved profile."
-          requirements={alignment.no_recorded_evidence ?? []}
-          empty="No requirements are in this group."
-        />
-        <AlignmentGroup
-          title="Unknown / unassessed"
-          intro="Review education and eligibility requirements yourself."
-          requirements={alignment.unknown_unassessed ?? []}
-          empty="No requirements are unknown or unassessed."
-        />
+      <div className="analysis-overview" aria-label="Requirement counts">
+        <span><strong>{alignment.shown_on_resume?.length ?? 0}</strong> shown on this resume</span>
+        <span><strong>{alignment.candidate_evidence_not_shown?.length ?? 0}</strong> candidate evidence not shown</span>
+        <span><strong>{alignment.no_recorded_evidence?.length ?? 0}</strong> no recorded evidence</span>
+        <span><strong>{alignment.unknown_unassessed?.length ?? 0}</strong> unknown / unassessed</span>
       </div>
+      {((alignment.shown_on_resume?.length ?? 0) + (alignment.candidate_evidence_not_shown?.length ?? 0) + (alignment.no_recorded_evidence?.length ?? 0) + (alignment.unknown_unassessed?.length ?? 0)) === 0 ? (
+        <p className="analysis-zero">No requirements are recorded for this role yet.</p>
+      ) : (
+        <div className="alignment-layout">
+          {(alignment.shown_on_resume?.length ?? 0) > 0 && (
+            <AlignmentGroup
+              title="Shown on this resume"
+              intro="These requirements have evidence in this resume version."
+              requirements={alignment.shown_on_resume ?? []}
+              empty="No job requirements have accepted evidence on this resume version."
+              
+            />
+          )}
+          {(alignment.candidate_evidence_not_shown?.length ?? 0) > 0 && (
+            <AlignmentGroup
+              title="Candidate evidence not shown"
+              intro="Recorded candidate evidence exists, but it is not shown in this resume version."
+              requirements={alignment.candidate_evidence_not_shown ?? []}
+              empty="No requirements are in this group."
+              
+            />
+          )}
+          {(alignment.no_recorded_evidence?.length ?? 0) > 0 && (
+            <AlignmentGroup
+              title="No recorded evidence"
+              intro="No supporting record was found in the selected resume or your saved profile."
+              requirements={alignment.no_recorded_evidence ?? []}
+              empty="No requirements are in this group."
+              
+            />
+          )}
+          {(alignment.unknown_unassessed?.length ?? 0) > 0 && (
+            <AlignmentGroup
+              title="Unknown / unassessed"
+              intro="Review education and eligibility requirements yourself."
+              requirements={alignment.unknown_unassessed ?? []}
+              empty="No requirements are unknown or unassessed."
+              
+            />
+          )}
+        </div>
+      )}
       {alignment.limitations.length > 0 && (
         <section className="auth-card dashboard-card alignment-limitations">
           <h2>Alignment limitations</h2>

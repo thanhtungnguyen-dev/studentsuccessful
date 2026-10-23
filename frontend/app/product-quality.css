@@ -250,3 +250,12 @@
 @media (max-width: 600px) {
   .workspace .project-gallery-card { padding: 18px; }
 }
+
+/* Requirement categories remain visible as counts while empty panels are omitted. */
+.workspace .analysis-overview { display:flex; flex-wrap:wrap; gap:9px; margin:15px 0 17px; }
+.workspace .analysis-overview span { display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid #dce3ee; color:#4f5f79; border-radius:10px; padding:9px 12px; font-size:13px; line-height:1.45; }
+.workspace .analysis-overview strong { font-size:15px; color:#202b45; font-variant-numeric:tabular-nums; }
+.workspace .analysis-zero { color:#58677d; font-size:14px; padding:20px; border:1px solid #e0e6f0; border-radius:12px; background:#fff; }
+.workspace :where(.fit-layout,.alignment-layout,.gap-layout) { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; align-items:start; }
+.workspace :where(.fit-layout,.alignment-layout,.gap-layout) > :only-child { grid-column:1/-1; max-width:850px; width:100%; }
+@media(max-width:850px) { .workspace :where(.fit-layout,.alignment-layout,.gap-layout) { grid-template-columns:minmax(0,1fr); } }

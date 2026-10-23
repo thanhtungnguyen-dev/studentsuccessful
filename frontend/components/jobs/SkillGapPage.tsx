@@ -122,36 +122,54 @@ export function SkillGapContent({ analysis }: { analysis: SkillGapAnalysis }) {
         <p className="gap-version"><strong>Selected resume:</strong> {analysis.resume_title}, version {analysis.resume_version_number}</p>
         <p className="muted">This view groups explicit job requirements by recorded evidence. It does not assess ability, predict hiring outcomes, or recommend changes.</p>
       </section>
-      <div className="gap-layout">
-        <SkillGapGroup
-          title="Covered"
-          intro="These requirements appear in the selected resume."
-          requirements={analysis.covered ?? []}
-          empty="No job requirements are covered by accepted evidence on this resume version."
-          selectedVersionId={analysis.resume_version_id}
-        />
-        <SkillGapGroup
-          title="Resume presentation gaps"
-          intro="Recorded candidate evidence exists, but it is not shown on this resume."
-          requirements={analysis.resume_presentation_gaps ?? []}
-          empty="No requirements are in this group."
-          selectedVersionId={analysis.resume_version_id}
-        />
-        <SkillGapGroup
-          title="Candidate evidence gaps"
-          intro="No supporting evidence in your saved records."
-          requirements={analysis.candidate_evidence_gaps ?? []}
-          empty="No requirements are in this group."
-          selectedVersionId={analysis.resume_version_id}
-        />
-        <SkillGapGroup
-          title="Unknown / unassessed"
-          intro="Review education and eligibility requirements yourself."
-          requirements={analysis.unknown ?? []}
-          empty="No requirements are unknown or unassessed."
-          selectedVersionId={analysis.resume_version_id}
-        />
+      <div className="analysis-overview" aria-label="Requirement counts">
+        <span><strong>{analysis.covered?.length ?? 0}</strong> covered</span>
+        <span><strong>{analysis.resume_presentation_gaps?.length ?? 0}</strong> resume presentation gaps</span>
+        <span><strong>{analysis.candidate_evidence_gaps?.length ?? 0}</strong> candidate evidence gaps</span>
+        <span><strong>{analysis.unknown?.length ?? 0}</strong> unknown / unassessed</span>
       </div>
+      {((analysis.covered?.length ?? 0) + (analysis.resume_presentation_gaps?.length ?? 0) + (analysis.candidate_evidence_gaps?.length ?? 0) + (analysis.unknown?.length ?? 0)) === 0 ? (
+        <p className="analysis-zero">No requirements are recorded for this role yet.</p>
+      ) : (
+        <div className="gap-layout">
+          {(analysis.covered?.length ?? 0) > 0 && (
+            <SkillGapGroup
+              title="Covered"
+              intro="These requirements appear in the selected resume."
+              requirements={analysis.covered ?? []}
+              empty="No job requirements are covered by accepted evidence on this resume version."
+              selectedVersionId={analysis.resume_version_id}
+            />
+          )}
+          {(analysis.resume_presentation_gaps?.length ?? 0) > 0 && (
+            <SkillGapGroup
+              title="Resume presentation gaps"
+              intro="Recorded candidate evidence exists, but it is not shown on this resume."
+              requirements={analysis.resume_presentation_gaps ?? []}
+              empty="No requirements are in this group."
+              selectedVersionId={analysis.resume_version_id}
+            />
+          )}
+          {(analysis.candidate_evidence_gaps?.length ?? 0) > 0 && (
+            <SkillGapGroup
+              title="Candidate evidence gaps"
+              intro="No supporting evidence in your saved records."
+              requirements={analysis.candidate_evidence_gaps ?? []}
+              empty="No requirements are in this group."
+              selectedVersionId={analysis.resume_version_id}
+            />
+          )}
+          {(analysis.unknown?.length ?? 0) > 0 && (
+            <SkillGapGroup
+              title="Unknown / unassessed"
+              intro="Review education and eligibility requirements yourself."
+              requirements={analysis.unknown ?? []}
+              empty="No requirements are unknown or unassessed."
+              selectedVersionId={analysis.resume_version_id}
+            />
+          )}
+        </div>
+      )}
       {analysis.limitations.length > 0 && (
         <section className="auth-card dashboard-card gap-limitations">
           <h2>Analysis limitations</h2>
