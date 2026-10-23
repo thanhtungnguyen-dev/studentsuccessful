@@ -221,6 +221,14 @@ function displayChoice(value: string): string {
   return value.toLowerCase().replaceAll("_", " ").replace(/\b\w/g, (character) => character.toUpperCase());
 }
 
+function formatJobLocation(location: string): string {
+  // Expand terminal country codes only when the location includes a city and region.
+  // "San Francisco, CA" must remain California, not become Canada.
+  return location.replace(/^(.*?,\s*[^,]+),\s*(CA|US)$/i, (_full, region, code: string) =>
+    `${region}, ${code.toUpperCase() === "CA" ? "Canada" : "United States"}`
+  );
+}
+
 function JobMeta({
   job,
   location,
@@ -234,7 +242,7 @@ function JobMeta({
         {location ? (
           <>
             <MapPin size={13} aria-hidden="true" />
-            {location}
+            {formatJobLocation(location)}
           </>
         ) : job.role_name}
       </span>
@@ -331,7 +339,7 @@ export function JobDetail({
         <div className="job-detail-identity">
           <p className="job-detail-employer">{job.company_name}</p>
           <h2>{job.title}</h2>
-          <p className="job-detail-subtitle"><MapPin size={14} aria-hidden="true" />{job.locations.length ? job.locations.join(", ") : "Location not specified"}</p>
+          <p className="job-detail-subtitle"><MapPin size={14} aria-hidden="true" />{job.locations.length ? job.locations.map(formatJobLocation).join(" · ") : "Location not specified"}</p>
           <div className="job-detail-tags">
             {job.work_mode && <span>{displayChoice(job.work_mode)}</span>}
             {job.employment_type && <span>{displayChoice(job.employment_type)}</span>}
