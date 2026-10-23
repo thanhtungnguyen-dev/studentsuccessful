@@ -1,5 +1,6 @@
 "use client";
 import { PageHeader } from "../ui/PageHeader";
+import { isDemoModeEnabled } from "../../lib/demo/config";
 import { CompanyLogo } from "./CompanyLogo";
 import { ArrowUpRight, Bookmark, EyeOff, MapPin } from "lucide-react";
 import { LoadingState } from "../ui/LoadingState";
@@ -343,7 +344,7 @@ export function JobDetail({
       <div className="job-detail-facts" aria-label="Posting information">
         <div><span>Source</span><strong>{job.source_name}</strong></div>
         <div><span>Posted</span><strong>{job.posted_at ? formatJobDate(job.posted_at) : "Not provided"}</strong></div>
-        <div><span>Last verified</span><strong>{formatJobDate(job.last_verified_at)}</strong></div>
+        <div><span>{isDemoModeEnabled() ? "Snapshot date" : "Last verified"}</span><strong>{formatJobDate(job.last_verified_at)}</strong></div>
       </div>
       <h3>About the role</h3>
       <p className="job-description">{job.description || "No description provided."}</p>

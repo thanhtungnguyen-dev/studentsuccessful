@@ -103,12 +103,20 @@ function ConfirmedSkills({ data }: { data: Row }) {
   const names = [...new Map(raw.map(skill => [title(skill, "").trim().toLowerCase(), title(skill, "")])).values()].filter(Boolean);
   const skills = names.filter(name => !(name === "C++" && names.some(other => other.toLowerCase() === "c/c++")))
     .sort((a, b) => a.localeCompare(b));
-  const matching = skills.filter(skill => skill.toLowerCase().includes(query.trim().toLowerCase()));
-  const visible = showAll || query ? matching : matching.slice(0, 12);
+  const priority = ["Python", "React", "TypeScript", "JavaScript", "PostgreSQL", "SQL", "C/C++", "Linux", "Git"];
+  const ordered = [...skills].sort((a, b) => {
+    const rank = (skill: string) => {
+      const index = priority.findIndex(item => item.toLowerCase() === skill.toLowerCase());
+      return index < 0 ? priority.length : index;
+    };
+    return rank(a) - rank(b) || a.localeCompare(b);
+  });
+  const matching = ordered.filter(skill => skill.toLowerCase().includes(query.trim().toLowerCase()));
+  const visible = showAll || query ? matching : matching.slice(0, 9);
   return <Panel title="Confirmed skills" icon={<CircleCheck size={19} />} href="/skills" count={skills.length} className="candidate-skills-panel">
     {skills.length > 9 && <label className="candidate-skill-search"><Search size={17} aria-hidden="true" /><span className="sr-only">Find a skill</span><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Find a skill" /></label>}
     {matching.length ? <ul className="candidate-skill-grid">{visible.map(skill => <li key={skill} className="candidate-skill-chip"><TechMark name={skill} /><span>{skill}</span></li>)}</ul> : <p className="candidate-empty">{query ? "No skills match your search." : "Add your skills to build your profile."}</p>}
-    {!query && skills.length > 12 && <button type="button" className="candidate-show-more" onClick={() => setShowAll(value => !value)} aria-expanded={showAll}>{showAll ? "Show fewer skills" : `Show all ${skills.length} skills`} <ChevronDown size={15} className={showAll ? "candidate-chevron-up" : ""} /></button>}
+    {!query && skills.length > 9 && <button type="button" className="candidate-show-more" onClick={() => setShowAll(value => !value)} aria-expanded={showAll}>{showAll ? "Show fewer skills" : `Show all ${skills.length} skills`} <ChevronDown size={15} className={showAll ? "candidate-chevron-up" : ""} /></button>}
   </Panel>;
 }
 function ReconciledSkills({ data }: { data: Row }) {

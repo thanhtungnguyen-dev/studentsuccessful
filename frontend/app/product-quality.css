@@ -75,3 +75,8 @@
 @media (prefers-reduced-motion: reduce) {
   .workspace :where(.ui-card, .auth-card, .application-card) { scroll-behavior: auto; }
 }
+
+/* Keep the small personal-information card from stretching to the height of the skill browser. */
+.workspace .candidate-top-grid > .candidate-personal-panel { align-self: start; }
+.workspace .candidate-skill-chip { min-height: 38px; }
+.workspace .candidate-show-more { min-height: 44px; }
