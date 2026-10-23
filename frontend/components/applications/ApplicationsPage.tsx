@@ -132,10 +132,12 @@ export function ApplicationsPage() {
   const [items, setItems] = useState<Application[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [attempt, setAttempt] = useState(0);
   const [pendingIds, setPendingIds] = useState<Set<string>>(() => new Set());
 
   function handleError(reason: unknown) {
+    setSuccess("");
     setError(authErrorMessage(reason));
     if (reason instanceof ApiError && reason.status === 401) void refresh().catch(() => {});
   }
@@ -150,12 +152,14 @@ export function ApplicationsPage() {
   async function updateStatus(application: Application, status: ApplicationStatus, statusNote: string) {
     setPendingIds((current) => new Set(current).add(application.id));
     setError("");
+    setSuccess("");
     try {
       replace(await apiClient.updateApplication(application.id, {
         expected_version: application.version,
         status,
         ...(statusNote.trim() ? { status_note: statusNote.trim() } : {}),
       }));
+      setSuccess(`Status updated for ${application.company_name}.`);
     } catch (reason) {
       handleError(reason);
       if (reason instanceof ApiError && reason.status === 409) setAttempt((value) => value + 1);
@@ -171,11 +175,13 @@ export function ApplicationsPage() {
   async function saveNotes(application: Application, notes: string) {
     setPendingIds((current) => new Set(current).add(application.id));
     setError("");
+    setSuccess("");
     try {
       replace(await apiClient.updateApplication(application.id, {
         expected_version: application.version,
         notes: notes.trim() || null,
       }));
+      setSuccess(`Note saved for ${application.company_name}.`);
     } catch (reason) {
       handleError(reason);
       if (reason instanceof ApiError && reason.status === 409) setAttempt((value) => value + 1);
@@ -258,6 +264,7 @@ export function ApplicationsPage() {
                 </div>
                 {loading && items !== null && <div className="applications-refresh" role="status"><span className="sr-only">Updating applications</span></div>}
                 {error && items !== null ? <p role="alert" className="auth-error">{error}</p> : null}
+                {success && <p role="status" className="application-saved">{success}</p>}
                 {items === null ? (
                   error ? (
                     <section className="auth-card dashboard-card">
