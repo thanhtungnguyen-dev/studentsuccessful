@@ -1,6 +1,7 @@
 "use client";
 
 import { WorkspaceMetrics } from "./WorkspaceMetrics";
+import { WorkspaceFocus } from "./WorkspaceFocus";
 import {SkillsSummary,ProjectsSummary} from "../portfolio/PortfolioSummaries";
 import {ArtifactSummary} from "../artifacts/ArtifactList";
 import {ResumeSummary} from "../resumes/ResumesPage";
@@ -11,7 +12,7 @@ import { UserRound, GraduationCap, Building2, Globe2, SlidersHorizontal, ListChe
 import { Reveal } from "../ui/Reveal";
 import { Card } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
-import { ArrowUpRight, BriefcaseBusiness, ContactRound, ClipboardList } from "lucide-react";
+
 import { useEffect, useState, type ReactNode } from "react";
 import { ApiError, authErrorMessage } from "../../lib/api/client";
 import { dashboardLoaders } from "../../lib/dashboard/data";
@@ -45,14 +46,7 @@ const count = (n: number, singular: string, plural = `${singular}s`) => `${n} ${
 export function Dashboard() {
   return <div className="dashboard-overview">
     <WorkspaceMetrics />
-    <Reveal as="section" className="career-section dashboard-wide" aria-labelledby="career-title">
-      <div className="section-heading"><h2 id="career-title">Your next steps</h2><p>Go straight to the tools you use most.</p></div>
-      <div className="career-actions">
-        <Card><Link className="career-card-link" href="/jobs" aria-label="Browse Jobs"><BriefcaseBusiness className="action-icon" size={24} aria-hidden="true" /><h3>Discover Jobs</h3><p>Search roles, compare requirements, and save jobs.</p><span className="action-link">Browse Jobs<ArrowUpRight size={18} aria-hidden="true" /></span></Link></Card>
-        <Card><Link className="career-card-link" href="/candidate" aria-label="View Candidate Profile"><ContactRound className="action-icon" size={24} aria-hidden="true" /><h3>Candidate Profile</h3><p>Review your skills, projects, and supporting records.</p><span className="action-link">View Candidate Profile<ArrowUpRight size={18} aria-hidden="true" /></span></Link></Card>
-        <Card><Link className="career-card-link" href="/applications" aria-label="View Applications"><ClipboardList className="action-icon" size={24} aria-hidden="true" /><h3>Applications</h3><p>Update statuses and keep interview notes together.</p><span className="action-link">View Applications<ArrowUpRight size={18} aria-hidden="true" /></span></Link></Card>
-      </div>
-    </Reveal>
+    <WorkspaceFocus />
     <Reveal as="section" className="overview-group" aria-labelledby="profile-overview-title">
       <div className="section-heading"><h2 id="profile-overview-title">Profile overview</h2></div>
       <Card className="summary-list">
