@@ -40,3 +40,7 @@
 
 /* Keep the next meaningful action visible above the fold on typical laptops. */
 .focus-primary-action { margin-top: 24px; }
+
+/* Employer marks remain readable without dominating the application list. */
+.focus-application-row .company-logo { display: inline-grid; place-items: center; width: 42px; height: 42px; flex: 0 0 42px; padding: 8px; border: 1px solid #e3e8f1; border-radius: 11px; background: #fff; overflow: hidden; font-size: 13px; }
+.focus-application-row .company-logo img { width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; }
