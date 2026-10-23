@@ -64,7 +64,7 @@ try {
     await mobilePage.waitForTimeout(1200);
     await mobilePage.screenshot({ path: path.join(output, "mobile-workspace.jpg"), type: "jpeg", quality: 86, fullPage: false });
     console.log("Captured mobile workspace");
-    for (const [route, name] of [["/jobs", "mobile-jobs"], ["/applications", "mobile-applications"]]) {
+    for (const [route, name] of [["/jobs", "mobile-jobs"], ["/applications", "mobile-applications"], ["/resumes", "mobile-resumes"]]) {
       await mobilePage.goto(new URL(route, origin).toString(), { waitUntil: "domcontentloaded" });
       await mobilePage.locator("h1").first().waitFor({ state: "visible", timeout: 30000 });
       await mobilePage.evaluate(() => document.fonts.ready);

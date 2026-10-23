@@ -44,7 +44,9 @@ Screenshots are captured from the running Next.js application at desktop and mob
 ![StudentSuccessful mobile workspace](docs/screenshots/mobile-workspace.jpg)
 
 
-The [workspace screenshot collection](docs/screenshots/) also includes Applications, Resumes, Projects, Skills, role analysis, and mobile Jobs/Applications views. The mobile Job Discovery page uses expandable filters so results appear sooner.\n\n## Try it online
+The [workspace screenshot collection](docs/screenshots/) includes Applications, Resumes, Projects, Skills, role analysis, and mobile views of Jobs, Applications, and Resumes. Job Discovery uses expandable filters on smaller screens.
+
+## Try it online
 
 1. Open **[studentsuccessful.vercel.app](https://studentsuccessful.vercel.app/)**.
 2. Choose **Try interactive demo** to enter the workspace without creating an account.
