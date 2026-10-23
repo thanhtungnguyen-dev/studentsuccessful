@@ -39,6 +39,9 @@ Screenshots are captured from the running Next.js application, not design mockup
 | Job discovery | Candidate profile |
 | ![Browse internship opportunities](docs/screenshots/jobs.jpg) | ![Review profile and skills](docs/screenshots/candidate.jpg) |
 
+![StudentSuccessful mobile workspace](docs/screenshots/mobile-workspace.jpg)
+
+
 ## Try it online
 
 1. Open **[studentsuccessful.vercel.app](https://studentsuccessful.vercel.app/)**.

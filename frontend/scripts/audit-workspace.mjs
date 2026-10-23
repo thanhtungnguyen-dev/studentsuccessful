@@ -52,6 +52,46 @@ for (const width of [1440, 390]) {
         failures.push(`${width}px ${route}: ${error.message}`);
       }
     }
+    // Exercise representative interactions, not just the ability to render routes.
+    try {
+      await page.goto(new URL("/jobs", origin).toString(), { waitUntil: "domcontentloaded" });
+      await page.locator(".job-card").first().waitFor({ state: "visible", timeout: 15000 });
+      const firstJob = page.locator(".job-card .job-result-select").first();
+      await firstJob.click();
+      await page.locator(".job-detail").first().waitFor({ state: "visible", timeout: 15000 });
+      console.log("PASS " + width + "px job selection and detail view");
+    } catch (error) { failures.push(width + "px job interaction: " + error.message); }
+
+    try {
+      await page.goto(new URL("/candidate", origin).toString(), { waitUntil: "domcontentloaded" });
+      const search = page.getByPlaceholder("Find a skill");
+      await search.waitFor({ state: "visible", timeout: 15000 });
+      await search.fill("Python");
+      await page.locator(".candidate-skill-chip").first().waitFor({ state: "visible", timeout: 15000 });
+      const names = await page.locator(".candidate-skill-chip").allTextContents();
+      if (!names.length || names.some(name => !name.toLowerCase().includes("python"))) {
+        failures.push(width + "px candidate search did not filter skills");
+      } else console.log("PASS " + width + "px candidate skill search");
+      await search.fill("");
+    } catch (error) { failures.push(width + "px candidate search: " + error.message); }
+
+    try {
+      await page.goto(new URL("/applications", origin).toString(), { waitUntil: "domcontentloaded" });
+      const select = page.locator('select[aria-label^="Update status for"]').first();
+      await select.waitFor({ state: "visible", timeout: 15000 });
+      const before = await select.inputValue();
+      const after = before === "INTERVIEW" ? "APPLIED" : "INTERVIEW";
+      await select.selectOption(after);
+      await page.waitForFunction(expected => {
+        const element = document.querySelector('select[aria-label^="Update status for"]');
+        return element && element.value === expected;
+      }, after, { timeout: 15000 });
+      await page.waitForTimeout(500);
+      await page.reload({ waitUntil: "domcontentloaded" });
+      await select.waitFor({ state: "visible", timeout: 15000 });
+      if (await select.inputValue() !== after) failures.push(width + "px application status did not persist after refresh");
+      else console.log("PASS " + width + "px application status persists");
+    } catch (error) { failures.push(width + "px application status update: " + error.message); }
   } finally {
     await context.close();
   }

@@ -38,6 +38,24 @@ try {
   await capture("/demo", "dashboard", ".desktop-sidebar");
   await capture("/jobs", "jobs", 'h1:has-text("Jobs")');
   await capture("/candidate", "candidate", 'h1:has-text("Candidate Profile")');
+
+  const mobile = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    deviceScaleFactor: 1,
+    reducedMotion: "reduce",
+    colorScheme: "light",
+  });
+  try {
+    const mobilePage = await mobile.newPage();
+    await mobilePage.goto(new URL("/demo", origin).toString(), { waitUntil: "domcontentloaded" });
+    await mobilePage.locator(".mobile-topbar").first().waitFor({ state: "visible", timeout: 30000 });
+    await mobilePage.evaluate(() => document.fonts.ready);
+    await mobilePage.waitForTimeout(1200);
+    await mobilePage.screenshot({ path: path.join(output, "mobile-workspace.jpg"), type: "jpeg", quality: 86, fullPage: false });
+    console.log("Captured mobile workspace");
+  } finally {
+    await mobile.close();
+  }
 } finally {
   await browser.close();
 }
