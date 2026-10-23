@@ -112,4 +112,4 @@ For technical implementation details, see [engineering documentation](docs/) and
 
 ### Screenshot maintenance
 
-The [README screenshot workflow](.github/workflows/readme-screenshots.yml) renders the actual frontend in a browser and refreshes the images when this README changes. It can also be started manually from GitHub Actions.
+The [README screenshot workflow](.github/workflows/readme-screenshots.yml) renders the actual frontend in a browser and refreshes the images when this README changes. It can also be started manually from GitHub Actions. Images are captured using the browser installed on the GitHub runner.

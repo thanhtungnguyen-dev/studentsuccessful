@@ -30,9 +30,8 @@ jobs:
         working-directory: frontend
         run: npm ci
 
-      - name: Install Chromium
-        working-directory: frontend
-        run: npx playwright install --with-deps chromium
+      - name: Verify runner Chrome
+        run: google-chrome --version
 
       - name: Build frontend showcase
         working-directory: frontend

@@ -7,7 +7,7 @@ const origin = process.env.SCREENSHOT_BASE_URL || "http://127.0.0.1:3000";
 const output = path.resolve(process.cwd(), "../docs/screenshots");
 await mkdir(output, { recursive: true });
 
-const browser = await chromium.launch({ headless: true });
+const browser = await chromium.launch({ channel: "chrome", headless: true });
 const context = await browser.newContext({
   viewport: { width: 1440, height: 900 },
   deviceScaleFactor: 1,
