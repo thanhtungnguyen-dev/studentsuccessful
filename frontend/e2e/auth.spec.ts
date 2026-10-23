@@ -11,7 +11,7 @@ test("real registration, refresh, shared tabs, CSRF logout, and login", async ({
   await page.goto("/");
 
   await expect(
-    page.getByRole("link", { name: "Sign in", exact: true })
+    page.locator(".ssi-header").getByRole("link", { name: "Sign in", exact: true })
   ).toBeVisible();
 
   await page.screenshot({
@@ -117,7 +117,7 @@ test("real registration, refresh, shared tabs, CSRF logout, and login", async ({
   ).toBe(true);
 
   await expect(
-    page.getByRole("link", {
+    page.locator(".ssi-header").getByRole("link", {
       name: "Sign in",
       exact: true,
     })
@@ -127,7 +127,7 @@ test("real registration, refresh, shared tabs, CSRF logout, and login", async ({
   await second.reload();
 
   await expect(
-    second.getByRole("link", {
+    second.locator(".ssi-header").getByRole("link", {
       name: "Sign in",
       exact: true,
     })
@@ -154,7 +154,7 @@ test("real registration, refresh, shared tabs, CSRF logout, and login", async ({
   await page.bringToFront();
 
   await page
-    .getByRole("link", {
+    .locator(".ssi-header").getByRole("link", {
       name: "Sign in",
       exact: true,
     })
