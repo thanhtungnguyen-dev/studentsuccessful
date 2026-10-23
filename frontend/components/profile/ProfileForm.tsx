@@ -13,7 +13,7 @@ export function ProfilePage() {
   const { user, error, refresh } = useAuth();
   return <main className="auth-shell profile-shell">
     <Link href="/" className="brand">StudentSuccessful</Link><ReturnToReview />
-    <PageHeader title="Application Profile" description="Facts you choose to use on applications. These do not set your job-search preferences." />
+    <PageHeader title="Personal information" description="Add the contact details you use when applying for jobs." />
     {user === undefined ? (error ? <div><p role="alert">{error}</p><button className="primary" onClick={() => { void refresh().catch(() => {}); }}>Try again</button></div> : <LoadingState label="Checking your session…" />)
       : user === null ? <p className="auth-footer">Please <Link href="/login">Login</Link> to view your profile.</p>
       : <ProfileForm key={user.id} />}

@@ -13,7 +13,7 @@ export function WorkAuthorizationPage() {
   const { user, error, refresh } = useAuth();
   return <main className="auth-shell work-authorization-shell">
     <Link href="/" className="brand">StudentSuccessful</Link><ReturnToReview />
-    <PageHeader title="Work Authorization" description="Enter your authorization facts for each country. Country and status do not set job-search preferences or determine sponsorship answers." />
+    <PageHeader title="Work Authorization" description="Record where you are authorized to work. Check sponsorship requirements for each role separately." />
     {user === undefined ? (error ? <div><p role="alert">{error}</p><button className="primary" onClick={() => { void refresh().catch(() => {}); }}>Try again</button></div> : <LoadingState label="Checking your session…" />)
       : user === null ? <p className="auth-footer">Please <Link href="/login">Login</Link> to view work authorization.</p>
       : <WorkAuthorizationContent key={user.id} />}

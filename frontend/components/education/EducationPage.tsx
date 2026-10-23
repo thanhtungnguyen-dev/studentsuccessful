@@ -13,7 +13,7 @@ export function EducationPage() {
   const { user, error, refresh } = useAuth();
   return <main className="auth-shell education-shell">
     <Link href="/" className="brand">StudentSuccessful</Link><ReturnToReview />
-    <PageHeader title="Education" description="Your academic facts, entered by you. GPA stays on its original scale." />
+    <PageHeader title="Education" description="Add your education and enter GPA on its original scale." />
     {user === undefined ? (error ? <div><p role="alert">{error}</p><button className="primary" onClick={() => { void refresh().catch(() => {}); }}>Try again</button></div> : <LoadingState label="Checking your session…" />)
       : user === null ? <p className="auth-footer">Please <Link href="/login">Login</Link> to view education.</p>
       : <EducationContent key={user.id} />}

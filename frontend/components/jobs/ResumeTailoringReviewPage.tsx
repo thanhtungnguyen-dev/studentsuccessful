@@ -318,7 +318,7 @@ export function ResumeTailoringReviewPage({ jobId }: { jobId: string }) {
                     </section>
                     {reviewError && <section className="auth-card dashboard-card"><p role="alert" className="auth-error">{reviewError}</p><button className="secondary" disabled={busy} onClick={() => setReviewAttempt((value) => value + 1)}>Reload review</button></section>}
                     {review ? <ResumeTailoringReviewContent review={review} busy={busy} onUpdate={updateItem} onFinalize={finalizeReview} />
-                      : reviewMissing ? <section className="auth-card dashboard-card review-start"><PageHeader title="Resume Draft Review" /><p>This creates a saved snapshot of the current evidence-backed Phase 16 suggestions for the selected resume version.</p><p className="muted">It does not create a ResumeVersion or change candidate evidence.</p><button type="button" disabled={busy} onClick={() => void createReview()}>Start review</button></section>
+                      : reviewMissing ? <section className="auth-card dashboard-card review-start"><PageHeader title="Resume Draft Review" /><p>Save a review of the suggestions for this resume version.</p><p className="muted">Your resume file and saved skills stay unchanged.</p><button type="button" disabled={busy} onClick={() => void createReview()}>Start review</button></section>
                         : !reviewError && <LoadingState label="Loading saved review…" />}
                   </>}
     </main>

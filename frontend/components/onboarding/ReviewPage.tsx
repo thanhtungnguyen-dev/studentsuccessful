@@ -11,7 +11,7 @@ import { ReviewSections } from "./ReviewSections";
 
 export function ReviewPage() {
   const { user, error, refresh } = useAuth();
-  return <main className="auth-shell review-shell"><Link className="brand" href="/">StudentSuccessful</Link><PageHeader title="Onboarding Review" description="Review your saved information. Use Edit to make changes, save them, then return here." />
+  return <main className="auth-shell review-shell"><Link className="brand" href="/">StudentSuccessful</Link><PageHeader title="Onboarding Review" description="Check your profile before finishing setup. You can edit anything later." />
     {user === undefined ? error ? <><p role="alert" className="auth-error">{error}</p><button className="secondary" onClick={() => void refresh().catch(() => {})}>Retry session</button></> : <LoadingState label="Checking your session…" />
       : user === null ? <p>Please <Link href="/login">Login</Link> to review your information.</p> : <ReviewContent key={user.id} />}
   </main>;

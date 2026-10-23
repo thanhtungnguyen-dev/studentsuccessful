@@ -216,7 +216,7 @@ export function AlertsPage() {
   return (
     <main className="auth-shell dashboard-shell alerts-shell">
       <Link href="/" className="brand">StudentSuccessful</Link>
-      <PageHeader title="Alerts" description="New canonical jobs matched by your alert-enabled saved searches." />
+      <PageHeader title="Alerts" description="New roles from searches where you turned on alerts." />
       {sessionError ? <p role="alert" className="auth-error">{sessionError}</p>
         : user === undefined ? <LoadingState label="Checking your session…" />
           : user === null ? <p>Please <Link href="/login">Login</Link> to view alerts.</p>

@@ -50,7 +50,7 @@ export function DiscoveryFilters({ draft, roles, locations, onChange, onSubmit, 
         <label>Company<input value={draft.company} onChange={(e) => onChange({ ...draft, company: e.target.value })} /></label><label>Skill or technology<input value={draft.requirement} onChange={(e) => onChange({ ...draft, requirement: e.target.value })} /></label>
       </JobFilterPopover>
       <div className="job-filter-actions"><button type="submit">Apply filters</button><button className="secondary" type="button" onClick={onClear}>Clear filters</button></div>
-    </div><p className="job-filter-help muted">Choose your filters, then select Apply filters.</p>
+    </div><p className="job-filter-help muted">Select Apply filters to update results.</p>
   </form>;
 }
 export function AppliedFilters({ search, roles, onChange, onClear }: { search: JobDiscoverySearch; roles: CatalogItem[]; onChange: (search: JobDiscoverySearch) => void; onClear: () => void }) {

@@ -11,7 +11,7 @@ import { useAuth } from "../auth/AuthProvider";
 type Options = Record<typeof GROUPS[number]["key"], Array<{ id: string; name: string }>>;
 export function PreferencesPage() {
   const { user, error, refresh } = useAuth();
-  return <main className="auth-shell preferences-shell"><Link href="/" className="brand">StudentSuccessful</Link><ReturnToReview /><PageHeader title="Career Preferences" description="Choose what you want. Technology interests are preferences, not claims about your skills." />
+  return <main className="auth-shell preferences-shell"><Link href="/" className="brand">StudentSuccessful</Link><ReturnToReview /><PageHeader title="Career Preferences" description="Choose the roles, locations, and technologies you want to work with." />
     {user === undefined ? error ? <><p role="alert">{error}</p><button onClick={() => void refresh().catch(() => {})}>Retry</button></> : <LoadingState label="Checking your session…" />
       : user === null ? <p>Please <Link href="/login">Login</Link> to view preferences.</p> : <PreferencesForm key={user.id} />}
   </main>;

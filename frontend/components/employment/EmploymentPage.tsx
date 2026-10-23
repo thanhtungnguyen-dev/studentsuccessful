@@ -13,7 +13,7 @@ export function EmploymentPage() {
   const { user, error, refresh } = useAuth();
   return <main className="auth-shell employment-shell">
     <Link href="/" className="brand">StudentSuccessful</Link><ReturnToReview />
-    <PageHeader title="Employment" description="Your work-history facts, entered by you. Employment location does not set job-search preferences." />
+    <PageHeader title="Employment" description="Add work experience, dates, and locations." />
     {user === undefined ? (error ? <div><p role="alert">{error}</p><button className="primary" onClick={() => { void refresh().catch(() => {}); }}>Try again</button></div> : <LoadingState label="Checking your session…" />)
       : user === null ? <p className="auth-footer">Please <Link href="/login">Login</Link> to view employment.</p>
       : <EmploymentContent key={user.id} />}
