@@ -38,6 +38,11 @@ try {
   await capture("/demo", "dashboard", ".desktop-sidebar");
   await capture("/jobs", "jobs", 'h1:has-text("Jobs")');
   await capture("/candidate", "candidate", 'h1:has-text("Candidate Profile")');
+  // Additional workspace screens used for UX review (actual browser captures).
+  await capture("/applications", "applications", 'h1:has-text("Applications")');
+  await capture("/resumes", "resumes", 'h1:has-text("Resumes")');
+  await capture("/projects", "projects", 'h1:has-text("Projects")');
+  await capture("/skills", "skills", 'h1:has-text("Skills")');
 
   const mobile = await browser.newContext({
     viewport: { width: 390, height: 844 },
