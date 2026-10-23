@@ -231,7 +231,6 @@ export function createInitialDemoState(): DemoWorkspaceState {
       skills: [
         "Python",
         "C/C++",
-        "C++",
         "React",
         "TypeScript",
         "PostgreSQL",
@@ -239,8 +238,6 @@ export function createInitialDemoState(): DemoWorkspaceState {
         "Linux",
         "Git",
         "Data Structures",
-        "Software Development",
-        "Programming",
         "Testing",
         "Debugging",
       ],

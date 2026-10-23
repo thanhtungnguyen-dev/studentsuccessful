@@ -38,7 +38,7 @@ export function SkillChoices({ values, catalog, onChange }: { values: SkillSelec
   const selected = new Set(state.skill_ids);
   const ordered = [...catalog].sort((a, b) => Number(selected.has(b.id)) - Number(selected.has(a.id)) || a.name.localeCompare(b.name));
   const filtered = ordered.filter(item => item.name.toLowerCase().includes(search.trim().toLowerCase()));
-  const visible = search || showAll ? filtered : filtered.filter((item, index) => selected.has(item.id) || index < 18);
+  const visible = search || showAll ? filtered : selected.size ? filtered.filter(item => selected.has(item.id)) : filtered.slice(0, 8);
   const count = state.skill_ids.length + state.custom_values.length;
   return <fieldset className="skill-choices skill-choices-refined">
     <legend>Skills & technologies</legend>
@@ -51,7 +51,7 @@ export function SkillChoices({ values, catalog, onChange }: { values: SkillSelec
       <input type="checkbox" checked={selected.has(item.id)} onChange={() => onChange({ ...state, skill_ids: selected.has(item.id) ? state.skill_ids.filter(id => id !== item.id) : [...state.skill_ids, item.id] })} />
       <SkillIcon name={item.name} /><span>{item.name}</span>
     </label>)}</div> : <p className="candidate-empty">No skills found. Add a custom skill below.</p>}
-    {!search && catalog.length > 18 && <button type="button" className="candidate-show-more" aria-expanded={showAll} onClick={() => setShowAll(open => !open)}>{showAll ? "Show fewer skills" : `Browse all ${catalog.length} skills`} <ChevronDown size={15} className={showAll ? "candidate-chevron-up" : ""}/></button>}
+    {!search && (showAll || filtered.length > visible.length) && <button type="button" className="candidate-show-more" aria-expanded={showAll} onClick={() => setShowAll(open => !open)}>{showAll ? "Show selected skills" : `Browse all ${catalog.length} skills`} <ChevronDown size={15} className={showAll ? "candidate-chevron-up" : ""}/></button>}
     {state.skill_ids.filter(id => !catalog.some(item => item.id === id)).map(id => <p key={id}>Saved skill without a catalog label: {id} <button type="button" className="secondary" onClick={() => onChange({ ...state, skill_ids: state.skill_ids.filter(x => x !== id) })}>Remove</button></p>)}
     <div className="skill-custom-entry"><label htmlFor="new-skill">Add a skill</label><div><input id="new-skill" value={other} maxLength={150} placeholder="e.g. Kubernetes" onChange={event => setOther(event.target.value)} onKeyDown={event => { if (event.key === "Enter") { event.preventDefault(); try { onChange(addCustomSkill(state, other, catalog)); setOther(""); setError(""); } catch (reason) { setError((reason as Error).message); } } }} /><button type="button" className="secondary" onClick={() => { try { onChange(addCustomSkill(state, other, catalog)); setOther(""); setError(""); } catch (reason) { setError((reason as Error).message); } }}>Add skill</button></div></div>
     {error && <p role="alert" className="auth-error">{error}</p>}

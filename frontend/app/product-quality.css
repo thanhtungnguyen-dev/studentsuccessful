@@ -140,3 +140,8 @@
 .workspace .analysis-source-disclosure[open] { padding-bottom: 12px; }
 .workspace .analysis-source-disclosure > p,
 .workspace .analysis-source-disclosure li { font-size: 13px; line-height: 1.6; }
+
+/* Portfolio actions should not repeat long project titles within each button. */
+.workspace .project-external-links + .auth-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:17px; }
+.workspace .project-external-links + .auth-actions button { min-height:44px; }
+.workspace .project-external-links + .auth-actions button[aria-label^="Delete"] { color:#8a3542; }

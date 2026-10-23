@@ -33,7 +33,7 @@ function ProjectsContent(){
   {safeApplicationUrl(row.repository_url ?? "") && <a className="secondary" href={safeApplicationUrl(row.repository_url ?? "")!} target="_blank" rel="noopener noreferrer">View code ↗</a>}
   {!safeApplicationUrl(row.project_url ?? "") && !safeApplicationUrl(row.repository_url ?? "") && <p className="muted">Add a link so others can explore your work.</p>}
 </div>
- {!editing&&!deleting&&<div className="auth-actions"><button className="secondary" onClick={()=>{setEditing(row);setForm({title:row.title,description:row.description,project_url:row.project_url,repository_url:row.repository_url,technologies:row.technologies});setError("");setSuccess("");}}>Edit {row.title}</button><button className="secondary" onClick={()=>setDeleting(row.id)}>Delete {row.title}</button></div>}
+ {!editing&&!deleting&&<div className="auth-actions"><button className="secondary" aria-label={`Edit ${row.title}`} onClick={()=>{setEditing(row);setForm({title:row.title,description:row.description,project_url:row.project_url,repository_url:row.repository_url,technologies:row.technologies});setError("");setSuccess("");}}>Edit project</button><button className="secondary" aria-label={`Delete ${row.title}`} onClick={()=>setDeleting(row.id)}>Delete</button></div>}
  {deleting===row.id&&<div><p>Delete this project? Your Skills and Preferences will remain unchanged.</p><button className="secondary" disabled={busy} onClick={()=>void remove()}>{busy?"Deleting…":"Confirm delete"}</button><button className="secondary" disabled={busy} onClick={()=>setDeleting(null)}>Cancel deletion</button></div>}
  </article>)}</div></>}
  </>;

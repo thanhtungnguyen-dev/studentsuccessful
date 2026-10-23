@@ -20,6 +20,16 @@ it("renders explicit structured and exact custom skills",()=>{const html=render(
 it("adds explicit custom skills without mutating input or preferences",()=>{const input=selection({skill_ids:['python']});const result=addCustomSkill(input,'  Linux  ',catalog);expect(result).toEqual({skill_ids:['python'],custom_values:['  Linux  ']});expect(input.custom_values).toEqual([]);});
 it.each([' ','x'.repeat(151)])("rejects invalid Other skill %s",value=>{expect(()=>addCustomSkill({},value,[])).toThrow();});
 it("prevents normalized custom duplicates and catalog duplicates",()=>{expect(()=>addCustomSkill({custom_values:[' My  skill ']},'my skill',[])).toThrow('already selected');expect(()=>addCustomSkill({},' python ',catalog)).toThrow('catalog');});
+it("shows selected skills first and makes unselected catalog skills discoverable", () => {
+  const html = render(h(SkillChoices, {
+    values: { skill_ids: ["python"] },
+    catalog: [{ id: "python", name: "Python" }, { id: "java", name: "Java" }],
+    onChange: vi.fn(),
+  }));
+  expect(html).toContain("1 selected");
+  expect(html).toContain("Browse all 2 skills");
+  expect(html).not.toContain(">Java</span>");
+});
 it("offers an Other entry when catalog is empty",()=>{const html=render(h(SkillChoices,{values:{},catalog:[],onChange:vi.fn()}));expect(html).toContain('Catalog unavailable. You can still add a custom skill.');expect(html).toContain('Add a skill');});
 it("retains unavailable saved catalog identities",()=>{expect(render(h(SkillList,{values:{skill_ids:['missing']},catalog:[]}))).toContain('Unavailable catalog skill missing');});
 it("renders multiple project summaries and separate technologies",()=>{const html=render(h(ProjectsSummary,{data:{projects:[project,{...project,id:'two',title:'Second',technologies:{}}],catalog}}));for(const text of ['My project','Second','Factual description','Project technologies','Python','Project-only','No skills or technologies saved'])expect(html).toContain(text);});
