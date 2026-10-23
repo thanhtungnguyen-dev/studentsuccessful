@@ -11,20 +11,15 @@ test("real registration, refresh, shared tabs, CSRF logout, and login", async ({
   await page.goto("/");
 
   await expect(
-    page.getByRole("link", { name: "Register", exact: true })
-  ).toBeVisible();
-
-  await expect(
-    page.getByRole("link", { name: "Login", exact: true })
+    page.getByRole("link", { name: "Sign in", exact: true })
   ).toBeVisible();
 
   await page.screenshot({
     path: test.info().outputPath("signed-out.png"),
   });
 
-  await page
-    .getByRole("link", { name: "Register", exact: true })
-    .click();
+  await page.goto("/register");
+  await expect(page.getByRole("heading", { name: "Create your account" })).toBeVisible();
 
   await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
@@ -123,7 +118,7 @@ test("real registration, refresh, shared tabs, CSRF logout, and login", async ({
 
   await expect(
     page.getByRole("link", {
-      name: "Login",
+      name: "Sign in",
       exact: true,
     })
   ).toBeVisible();
@@ -133,7 +128,7 @@ test("real registration, refresh, shared tabs, CSRF logout, and login", async ({
 
   await expect(
     second.getByRole("link", {
-      name: "Login",
+      name: "Sign in",
       exact: true,
     })
   ).toBeVisible();
@@ -160,7 +155,7 @@ test("real registration, refresh, shared tabs, CSRF logout, and login", async ({
 
   await page
     .getByRole("link", {
-      name: "Login",
+      name: "Sign in",
       exact: true,
     })
     .click();
