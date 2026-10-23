@@ -86,7 +86,7 @@ export function WorkspaceFocus() {
           </div>
           {applications?.length ? (
             <ul className="focus-applications">
-              {orderedApplications!.slice(0, 3).map(item => (
+              {(orderedApplications ?? []).slice(0, 3).map(item => (
                 <li className="focus-application-row" key={item.id}>
                   <CompanyLogo company={item.company_name} />
                   <div className="focus-application-identity">
