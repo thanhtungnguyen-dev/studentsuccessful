@@ -54,7 +54,7 @@ it("uploads one named file as multipart, lists versions, selects a primary, and 
 it("keeps managed Resumes distinct from Career Artifact external links", () => {
   const html = render(h(ResumeSummary, { items: [resume] }));
   expect(html).toContain("resume with version history");
-  expect(html).toContain("separate from Career Artifacts external links");
+  expect(html).toContain("External portfolio links are stored separately.");
   expect(html).not.toContain("external_url");
 });
 
