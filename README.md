@@ -18,6 +18,17 @@
 - **Track applications:** save roles, organize applications, and update their status.
 - **Build your profile:** keep education, projects, employment, skills, and career preferences together.
 
+## One connected workflow
+
+**Browse → Compare → Prepare → Track.**
+
+1. Browse internship roles and examine the stated requirements.
+2. Compare requirements against skills, projects, and resume evidence recorded in your profile. Missing evidence is **not** a judgment of your ability.
+3. Manage resume versions and review the suggestions associated with a selected role.
+4. Record your application and revisit its status, notes, and resume.
+
+This is the core interaction the redesigned dashboard now emphasizes: the next useful action, not just a list of features.
+
 ## Screenshots
 
 Screenshots are captured from the running Next.js application, not design mockups. They are refreshed from the actual frontend whenever this README changes.
