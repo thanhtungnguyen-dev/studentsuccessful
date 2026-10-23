@@ -20,7 +20,7 @@
 
 ## Screenshots
 
-Screenshots are captured from the running Next.js application, not design mockups.
+Screenshots are captured from the running Next.js application, not design mockups. They are refreshed from the actual frontend whenever this README changes.
 
 | Landing page | Career workspace |
 |:--:|:--:|
