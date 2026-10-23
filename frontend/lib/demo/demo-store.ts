@@ -532,9 +532,9 @@ function buildEvidenceForSkillNames(
       section_header: sectionHeader,
       bullet_text:
         category === "EXPERIENCE"
-          ? `Engineered production-grade ${skillName} modules in Waterloo Systems Lab, reducing diagnostic query latency by 38% across 250k test rows.`
+          ? `Engineered production-grade ${skillName} modules in Waterloo Systems Lab, and validating query performance with repeatable tests.`
           : category === "PROJECTS"
-            ? `Built and verified ${skillName} components in TraceFlow and CoOpMap with 99.4% automated CI test coverage.`
+            ? `Built and verified ${skillName} components in TraceFlow and CoOpMap with automated build and test checks.`
             : `Proficient in ${skillName} across undergraduate coursework, co-op projects, and lab teaching.`,
       recognized_skills: [
         {
@@ -617,7 +617,7 @@ function createInitialApiState(): PersistedDemoApiState {
       end_date: "2026-08-28",
       currently_employed: false,
       description:
-        "Engineered a Linux process telemetry agent in C/C++ and Python that streamed diagnostic events into PostgreSQL, cutting query latency by 38% across 250k test rows.",
+        "Engineered a Linux process telemetry agent in C/C++ and Python that streamed diagnostic events into PostgreSQL, with documented query performance tests.",
       created_at: "2026-09-15T12:18:00Z",
       updated_at: "2026-10-10T15:00:00Z",
     },
@@ -680,7 +680,7 @@ function createInitialApiState(): PersistedDemoApiState {
       id: "proj-traceflow",
       title: "TraceFlow — Linux Systems & PostgreSQL Telemetry Agent",
       description:
-        "Built a lightweight Linux daemon in C/C++ with Python CLI tooling that collects process metrics and indexes time-series diagnostic logs into PostgreSQL. Reduced query latency across 250k rows by 38%.",
+        "Built a lightweight Linux daemon in C/C++ with Python CLI tooling that collects process metrics and indexes time-series diagnostic logs into PostgreSQL. Tested query performance on repeatable datasets.",
       technologies: {
         skill_ids: [
           skillNameToId("C/C++"),
@@ -701,7 +701,7 @@ function createInitialApiState(): PersistedDemoApiState {
       id: "proj-coopmap",
       title: "CoOpMap — Full-Stack Course & Requirement Visualizer",
       description:
-        "Designed an interactive prerequisite and skill-mapping web application in React, TypeScript, Python, and PostgreSQL for undergraduate CS students with 99.4% CI test pass rate.",
+        "Designed an interactive prerequisite and skill-mapping web application in React, TypeScript, Python, and PostgreSQL for undergraduate CS students with automated tests for key user flows.",
       technologies: {
         skill_ids: [
           skillNameToId("React"),
@@ -824,7 +824,7 @@ function createInitialApiState(): PersistedDemoApiState {
         "ALEX RIVERA — B.Sc. Honours Computer Science (Co-Op), University of Waterloo (GPA 3.85/4.00)\n" +
         "TECHNICAL SKILLS: C/C++, C++, Python, Linux, PostgreSQL, SQL, Git, React, TypeScript, Debugging, Testing\n" +
         "EXPERIENCE:\n" +
-        "• Undergraduate Systems Software Researcher, Waterloo Systems Lab: Engineered a Linux telemetry daemon in C/C++ and Python indexing 250k+ rows into PostgreSQL (-38% query latency).\n" +
+        "• Undergraduate Systems Software Researcher, Waterloo Systems Lab: Engineered a Linux telemetry daemon in C/C++ and Python indexing diagnostic records in PostgreSQL and profiling queries.\n" +
         "• Undergraduate Teaching Assistant (Data Structures & C++): Led weekly lab debugging sessions for 60+ CS students.\n" +
         "PROJECTS:\n" +
         "• TraceFlow (C/C++, Python, Linux, PostgreSQL, Git): Systems telemetry collector and automated verification CLI.\n" +
@@ -835,7 +835,7 @@ function createInitialApiState(): PersistedDemoApiState {
         "ALEX RIVERA — B.Sc. Honours Computer Science (Co-Op), University of Waterloo\n" +
         "TECHNICAL SKILLS: Python, React, TypeScript, SQL, PostgreSQL, Data Structures, Git, Testing\n" +
         "PROJECTS & EXPERIENCE:\n" +
-        "• CoOpMap — Full-Stack Course & Requirement Visualizer (React, TypeScript, Python, PostgreSQL): Built interactive web app used by 180+ students with 99.4% test pass rate.\n" +
+        "• CoOpMap — Full-Stack Course & Requirement Visualizer (React, TypeScript, Python, PostgreSQL): Built interactive web app with tested search and course planning flows.\n" +
         "• Undergraduate Teaching Assistant — Data Structures & Algorithms: Mentored 60+ students and wrote automated Python grading suites.",
     },
   };

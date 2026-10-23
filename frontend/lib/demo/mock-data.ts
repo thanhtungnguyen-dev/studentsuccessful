@@ -2,7 +2,7 @@
  * Internally consistent, fictional university student dataset for StudentSuccessful Demo Mode.
  *
  * All records—profile qualifications, technical skills, projects, resume versions,
- * verified 2027 internship snapshots, and tracked applications—are linked so changes
+ * illustrative 2027 internship snapshots, and tracked applications—are linked so changes
  * in one view immediately reflect in Fit Analysis, Resume Alignment, and the Tracker.
  */
 
@@ -254,7 +254,7 @@ export function createInitialDemoState(): DemoWorkspaceState {
           summary:
             "Built a lightweight Linux daemon in C++ with Python CLI tooling that collects process metrics and indexes time-series logs into PostgreSQL.",
           impact:
-            "Reduced query latency across 250k test diagnostic rows by 38% using indexed batch writes and automated regression scripts.",
+            "Built indexed batch writes and regression checks for repeatable telemetry queries.",
         },
         {
           id: "proj-2",
@@ -265,7 +265,7 @@ export function createInitialDemoState(): DemoWorkspaceState {
           summary:
             "Designed an interactive prerequisite and skill-mapping web application for undergraduate CS students with automated unit and integration tests.",
           impact:
-            "Adopted by 180+ students during term enrollment with 99.4% test suite pass rate in CI.",
+            "Implemented course planning features with automated tests for key interactions.",
         },
         {
           id: "proj-3",
@@ -274,7 +274,7 @@ export function createInitialDemoState(): DemoWorkspaceState {
           timeframe: "Sep 2026 – Present",
           skills: ["Data Structures", "C++", "Python", "Programming", "Debugging", "Testing"],
           summary:
-            "Lead weekly lab sections for 60+ first-year students covering memory management, graph algorithms, complexity analysis, and gdb debugging.",
+            "Led weekly lab sections for first-year students covering memory management, graph algorithms, complexity analysis, and gdb debugging.",
           impact:
             "Authored automated grading harnesses in Python and C++ to give students clearer edge-case feedback.",
         },
