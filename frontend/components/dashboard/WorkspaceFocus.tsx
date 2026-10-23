@@ -30,6 +30,11 @@ export function WorkspaceFocus() {
     return () => { active = false; };
   }, [attempt]);
 
+  const orderedApplications = applications === null ? null : [...applications].sort((a, b) => {
+    const first = Date.parse(a.applied_at ?? "") || 0;
+    const second = Date.parse(b.applied_at ?? "") || 0;
+    return second - first;
+  });
   const interviewCount = applications?.filter(item => item.current_status === "INTERVIEW").length ?? 0;
   const tracked = applications?.length ?? 0;
   const focus = applications === null
@@ -81,7 +86,7 @@ export function WorkspaceFocus() {
           </div>
           {applications?.length ? (
             <ul className="focus-applications">
-              {applications.slice(0, 3).map(item => (
+              {orderedApplications!.slice(0, 3).map(item => (
                 <li className="focus-application-row" key={item.id}>
                   <CompanyLogo company={item.company_name} />
                   <div className="focus-application-identity">
