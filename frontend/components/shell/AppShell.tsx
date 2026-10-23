@@ -253,6 +253,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             </button>
           </div>
           <WorkspaceNavigation pathname={pathname} onNavigate={close} />
+          <div className="mobile-sheet-account" aria-label="Account controls">
+            <AccountControls />
+          </div>
         </div>
       </dialog>
       <div
