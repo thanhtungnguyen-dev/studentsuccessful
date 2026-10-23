@@ -126,7 +126,6 @@ export function AuthForm({ mode }: { mode: "register" | "login" }) {
             </li>
           </ul>
         </Reveal>
-        <p className="auth-story-note">A thoughtful workspace for your next move.</p>
       </aside>
       <div className="auth-form-panel">
         <Link href="/" className="workspace-brand auth-mobile-brand">
@@ -138,15 +137,15 @@ export function AuthForm({ mode }: { mode: "register" | "login" }) {
           aria-labelledby="form-title"
         >
           <p className="eyebrow">
-            {registering ? "GET STARTED" : "GOOD TO SEE YOU AGAIN"}
+            {registering ? "GET STARTED" : "SIGN IN"}
           </p>
           <h1 id="form-title">
             {registering ? "Create your account" : "Welcome back"}
           </h1>
           <p className="muted">
             {registering
-              ? "Bring your experience and opportunities together."
-              : "Continue your career journey."}
+              ? "Keep your profile, resumes, and applications together."
+              : "Sign in to manage your jobs, resumes, and applications."}
           </p>
           <form onSubmit={submit} noValidate aria-busy={busy}>
             <fieldset disabled={busy}>
@@ -158,10 +157,7 @@ export function AuthForm({ mode }: { mode: "register" | "login" }) {
                 autoComplete="email"
                 autoCapitalize="none"
                 placeholder="you@university.edu"
-                defaultValue={
-                  demoEnabled ? "alex.rivera@university.edu" : undefined
-                }
-                required
+                                required
               />
               <label htmlFor="password">Password</label>
               <input
@@ -169,8 +165,7 @@ export function AuthForm({ mode }: { mode: "register" | "login" }) {
                 name="password"
                 type="password"
                 autoComplete={registering ? "new-password" : "current-password"}
-                defaultValue={demoEnabled ? "demo-password-123" : undefined}
-                required
+                                required
                 aria-describedby={registering ? "password-help" : undefined}
               />
               {registering && (
@@ -184,8 +179,7 @@ export function AuthForm({ mode }: { mode: "register" | "login" }) {
                     name="confirmation"
                     type="password"
                     autoComplete="new-password"
-                    defaultValue={demoEnabled ? "demo-password-123" : undefined}
-                    required
+                                        required
                   />
                 </>
               )}
@@ -214,7 +208,7 @@ export function AuthForm({ mode }: { mode: "register" | "login" }) {
                 onClick={handleSampleWorkspace}
                 disabled={busy}
               >
-                Explore sample workspace without signing in
+                Enter workspace without signing in
               </button>
             </div>
           )}
@@ -225,7 +219,6 @@ export function AuthForm({ mode }: { mode: "register" | "login" }) {
             </Link>
           </p>
         </Reveal>
-        <p className="auth-form-note">Your experience. Your goals. Your next step.</p>
       </div>
     </main>
   );

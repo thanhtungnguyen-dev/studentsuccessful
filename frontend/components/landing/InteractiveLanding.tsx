@@ -73,7 +73,7 @@ const sectionTips: Record<string, string> = {
   discover:
     "Select any company role to inspect its requirements. Clicking Apply opens the official employer posting.",
   match:
-    "Toggle skills in your sample profile to see how recorded qualifications compare against the selected role.",
+    "Select skills to see which job requirements your profile covers.",
   resume:
     "Switch between Resume v1 and v2 to see which requirements are explicitly shown on each document.",
   track:
@@ -151,9 +151,9 @@ function CareerGuide({ section }: { section: string }) {
   useEffect(() => {
     if (!enabled) return;
     const hints: [string, string][] = [
-      [".ssi-try-demo-cta", "Enter the full StudentSuccessful workspace with realistic sample student data."],
+      [".ssi-try-demo-cta", "Open the full workspace to manage jobs, resumes, and applications."],
       [".ssi-external-apply", "Opens the official employer careers page in a new tab."],
-      [".ssi-mark-applied", "Adds this role to the sample tracker below so you can test stage updates."],
+      [".ssi-mark-applied", "Adds the role to the tracker below, without submitting an application."],
       [".ssi-save", "Bookmark an internship to keep it on your shortlist."],
       [".ssi-job-main", "Select an internship to inspect its required skills and role summary."],
       [".ssi-searchbar", "Filter postings by company name, role title, or skill."],
@@ -444,7 +444,7 @@ export function InteractiveLanding() {
       )
     );
     setDemoNotice(
-      `${job.company} role added to your sample tracker. To submit a real application, use the official ${job.company} career link.`
+      `${job.company} role added to the tracker. To submit an application, follow the employer link.`
     );
   }
 
@@ -520,8 +520,8 @@ export function InteractiveLanding() {
               <MailOpen size={15} />
               <span>Replay intro</span>
             </button>
-            <Link href="/login" className="ssi-login" aria-label="Login">
-              Sign in
+            <Link href={demoEnabled ? "/demo" : "/login"} className="ssi-login" aria-label={demoEnabled ? "Open workspace" : "Sign in"}>
+              {demoEnabled ? "Open workspace" : "Sign in"}
             </Link>
             <Link
               href={demoEntryHref}
@@ -557,9 +557,8 @@ export function InteractiveLanding() {
               <em>Make every move count.</em>
             </h1>
             <p>
-              Discover real internships, see how your coursework and projects map
-              to each requirement, and keep every resume version and application
-              organized in one calm workspace.
+              Explore internship roles, compare their requirements with your skills,
+              and keep resumes and applications organized in one place.
             </p>
             <div className="ssi-actions">
               <Link
@@ -673,8 +672,8 @@ export function InteractiveLanding() {
                 <Check size={17} />
               </span>
               <div>
-                <b>One connected workflow</b>
-                <small>From discovery to interview prep</small>
+                <b>One place to stay organized</b>
+                <small>Jobs, resumes, and applications together</small>
               </div>
             </div>
           </Reveal>
@@ -689,37 +688,37 @@ export function InteractiveLanding() {
               <div className="ssi-hero-marquee-group">
                 <a href="#discover" className="ssi-hero-step-pill">
                   <span className="ssi-hero-step-num">01</span>
-                  <span>Discover verified 2027 internships</span>
+                  <span>Browse 2027 internships</span>
                 </a>
                 <a href="#match" className="ssi-hero-step-pill">
                   <span className="ssi-hero-step-num">02</span>
-                  <span>Compare qualification evidence</span>
+                  <span>Compare roles with your skills</span>
                 </a>
                 <a href="#resume" className="ssi-hero-step-pill">
                   <span className="ssi-hero-step-num">03</span>
-                  <span>Align tailored resume versions</span>
+                  <span>Check your resume versions</span>
                 </a>
                 <a href="#track" className="ssi-hero-step-pill">
                   <span className="ssi-hero-step-num">04</span>
-                  <span>Track applications &amp; interviews</span>
+                  <span>Track applications</span>
                 </a>
               </div>
               <div className="ssi-hero-marquee-group" aria-hidden="true">
                 <a href="#discover" className="ssi-hero-step-pill" tabIndex={-1}>
                   <span className="ssi-hero-step-num">01</span>
-                  <span>Discover verified 2027 internships</span>
+                  <span>Browse 2027 internships</span>
                 </a>
                 <a href="#match" className="ssi-hero-step-pill" tabIndex={-1}>
                   <span className="ssi-hero-step-num">02</span>
-                  <span>Compare qualification evidence</span>
+                  <span>Compare roles with your skills</span>
                 </a>
                 <a href="#resume" className="ssi-hero-step-pill" tabIndex={-1}>
                   <span className="ssi-hero-step-num">03</span>
-                  <span>Align tailored resume versions</span>
+                  <span>Check your resume versions</span>
                 </a>
                 <a href="#track" className="ssi-hero-step-pill" tabIndex={-1}>
                   <span className="ssi-hero-step-num">04</span>
-                  <span>Track applications &amp; interviews</span>
+                  <span>Track applications</span>
                 </a>
               </div>
             </div>
@@ -738,10 +737,9 @@ export function InteractiveLanding() {
               Stop collecting tabs. <em>Start finding direction.</em>
             </h2>
             <p>
-              Browse verified 2027 internship and co-op postings from leading
-              engineering teams. Filter by location or work style, inspect core
-              requirements at a glance, and open the employer&apos;s official
-              application page directly.
+              Browse selected internship and co-op roles. Filter by location or work
+              style, check what each role asks for, and follow the employer link
+              to confirm the current posting.
             </p>
             <div className="ssi-story-points">
               <span>
@@ -767,9 +765,9 @@ export function InteractiveLanding() {
             <div className="ssi-demo-head">
               <div>
                 <span className="ssi-demo-eyebrow">
-                  OFFICIAL EMPLOYER POSTINGS · 2027
+                  INTERNSHIP ROLE EXAMPLES · 2027
                 </span>
-                <h3>Explore real internships</h3>
+                <h3>Browse internship roles</h3>
               </div>
             </div>
 
@@ -1351,8 +1349,7 @@ export function InteractiveLanding() {
               Make your next application <em>your most organized one.</em>
             </h2>
             <p>
-              Explore the complete StudentSuccessful workspace right now—or
-              create your account to begin organizing your search.
+              Explore how to organize your roles, resumes, and applications in one workspace.
             </p>
             <div className="ssi-actions">
               <Link
@@ -1364,13 +1361,13 @@ export function InteractiveLanding() {
               >
                 {hasInteractiveDemo ? "Try interactive demo" : "Get started"} <ArrowUpRight size={18} />
               </Link>
-              <Link
+              {!demoEnabled && (<Link
                 className="ssi-button ssi-button-bottom-outline ssi-button-big"
                 href="/register"
-                aria-label="Register"
+                aria-label="Create account"
               >
-                Create your workspace <ArrowRight size={17} />
-              </Link>
+                Create account <ArrowRight size={17} />
+              </Link>)}
             </div>
           </Reveal>
         </div>
@@ -1389,7 +1386,7 @@ export function InteractiveLanding() {
             />
           </Link>
           <p>
-            A clearer system for the preparation behind your next internship.
+            Find roles, review requirements, and keep your applications in order.
           </p>
           <div className="ssi-footer-links">
             <a href="#discover">Job discovery</a>
@@ -1404,8 +1401,8 @@ export function InteractiveLanding() {
             >
               {hasInteractiveDemo ? "Interactive demo" : "Get started"}
             </Link>
-            <Link href="/login">Sign in</Link>
-            <Link href="/register">Create account</Link>
+            {!demoEnabled && (<><Link href="/login">Sign in</Link>
+            <Link href="/register">Create account</Link></>)}
           </div>
           <small>
             Sample interactions use illustrative student data. Official career

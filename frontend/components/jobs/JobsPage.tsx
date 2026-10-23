@@ -442,7 +442,7 @@ export function SavedSearchControls({
 }) {
   return (
     <section className="saved-searches">
-      <h2>Saved searches</h2><p className="muted">Return to a search or save your applied filters.</p>
+      <h2>Saved searches</h2><p className="muted">Save filter combinations to check again later.</p>
       <details className="saved-search-create" key={searches?.map((search) => search.id).join(",")}>
         <summary>Save current search</summary>
         <form onSubmit={(event) => { event.preventDefault(); onCreate(); }}>
@@ -571,7 +571,7 @@ export function JobsContent({
     <div className="jobs-layout" aria-busy={isUpdating}>
       {isUpdating && <div className="jobs-refresh-bar" aria-label="Updating jobs" role="progressbar" />}
       <section className="jobs-results-pane" aria-label="Job results" tabIndex={0}>
-        <h2>{search.view === "all" ? "Newest matching jobs" : displayChoice(search.view) + " jobs"}</h2>
+        <h2>{search.view === "all" ? "Recent opportunities" : displayChoice(search.view) + " jobs"}</h2>
         <ul className="jobs-list">
           {result.items.map((job) => (
             <li key={job.id}>
@@ -909,7 +909,7 @@ export function JobsPage() {
 
   return (
     <main className="auth-shell dashboard-shell jobs-shell">
-      <PageHeader title="Jobs" description="Discover opportunities that fit your goals.">
+      <PageHeader title="Jobs" description="Search internships, compare requirements, and save roles.">
       {user ? <button ref={savedTrigger} className="secondary" type="button" onClick={() => savedDialog.current?.showModal()}>Saved searches</button> : null}</PageHeader>
       {sessionError ? <p role="alert" className="auth-error">{sessionError}</p>
         : user === undefined ? <LoadingState label="Checking your session…" />

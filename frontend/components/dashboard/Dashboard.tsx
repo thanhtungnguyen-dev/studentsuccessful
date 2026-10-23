@@ -46,15 +46,15 @@ export function Dashboard() {
   return <div className="dashboard-overview">
     <WorkspaceMetrics />
     <Reveal as="section" className="career-section dashboard-wide" aria-labelledby="career-title">
-      <div className="section-heading"><h2 id="career-title">Your next steps</h2><p>From preparation to opportunity.</p></div>
+      <div className="section-heading"><h2 id="career-title">Your next steps</h2><p>Go straight to the tools you use most.</p></div>
       <div className="career-actions">
-        <Card><Link className="career-card-link" href="/jobs" aria-label="Browse Jobs"><BriefcaseBusiness className="action-icon" size={24} aria-hidden="true" /><h3>Discover Jobs</h3><p>Explore listings and find opportunities that interest you.</p><span className="action-link">Browse Jobs<ArrowUpRight size={18} aria-hidden="true" /></span></Link></Card>
-        <Card><Link className="career-card-link" href="/candidate" aria-label="View Candidate Profile"><ContactRound className="action-icon" size={24} aria-hidden="true" /><h3>Candidate Profile</h3><p>See your saved experience and the sources behind it.</p><span className="action-link">View Candidate Profile<ArrowUpRight size={18} aria-hidden="true" /></span></Link></Card>
-        <Card><Link className="career-card-link" href="/applications" aria-label="View Applications"><ClipboardList className="action-icon" size={24} aria-hidden="true" /><h3>Applications</h3><p>Keep track of your applications and their next steps.</p><span className="action-link">View Applications<ArrowUpRight size={18} aria-hidden="true" /></span></Link></Card>
+        <Card><Link className="career-card-link" href="/jobs" aria-label="Browse Jobs"><BriefcaseBusiness className="action-icon" size={24} aria-hidden="true" /><h3>Discover Jobs</h3><p>Search roles, compare requirements, and save jobs.</p><span className="action-link">Browse Jobs<ArrowUpRight size={18} aria-hidden="true" /></span></Link></Card>
+        <Card><Link className="career-card-link" href="/candidate" aria-label="View Candidate Profile"><ContactRound className="action-icon" size={24} aria-hidden="true" /><h3>Candidate Profile</h3><p>Review your skills, projects, and supporting records.</p><span className="action-link">View Candidate Profile<ArrowUpRight size={18} aria-hidden="true" /></span></Link></Card>
+        <Card><Link className="career-card-link" href="/applications" aria-label="View Applications"><ClipboardList className="action-icon" size={24} aria-hidden="true" /><h3>Applications</h3><p>Update statuses and keep interview notes together.</p><span className="action-link">View Applications<ArrowUpRight size={18} aria-hidden="true" /></span></Link></Card>
       </div>
     </Reveal>
     <Reveal as="section" className="overview-group" aria-labelledby="profile-overview-title">
-      <div className="section-heading"><h2 id="profile-overview-title">Profile Overview</h2><p>Your saved information at a glance.</p></div>
+      <div className="section-heading"><h2 id="profile-overview-title">Profile overview</h2></div>
       <Card className="summary-list">
         <DashboardCard profileControl title="Personal Information" href="/profile" icon={UserRound} summary={data => data ? "Profile saved" : "Not provided"} load={dashboardLoaders.profile}>{data => <ProfileSummary data={data}/>}</DashboardCard>
         <DashboardCard profileControl title="Education" href="/education" icon={GraduationCap} summary={data => count(data.length,"school")} load={dashboardLoaders.education}>{data => <EducationSummary data={data}/>}</DashboardCard>

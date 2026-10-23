@@ -148,7 +148,7 @@ export function CandidateSections({ data }: { data: CandidateProfile }) {
       <Records heading="Employment" data={profile} keys={["employment"]} empty="No employment records yet." detail={item => join(item, ["job_title", "employer_name"])} href="/employment" icon={<BriefcaseBusiness size={19} />} />
       <Records heading="Work authorization" data={profile} keys={["work_authorization", "work_authorizations"]} empty="No work authorization records yet." detail={item => join(item, ["authorization_status", "country_code"])} href="/work-authorization" icon={<ShieldCheck size={19} />} />
     </div>
-    <div className="candidate-section-heading candidate-evidence-heading"><h2>Additional details</h2><p>Expand a section only when you need the details.</p></div>
+    <div className="candidate-section-heading candidate-evidence-heading"><h2>Additional details</h2><p>Open a section to review the supporting records.</p></div>
     <div className="candidate-more-grid"><ReconciledSkills data={profile} /><ResumeEvidence data={profile} /><Preferences data={profile} /></div>
   </div>;
 }
@@ -168,7 +168,7 @@ export function CandidateProfilePage() {
     });
     return () => { active = false; };
   }, [attempt, refresh, user]);
-  return <main className="auth-shell dashboard-shell candidate-shell"><Link href="/" className="brand">StudentSuccessful</Link><PageHeader title="Candidate Profile" description="A clear view of your profile, qualifications and supporting evidence." />
+  return <main className="auth-shell dashboard-shell candidate-shell"><Link href="/" className="brand">StudentSuccessful</Link><PageHeader title="Candidate Profile" description="Review the details and skills saved to your profile." />
     {sessionError ? <p role="alert" className="auth-error">{sessionError}</p> : user === undefined ? <LoadingState label="Checking your session…" /> : user === null ? <p>Please <Link href="/login">Login</Link> to view your profile.</p> : state.status === "loading" ? <LoadingState label="Loading candidate profile…" /> : state.status === "error" ? <><p role="alert" className="auth-error">Could not load your profile. {state.message}</p><button className="secondary" onClick={() => setAttempt(value => value + 1)}>Retry</button></> : <CandidateSections data={state.data} />}
   </main>;
 }

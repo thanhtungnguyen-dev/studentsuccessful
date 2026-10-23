@@ -73,7 +73,7 @@ export function ApplicationCard({
       <dl>
         <div><dt>Applied</dt><dd>{dateLabel(application.applied_at)}</dd></div>
         <div><dt>Resume</dt><dd>{application.resume_title ? application.resume_title + (application.resume_version_number ? " · v" + application.resume_version_number : "") : "Not recorded"}</dd></div>
-        <div><dt>Listing</dt><dd>{application.job_lifecycle === "CLOSED" ? "Closed listing; tracking remains active." : "Current canonical listing"}</dd></div>
+        <div><dt>Listing</dt><dd>{application.job_lifecycle === "CLOSED" ? "Listing closed · still in your tracker." : "Listing on record"}</dd></div>
       </dl>
       <div className="application-actions">
         <label>
@@ -204,7 +204,7 @@ export function ApplicationsPage() {
   return (
     <main className="auth-shell dashboard-shell applications-shell">
       <Link href="/" className="brand">StudentSuccessful</Link>
-      <PageHeader title="Applications" description="Track applications only after you submit them yourself. Statuses are your private records." />
+      <PageHeader title="Applications" description="Track applications you have submitted, update their status, and keep notes." />
       {sessionError ? <p role="alert" className="auth-error">{sessionError}</p>
         : user === undefined ? <LoadingState label="Checking your session…" />
           : user === null ? <p>Please <Link href="/login">Login</Link> to view applications.</p>

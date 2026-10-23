@@ -41,7 +41,7 @@ export function AuthStatus() {
         <h1 id="home-title">{completed ? "Home" : "StudentSuccessful"}</h1>
         {completed && (
           <p className="muted">
-            Welcome back. Take the next step toward your career.
+            Your jobs, resumes, and applications in one place.
           </p>
         )}
         {user === undefined ? (
