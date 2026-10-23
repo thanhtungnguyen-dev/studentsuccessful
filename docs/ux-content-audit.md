@@ -35,3 +35,10 @@ Audited 23 October 2026 against the four actual Next.js screenshots captured in 
 - Nielsen Norman Group, *The 3 C's of Informational Microcopy* (2026): https://www.nngroup.com/articles/3-cs-microcopy/
 - W3C, WCAG 2.2: https://www.w3.org/TR/WCAG22/
 - Google web.dev, Core Web Vitals: https://web.dev/articles/vitals/
+
+## Performance-focused adjustments
+
+- Demo CTA now uses Next.js client-side navigation instead of a full-page reload.
+- Pip schedules animation frames only while following pointer motion; it does not animate indefinitely when idle.
+- The skippable opening scene runs more quickly while respecting reduced motion.
+- Performance impact still needs measurement on real devices; these are code-level improvements, not a claimed Core Web Vitals score.

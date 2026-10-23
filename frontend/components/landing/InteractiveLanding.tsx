@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { OfferIntro } from "./OfferIntro";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -104,17 +105,27 @@ function CareerGuide({ section }: { section: string }) {
       aimY = y,
       frame = 0;
     let active = true;
+    el.style.transform = `translate3d(${x}px,${y}px,0)`;
+    // Schedule frames only while Pip is travelling. An idle pointer uses no animation loop.
     const draw = () => {
       if (!active) return;
       x += (aimX - x) * 0.16;
       y += (aimY - y) * 0.16;
       el.style.transform = `translate3d(${x}px,${y}px,0)`;
-      frame = window.requestAnimationFrame(draw);
+      if (Math.abs(aimX - x) + Math.abs(aimY - y) > 0.8) {
+        frame = window.requestAnimationFrame(draw);
+      } else {
+        x = aimX;
+        y = aimY;
+        el.style.transform = `translate3d(${x}px,${y}px,0)`;
+        frame = 0;
+      }
     };
     const move = (e: PointerEvent) => {
       if (e.pointerType !== "mouse" && e.pointerType !== "pen") return;
       aimX = Math.min(window.innerWidth - 65, Math.max(8, e.clientX + 24));
       aimY = Math.min(window.innerHeight - 75, Math.max(12, e.clientY + 22));
+      if (frame === 0) frame = window.requestAnimationFrame(draw);
       el.style.setProperty(
         "--ssi-pip-look-x",
         `${(e.clientX / window.innerWidth - 0.5) * 3}px`
@@ -124,7 +135,6 @@ function CareerGuide({ section }: { section: string }) {
         `${(e.clientY / window.innerHeight - 0.5) * 2}px`
       );
     };
-    frame = window.requestAnimationFrame(draw);
     window.addEventListener("pointermove", move, { passive: true });
     return () => {
       active = false;
@@ -255,6 +265,7 @@ function CareerGuide({ section }: { section: string }) {
 }
 
 export function InteractiveLanding() {
+  const router = useRouter();
   const { refresh } = useAuth();
   const demoEnabled = isDemoModeEnabled();
   const configuredDemoOrigin = process.env.NEXT_PUBLIC_DEMO_DEPLOYMENT_URL?.trim();
@@ -322,7 +333,7 @@ export function InteractiveLanding() {
     } catch {
       // Ignore refresh error in demo mode
     }
-    window.location.assign(targetPath || "/demo");
+    router.push(targetPath || "/demo");
   }
 
   useEffect(() => {

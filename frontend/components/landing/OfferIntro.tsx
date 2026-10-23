@@ -8,10 +8,10 @@ type IntroStep = "checking" | "envelope" | "letter" | "question" | "exit" | "don
 const STORAGE_KEY = "studentsuccessful-offer-intro-seen-v1";
 
 const STEP_TIMINGS: Partial<Record<IntroStep, [IntroStep, number]>> = {
-  envelope: ["letter", 1380],
-  letter: ["question", 2500],
-  question: ["exit", 1680],
-  exit: ["done", 1040],
+  envelope: ["letter", 960],
+  letter: ["question", 2100],
+  question: ["exit", 1150],
+  exit: ["done", 700],
 };
 
 /** A fictional future-offer vignette, only for the public landing. */
