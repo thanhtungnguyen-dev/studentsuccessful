@@ -4,6 +4,7 @@ import { CompanyLogo } from "./CompanyLogo";
 import { LoadingState } from "../ui/LoadingState";
 
 import Link from "next/link";
+import { RoleAnalysisNav } from "./RoleAnalysisNav";
 import { useEffect, useState } from "react";
 
 import { ApiError, apiClient, authErrorMessage, type FitAnalysis } from "../../lib/api/client";
@@ -144,6 +145,7 @@ export function FitAnalysisPage({ jobId }: { jobId: string }) {
     <main className="auth-shell dashboard-shell fit-shell">
       <Link href="/" className="brand">StudentSuccessful</Link>
       <p className="fit-back"><Link href="/jobs">Back to jobs</Link></p>
+      {user && <RoleAnalysisNav jobId={jobId} selected="fit" />}
       {sessionError ? <p role="alert" className="auth-error">{sessionError}</p>
         : user === undefined ? <LoadingState label="Checking your session…" />
           : user === null ? <p>Please <Link href="/login">Login</Link> to view a fit analysis.</p>

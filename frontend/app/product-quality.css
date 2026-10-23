@@ -111,3 +111,15 @@
   .workspace .job-detail-links-primary > a { flex: 1 1 170px; }
   .workspace .application-actions { gap: 10px; }
 }
+
+/* Analysis flow: five related views, one job. Scrollable on narrow screens. */
+.workspace .role-analysis-nav { margin: 6px 0 22px; max-width: 100%; }
+.workspace .role-analysis-nav-label { display: block; margin-bottom: 10px; color: #515e77; font-size: 11px; font-weight: 800; letter-spacing: .1em; }
+.workspace .role-analysis-steps { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; background: #f7f8fd; border: 1px solid #e2e6ef; border-radius: 13px; padding: 6px; }
+.workspace .role-analysis-step { display: inline-flex; align-items: center; justify-content: center; color: #43516a; text-decoration: none; font-size: 13px; font-weight: 700; min-height: 41px; padding: 9px 12px; border-radius: 9px; white-space: nowrap; }
+.workspace .role-analysis-step:hover { background: #ececfc; color: #3b30a7; }
+.workspace .role-analysis-step[aria-current="page"] { background: #5044d0; color: #fff; box-shadow: 0 2px 9px #4d45c124; }
+@media (max-width: 700px) {
+  .workspace .role-analysis-steps { flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; }
+  .workspace .role-analysis-step { flex: 0 0 auto; font-size: 12px; }
+}
