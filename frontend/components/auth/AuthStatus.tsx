@@ -3,7 +3,7 @@ import { LoadingState } from "../ui/LoadingState";
 import { Dashboard } from "../dashboard/Dashboard";
 import { InteractiveLanding } from "../landing/InteractiveLanding";
 import Link from "next/link";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { AccountControls } from "./AccountControls";
 import { useAuth } from "./AuthProvider";
 
@@ -41,7 +41,7 @@ export function AuthStatus() {
         <h1 id="home-title">{completed ? "Home" : "StudentSuccessful"}</h1>
         {completed && (
           <p className="muted">
-            Your jobs, resumes, and applications in one place.
+            Review applications, resumes, and the experience you've saved.
           </p>
         )}
         {user === undefined ? (
@@ -61,31 +61,15 @@ export function AuthStatus() {
           </>
         ) : null}
       </section>
-      {user && !sessionError && (
-        <section
-          className={`ui-card setup-card${completed ? " setup-complete" : ""}`}
-          aria-labelledby="setup-title"
-        >
+      {user && !sessionError && !completed && (
+        <section className="ui-card setup-card" aria-labelledby="setup-title">
           <div>
-            {!completed && <p className="eyebrow">MAKE YOUR NEXT MOVE</p>}
-            <h2 id="setup-title">Profile setup</h2>
-            <p className="muted">
-              {completed ? (
-                <>
-                  <Check size={15} aria-hidden="true" />
-                  Complete
-                </>
-              ) : (
-                "Review your information before you complete onboarding."
-              )}
-            </p>
+            <p className="eyebrow">PROFILE SETUP</p>
+            <h2 id="setup-title">Finish your profile</h2>
+            <p className="muted">Review your information before using the workspace.</p>
           </div>
-          <Link
-            className={completed ? "secondary" : "primary"}
-            href="/onboarding/review"
-          >
-            {completed ? "Review profile setup" : "Continue setup"}
-            {completed && <ArrowRight size={16} aria-hidden="true" />}
+          <Link className="primary" href="/onboarding/review">
+            Continue setup <ArrowRight size={16} aria-hidden="true" />
           </Link>
         </section>
       )}

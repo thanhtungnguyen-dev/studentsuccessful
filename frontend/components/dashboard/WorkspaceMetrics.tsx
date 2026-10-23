@@ -27,7 +27,7 @@ export function WorkspaceMetrics() {
     return () => { active = false; };
   }, []);
   const cards = [
-    { label: "Available roles", value: counts.jobs, href: "/jobs", help: "Browse opportunities", icon: BriefcaseBusiness },
+    { label: "Roles in catalog", value: counts.jobs, href: "/jobs", help: "Browse opportunities", icon: BriefcaseBusiness },
     { label: "Applications", value: counts.applications, href: "/applications", help: "View your pipeline", icon: ClipboardCheck },
     { label: "Resume collections", value: counts.resumes, href: "/resumes", help: "Manage your versions", icon: Files },
   ];

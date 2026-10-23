@@ -37,3 +37,6 @@
 @media (max-width: 1000px) { .focus-layout { grid-template-columns: minmax(0,1fr); } .focus-primary { min-height: 260px; } }
 @media (max-width: 600px) { .focus-heading { flex-direction: column; align-items: flex-start; gap: 6px; }.focus-primary { padding: 23px; }.focus-activity { padding: 18px; }.focus-shortcuts { display: grid; grid-template-columns: minmax(0,1fr); }.focus-shortcuts a { justify-content: space-between; } }
 @media (prefers-reduced-motion: reduce) { .focus-primary-action, .focus-shortcuts a { transition: none; } }
+
+/* Keep the next meaningful action visible above the fold on typical laptops. */
+.focus-primary-action { margin-top: 24px; }
