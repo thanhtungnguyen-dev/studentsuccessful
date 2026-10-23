@@ -29,7 +29,7 @@ export function WorkspaceMetrics() {
   const cards = [
     { label: "Roles in catalog", value: counts.jobs, href: "/jobs", help: "Browse jobs", icon: BriefcaseBusiness },
     { label: "Applications", value: counts.applications, href: "/applications", help: "Open tracker", icon: ClipboardCheck },
-    { label: "Resume collections", value: counts.resumes, href: "/resumes", help: "Review resumes", icon: Files },
+    { label: "Resumes", value: counts.resumes, href: "/resumes", help: "Review resumes", icon: Files },
   ];
   return (
     <section className="workspace-metrics" aria-label="Workspace overview">
