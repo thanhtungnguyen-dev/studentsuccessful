@@ -56,6 +56,7 @@ export function ResumeAlignmentRequirement({ requirement }: { requirement: Align
         <p className="muted">{requirement.category}{requirement.importance ? ` · ${requirement.importance}` : ""}</p>
       </header>
       {requirement.description && <p className="alignment-description">{requirement.description}</p>}
+      <details className="analysis-source-disclosure"><summary>Why this result? View sources and limits</summary>
       <p><strong>Why this is listed:</strong> {requirement.explanation}</p>
       <p><strong>Limitation:</strong> {requirement.limitation}</p>
       {sources.length ? (
@@ -66,6 +67,7 @@ export function ResumeAlignmentRequirement({ requirement }: { requirement: Align
           </ul>
         </>
       ) : <p className="muted">No recorded sources.</p>}
+      </details>
     </article>
   );
 }

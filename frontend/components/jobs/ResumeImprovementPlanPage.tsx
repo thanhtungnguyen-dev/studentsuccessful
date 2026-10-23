@@ -65,6 +65,7 @@ export function ResumePlanAction({
       </header>
       {action.description && <p className="plan-description">{action.description}</p>}
       <p className="muted"><strong>Action:</strong> {action.action}</p>
+      <details className="analysis-source-disclosure"><summary>Why this result? View sources and limits</summary>
       <p><strong>Reason:</strong> {action.reason}</p>
       <p><strong>Limitation:</strong> {action.limitation}</p>
       {sources.length ? (
@@ -79,6 +80,7 @@ export function ResumePlanAction({
           </ul>
         </>
       ) : <p className="muted">No recorded sources.</p>}
+      </details>
     </article>
   );
 }

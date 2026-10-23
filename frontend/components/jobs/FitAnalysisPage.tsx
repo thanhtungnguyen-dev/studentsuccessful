@@ -39,6 +39,7 @@ export function FitRequirement({ requirement }: { requirement: FitRequirementRea
         </div>
       </header>
       {requirement.description && <p className="fit-description">{requirement.description}</p>}
+      <details className="analysis-source-disclosure"><summary>Why this result? View sources and limits</summary>
       <p><strong>Why this is listed:</strong> {requirement.explanation}</p>
       <p><strong>Limitation:</strong> {requirement.limitation}</p>
       <h4>Recorded sources</h4>
@@ -46,6 +47,7 @@ export function FitRequirement({ requirement }: { requirement: FitRequirementRea
         {(requirement.sources ?? []).map((source) => <li key={`${source.source_type}-${source.source_id}`}>{sourceLabel(source)}</li>)}
       </ul>
       {(requirement.sources ?? []).length === 0 && <p className="muted">No recorded sources.</p>}
+      </details>
     </article>
   );
 }

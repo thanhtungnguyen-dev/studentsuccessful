@@ -94,6 +94,7 @@ export function ResumeTailoringDraftAction({
           <CopyDraftButton draftText={item.draft_text} />
         </>
       )}
+      <details className="analysis-source-disclosure"><summary>Evidence used for this draft</summary>
       {sources.length ? (
         <>
           <h4>Recorded sources</h4>
@@ -106,6 +107,7 @@ export function ResumeTailoringDraftAction({
           </ul>
         </>
       ) : <p className="muted">No eligible recorded source is used for a draft.</p>}
+      </details>
     </article>
   );
 }

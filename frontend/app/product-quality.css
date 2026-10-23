@@ -133,3 +133,10 @@
 .workspace .resume-more-menu-actions { display: flex; flex-wrap: wrap; gap: 9px; padding-top: 10px; }
 .workspace .resume-version-actions { align-items: center; }
 .workspace .resume-version-actions .resume-more-menu { flex: 0 0 auto; }
+
+/* Dense evidence is present on request, without overwhelming every analysis card. */
+.workspace .analysis-source-disclosure { margin-top: 12px; border-top: 1px solid #e9ebf4; }
+.workspace .analysis-source-disclosure summary { display: flex; align-items: center; min-height: 44px; padding: 10px 0; cursor: pointer; color: #4b40b5; font-size: 13px; font-weight: 700; }
+.workspace .analysis-source-disclosure[open] { padding-bottom: 12px; }
+.workspace .analysis-source-disclosure > p,
+.workspace .analysis-source-disclosure li { font-size: 13px; line-height: 1.6; }
