@@ -28,7 +28,7 @@ function ProjectsContent(){
  {error&&<p role="alert" className="auth-error">{error}</p>}{success&&<p role="status" className="profile-success">{success}</p>}
  {!data ? error ? <button className="secondary" onClick={()=>setAttempt(x=>x+1)}>Retry Projects</button> : <LoadingState label="Loading projects…" /> : <>
  {!editing&&!deleting&&<button className="primary education-add" onClick={()=>{setForm(empty());setEditing("new");setError("");setSuccess("");}}>Add project</button>}
- {data.projects.length>=5&&!editing&&!deleting&&<div className="project-search">
+ {(data.projects.length>=5||Boolean(search.trim()))&&!editing&&!deleting&&<div className="project-search">
    <label htmlFor="project-search-input">Find a project</label>
    <input id="project-search-input" type="search" value={search} placeholder="Search names, descriptions, or technologies" onChange={event=>setSearch(event.target.value)}/>
    <span role="status">{visibleProjects.length} of {data.projects.length} projects</span>
