@@ -14,6 +14,7 @@ import { ApiError, apiClient, authErrorMessage, type CandidateProfile } from "..
 import { useAuth } from "../auth/AuthProvider";
 
 type Row = Record<string, unknown>;
+const COUNTRY_NAMES: Record<string, string> = { CA: "Canada", US: "United States" };
 type State = { status: "loading" } | { status: "error"; message: string } | { status: "ready"; data: CandidateProfile };
 
 function row(value: unknown): Row { return value !== null && typeof value === "object" && !Array.isArray(value) ? value as Row : {}; }
@@ -87,7 +88,7 @@ function ApplicationProfile({ data }: { data: Row }) {
   const profile = row(data.profile);
   const fields: [string, string][] = [["legal_first_name", "First name"], ["legal_last_name", "Last name"], ["preferred_name", "Preferred name"], ["phone_number", "Phone"], ["address_city", "City"], ["address_country_code", "Country"]];
   return <Panel title="Personal information" icon={<UserRound size={19} />} href="/profile" className="candidate-personal-panel">
-    {Object.keys(profile).length ? <dl className="candidate-field-list">{fields.map(([key, label]) => <div key={key}><dt>{label}</dt><dd>{key === "address_country_code" ? ({ CA: "Canada", US: "United States" }[text(profile[key]).toUpperCase()] || text(profile[key]) || "Not provided") : (text(profile[key]) || "Not provided")}</dd></div>)}</dl> : <p className="candidate-empty">No personal information saved yet.</p>}
+    {Object.keys(profile).length ? <dl className="candidate-field-list">{fields.map(([key, label]) => <div key={key}><dt>{label}</dt><dd>{key === "address_country_code" ? (COUNTRY_NAMES[text(profile[key]).toUpperCase()] || text(profile[key]) || "Not provided") : (text(profile[key]) || "Not provided")}</dd></div>)}</dl> : <p className="candidate-empty">No personal information saved yet.</p>}
   </Panel>;
 }
 function ConfirmedSkills({ data }: { data: Row }) {
