@@ -160,3 +160,34 @@
   .workspace .application-filters { display:flex; flex-wrap:nowrap; overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:thin; white-space:nowrap; gap:5px; padding-bottom:7px; }
   .workspace .application-filters button { flex:0 0 auto; min-height:44px; }
 }
+
+/* Applications: accessible search and clear result feedback. */
+.workspace .applications-search-bar {
+  display: flex; align-items: flex-end; flex-wrap: wrap; gap: 10px 16px;
+  margin: 14px 0 20px;
+}
+.workspace .applications-search-bar > label {
+  font-size: 13px; color: #38445e; font-weight: 700; width: 100%; margin: 0;
+}
+.workspace .applications-search-field { width: min(100%, 410px); }
+.workspace .applications-search-field input {
+  width: 100%; min-height: 44px; border-radius: 11px; background: white;
+  border: 1px solid #d7ddea; padding: 10px 14px;
+  font-size: 14px; color: #1d2b44;
+}
+.workspace .applications-search-field input:focus-visible {
+  outline: 3px solid #6a5cda; outline-offset: 2px;
+}
+.workspace .applications-result-count { font-size: 12px; color: #526079; padding-bottom: 12px; }
+.workspace .applications-search-empty { padding: 25px; }
+@media (max-width: 600px) {
+  .workspace .applications-search-bar { gap: 7px; }
+  .workspace .applications-search-field { width: 100%; }
+  .workspace .applications-result-count { padding-bottom: 0; }
+}
+
+/* Search bars with visually suppressed native focus receive a visible container ring. */
+.workspace .skill-choices-search:focus-within,
+.workspace .candidate-skill-search:focus-within {
+  outline: 3px solid #6454d7; outline-offset: 2px; border-radius: 10px;
+}

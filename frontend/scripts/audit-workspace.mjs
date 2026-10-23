@@ -102,6 +102,18 @@ for (const width of [1440, 390]) {
 
     try {
       await page.goto(new URL("/applications", origin).toString(), { waitUntil: "domcontentloaded" });
+      const search = page.getByRole("searchbox", { name: "Find an application" });
+      await search.fill("NVIDIA");
+      await page.locator(".application-card").first().waitFor({ state: "visible", timeout: 15000 });
+      const found = await page.locator(".application-card").count();
+      if (found !== 1 || !(await page.locator(".application-card").first().innerText()).includes("NVIDIA")) {
+        failures.push(width + "px application search returned unexpected results");
+      }
+      await search.fill("No Company With This Name");
+      await page.getByRole("heading", { name: "No applications found" }).waitFor({ state: "visible" });
+      await page.getByRole("button", { name: "Clear search" }).click();
+      await page.locator(".application-card").first().waitFor({ state: "visible" });
+      console.log("PASS " + width + "px application search and empty state");
       const select = page.locator('select[aria-label^="Update status for"]').first();
       await select.waitFor({ state: "visible", timeout: 15000 });
       const before = await select.inputValue();

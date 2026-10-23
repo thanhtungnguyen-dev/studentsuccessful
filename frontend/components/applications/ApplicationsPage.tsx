@@ -128,6 +128,7 @@ export function ApplicationCard({
 export function ApplicationsPage() {
   const { user, error: sessionError, refresh } = useAuth();
   const [filter, setFilter] = useState<StatusFilter>("ALL");
+  const [query, setQuery] = useState("");
   const [items, setItems] = useState<Application[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -205,6 +206,16 @@ export function ApplicationsPage() {
     };
   }, [attempt, filter, user]);
 
+  const normalizedQuery = query.trim().toLocaleLowerCase();
+  const visibleItems = items
+    ?.filter((item) =>
+      !normalizedQuery || [item.job_title, item.company_name, item.resume_title ?? ""]
+        .some((value) => value.toLocaleLowerCase().includes(normalizedQuery))
+    )
+    .sort((a, b) =>
+      (Date.parse(b.applied_at ?? "") || 0) - (Date.parse(a.applied_at ?? "") || 0)
+    );
+
   return (
     <main className="auth-shell dashboard-shell applications-shell">
       <Link href="/" className="brand">StudentSuccessful</Link>
@@ -227,6 +238,24 @@ export function ApplicationsPage() {
                     </button>
                   ))}
                 </nav>
+                <div className="applications-search-bar">
+                  <label htmlFor="application-search">Find an application</label>
+                  <div className="applications-search-field">
+                    <input
+                      id="application-search"
+                      type="search"
+                      value={query}
+                      placeholder="Search a company, role, or resume"
+                      autoComplete="off"
+                      onChange={(event) => setQuery(event.currentTarget.value)}
+                    />
+                  </div>
+                  {items !== null && (
+                    <span role="status" className="applications-result-count">
+                      {visibleItems?.length ?? 0} of {items.length} applications
+                    </span>
+                  )}
+                </div>
                 {loading && items !== null && <div className="applications-refresh" role="status"><span className="sr-only">Updating applications</span></div>}
                 {error && items !== null ? <p role="alert" className="auth-error">{error}</p> : null}
                 {items === null ? (
@@ -242,9 +271,15 @@ export function ApplicationsPage() {
                     <p className="muted">{filter === "ALL" ? "After applying on an employer's site, add the role to your tracker." : "Choose another status above to see your other applications."}</p>
                     {filter === "ALL" && <Link className="secondary" href="/jobs">Browse jobs</Link>}
                   </section>
+                ) : visibleItems?.length === 0 ? (
+                  <section className="auth-card dashboard-card applications-search-empty">
+                    <h2>No applications found</h2>
+                    <p className="muted">Try another company, job title, or resume name.</p>
+                    <button className="secondary" type="button" onClick={() => setQuery("")}>Clear search</button>
+                  </section>
                 ) : (
                   <section className="applications-list" aria-busy={loading} style={{ opacity: loading ? 0.68 : 1, transition: "opacity 140ms ease" }}>
-                    {items.map((application) => (
+                    {visibleItems?.map((application) => (
                       <ApplicationCard
                         key={application.id}
                         application={application}
