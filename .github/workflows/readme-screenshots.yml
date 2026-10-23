@@ -1,0 +1,62 @@
+name: Update README screenshots
+
+on:
+  push:
+    branches: [main]
+    paths: [README.md]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Install Chromium
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Build frontend showcase
+        working-directory: frontend
+        env:
+          NEXT_PUBLIC_DEMO_MODE: 'true'
+        run: npm run build
+
+      - name: Capture actual browser screenshots
+        working-directory: frontend
+        env:
+          NEXT_PUBLIC_DEMO_MODE: 'true'
+        run: |
+          npm run start > /tmp/studentsuccessful-next.log 2>&1 &
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:3000/ > /dev/null; then break; fi
+            sleep 2
+          done
+          curl -f http://127.0.0.1:3000/ > /dev/null
+          node scripts/capture-readme-screenshots.mjs
+
+      - name: Commit screenshots
+        run: |
+          git add docs/screenshots/
+          if ! git diff --cached --quiet; then
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'docs: refresh screenshots from live frontend'
+            git push origin HEAD:main
+          fi
