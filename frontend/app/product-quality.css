@@ -226,3 +226,27 @@
     text-align: center;
   }
 }
+
+/* Project portfolio: clear hierarchy, balanced cards and responsive layout. */
+.workspace .portfolio-content .project-gallery {
+  display: grid; grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 18px; align-items: stretch;
+}
+.workspace .project-gallery-card {
+  display: flex; flex-direction: column; gap: 12px; min-width: 0;
+  height: 100%; padding: 24px;
+}
+.workspace .project-gallery-card h2 { font-size: 18px; line-height: 1.35; letter-spacing: -.012em; margin: 0; }
+.workspace .project-gallery-card h3 { margin: 2px 0 0; font-size: 13px; color: #46536c; font-weight: 750; }
+.workspace .project-gallery-card .project-description {
+  margin: 0; font-size: 14px; line-height: 1.65; color: #46536c; overflow-wrap: anywhere;
+}
+.workspace .project-gallery-card .project-external-links { margin: auto 0 0; padding-top: 8px; }
+.workspace .project-gallery-card .auth-actions { margin-top: 0; }
+.workspace .project-gallery-card .auth-actions button[aria-label^="Delete"] { color: #8a3542; }
+@media (max-width: 990px) {
+  .workspace .portfolio-content .project-gallery { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .workspace .project-gallery-card { padding: 18px; }
+}
