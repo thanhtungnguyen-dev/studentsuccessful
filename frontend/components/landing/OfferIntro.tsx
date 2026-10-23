@@ -133,7 +133,7 @@ export function OfferIntro({ replaySignal }: { replaySignal: number }) {
           </div>
           <div className="ssi-offer-meta">
             <span>To</span>
-            <b>Tung</b>
+            <b>You, in the future</b>
           </div>
           <div className="ssi-offer-rule" />
           <div className="ssi-offer-letter-body">
@@ -141,7 +141,7 @@ export function OfferIntro({ replaySignal }: { replaySignal: number }) {
             <h2>
               Congratulations,
               <br />
-              <em>Tung.</em>
+              <em>you did it.</em>
             </h2>
             <p className="ssi-offer-lead">You&apos;ve been selected for the role of</p>
             <div className="ssi-offer-job-title">

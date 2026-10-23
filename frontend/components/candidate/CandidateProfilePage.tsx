@@ -99,7 +99,10 @@ function ConfirmedSkills({ data }: { data: Row }) {
     const kind = text(source.source_type || source.type || source.kind).toUpperCase();
     return kind.includes("CONFIRM") || kind.includes("USER");
   }));
-  const skills = [...new Map(raw.map(skill => [title(skill, "").trim().toLowerCase(), title(skill, "")])).values()].filter(Boolean).sort((a, b) => a.localeCompare(b));
+  // Display an overlapping C/C++ label only once without changing saved evidence.
+  const names = [...new Map(raw.map(skill => [title(skill, "").trim().toLowerCase(), title(skill, "")])).values()].filter(Boolean);
+  const skills = names.filter(name => !(name === "C++" && names.some(other => other.toLowerCase() === "c/c++")))
+    .sort((a, b) => a.localeCompare(b));
   const matching = skills.filter(skill => skill.toLowerCase().includes(query.trim().toLowerCase()));
   const visible = showAll || query ? matching : matching.slice(0, 12);
   return <Panel title="Confirmed skills" icon={<CircleCheck size={19} />} href="/skills" count={skills.length} className="candidate-skills-panel">

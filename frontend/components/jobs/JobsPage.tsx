@@ -262,7 +262,7 @@ export function jobDescriptionSummary(description: string | null): string {
 
 function MatchedFilters({ filters }: { filters: string[] }) {
   if (!filters.length) return null;
-  return <p className="job-matched">Matched your filters: {filters.join(" · ")}</p>;
+  return <p className="job-matched">Search filters: {filters.join(" · ")}</p>;
 }
 
 type JobActionProps = {

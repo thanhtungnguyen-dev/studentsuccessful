@@ -5,7 +5,6 @@ import { WorkspaceFocus } from "./WorkspaceFocus";
 import {SkillsSummary,ProjectsSummary} from "../portfolio/PortfolioSummaries";
 import {ArtifactSummary} from "../artifacts/ArtifactList";
 import {ResumeSummary} from "../resumes/ResumesPage";
-import Link from "next/link";
 import { SummaryDisclosure } from "../ui/summary-disclosure";
 import { completePreferences } from "../../lib/preferences/form";
 import { UserRound, GraduationCap, Building2, Globe2, SlidersHorizontal, ListChecks, FolderOpen, Files, Link2, type LucideIcon } from "lucide-react";

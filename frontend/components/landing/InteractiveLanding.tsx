@@ -531,9 +531,7 @@ export function InteractiveLanding() {
               <MailOpen size={15} />
               <span>Replay intro</span>
             </button>
-            <Link href={demoEnabled ? "/demo" : "/login"} className="ssi-login" aria-label={demoEnabled ? "Open workspace" : "Sign in"}>
-              {demoEnabled ? "Open workspace" : "Sign in"}
-            </Link>
+            {!demoEnabled && <Link href="/login" className="ssi-login" aria-label="Sign in">Sign in</Link>}
             <Link
               href={demoEntryHref}
               onClick={(e) => {
@@ -564,12 +562,12 @@ export function InteractiveLanding() {
               <span className="ssi-green-dot" /> THE CAREER WORKSPACE FOR STUDENTS
             </div>
             <h1 id="ssi-hero-title">
-              The opportunity is out there.{" "}
-              <em>Make every move count.</em>
+              Find a role worth applying to.{" "}
+              <em>Know what to do next.</em>
             </h1>
             <p>
-              Explore internship roles, compare their requirements with your skills,
-              and keep resumes and applications organized in one place.
+              Compare job requirements with your saved experience, keep resumes focused,
+              and track each application from the first step onward.
             </p>
             <div className="ssi-actions">
               <Link
@@ -586,7 +584,7 @@ export function InteractiveLanding() {
                 className="ssi-button ssi-button-outline ssi-button-big"
                 href="#discover"
               >
-                Explore 2027 roles <ArrowDownRight size={17} />
+                See how it works <ArrowDownRight size={17} />
               </a>
             </div>
             <div className="ssi-hero-trail">
@@ -616,7 +614,7 @@ export function InteractiveLanding() {
                   <small>YOUR WORKSPACE</small>
                   <strong>Find your next opportunity.</strong>
                   <span>
-                    Every internship, skill record, and application in one place.
+                    From job requirements to your next application step.
                   </span>
                 </div>
                 <div className="ssi-browser-quick">
@@ -1332,13 +1330,13 @@ export function InteractiveLanding() {
                 ))
               ) : (
                 <div className="ssi-empty">
-                  No sample applications in this stage yet.
+                  No applications in this stage.
                 </div>
               )}
             </div>
 
             <div className="ssi-demo-footer">
-              <span>Real-time pipeline stages &amp; interview prep notes</span>
+              <span>Application stages and private interview notes</span>
               <Link
                 href="/applications"
                 onClick={(e) => {
@@ -1357,7 +1355,7 @@ export function InteractiveLanding() {
           <Reveal className="ssi-final">
             <span className="ssi-kicker ssi-bottom-kicker">YOUR NEXT MOVE</span>
             <h2>
-              Make your next application <em>your most organized one.</em>
+              Know what a role needs. <em>Keep your next step in view.</em>
             </h2>
             <p>
               Explore how to organize your roles, resumes, and applications in one workspace.
