@@ -27,9 +27,9 @@ export function WorkspaceMetrics() {
     return () => { active = false; };
   }, []);
   const cards = [
-    { label: "Roles in catalog", value: counts.jobs, href: "/jobs", help: "Browse opportunities", icon: BriefcaseBusiness },
-    { label: "Applications", value: counts.applications, href: "/applications", help: "View your pipeline", icon: ClipboardCheck },
-    { label: "Resume collections", value: counts.resumes, href: "/resumes", help: "Manage your versions", icon: Files },
+    { label: "Roles in catalog", value: counts.jobs, href: "/jobs", help: "Browse jobs", icon: BriefcaseBusiness },
+    { label: "Applications", value: counts.applications, href: "/applications", help: "Open tracker", icon: ClipboardCheck },
+    { label: "Resume collections", value: counts.resumes, href: "/resumes", help: "Review resumes", icon: Files },
   ];
   return (
     <section className="workspace-metrics" aria-label="Workspace overview">

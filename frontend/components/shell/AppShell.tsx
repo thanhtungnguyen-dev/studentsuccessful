@@ -255,6 +255,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <WorkspaceNavigation pathname={pathname} onNavigate={close} />
           <div className="mobile-sheet-account" aria-label="Account controls">
             <AccountControls />
+            <Link href="/onboarding/review" className="mobile-sheet-review" onClick={close}>Review profile setup</Link>
           </div>
         </div>
       </dialog>

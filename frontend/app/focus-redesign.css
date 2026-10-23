@@ -67,3 +67,16 @@
   .workspace .workspace-metric-hint { font-size: 10px; line-height: 1.35; margin-top: 5px; }
   .workspace .home-review-link { margin: 8px 0 0; }
 }
+
+/* Mobile: remove duplicated links above the fold; keep their destinations in navigation. */
+.mobile-sheet-review { display:block; font-size:13px; font-weight:700; color:#5347c5; text-decoration:none; padding:12px 0 2px; min-height:44px; }
+@media (max-width: 600px) {
+  .workspace .home-review-link { display:none; }
+  .workspace .focus-heading > .focus-secondary-link { display:none; }
+  .workspace .focus-primary { padding:18px; }
+  .workspace .focus-primary-icon { margin-bottom:12px; width:45px; height:45px; }
+  .workspace .focus-primary-action { margin-top:12px; }
+  .workspace .workspace-metric-head { font-size:11px; }
+  .workspace .workspace-metric-hint { font-size:11px; }
+  .workspace .focus-heading { margin-bottom:14px; }
+}
