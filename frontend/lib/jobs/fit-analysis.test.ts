@@ -90,3 +90,11 @@ it("does not render an analysis before an authenticated request completes", () =
   expect(html).toContain("Loading fit analysis…");
   expect(html).not.toContain("Software resume");
 });
+
+it("summarizes empty classifications without rendering blank result cards", () => {
+  const html = render(h(FitAnalysisContent, { analysis: {...analysis, missing:[], unknown:[]} }));
+  expect(html).toContain('class="analysis-overview"');
+  expect(html).toContain("<h2>Recorded evidence</h2>");
+  expect(html).not.toContain("<h2>Unknown</h2>");
+  expect(html).not.toContain("<h2>No recorded evidence</h2>");
+});

@@ -114,3 +114,11 @@ it("does not render an alignment before an authenticated request completes", () 
   expect(html).toContain("Loading resume alignment…");
   expect(html).not.toContain("Software resume");
 });
+
+it("keeps category counts when the corresponding resume groups have no records", () => {
+  const html = render(h(ResumeAlignmentContent, { alignment: {...alignment, no_recorded_evidence:[], unknown_unassessed:[]} }));
+  expect(html).toContain('class="analysis-overview"');
+  expect(html).toContain("<h2>Shown on this resume</h2>");
+  expect(html).not.toContain("<h2>Unknown / unassessed</h2>");
+  expect(html).not.toContain("<h2>No recorded evidence</h2>");
+});

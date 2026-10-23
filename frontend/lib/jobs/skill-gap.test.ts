@@ -123,3 +123,10 @@ it("does not render a gap analysis before an authenticated request completes", (
   expect(html).toContain("Loading skill gap analysis…");
   expect(html).not.toContain("Software resume");
 });
+
+it("shows only nonempty evidence groups while preserving a complete count summary", () => {
+  const html = render(h(SkillGapContent, { analysis: {...analysis, unknown:[]} }));
+  expect(html).toContain('class="analysis-overview"');
+  expect(html).toContain("<h2>Covered</h2>");
+  expect(html).not.toContain("<h2>Unknown / unassessed</h2>");
+});
