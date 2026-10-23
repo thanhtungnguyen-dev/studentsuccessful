@@ -80,3 +80,9 @@
   .workspace .workspace-metric-hint { font-size:11px; }
   .workspace .focus-heading { margin-bottom:14px; }
 }
+
+/* Contrast and sizing for the compressed mobile metrics (loaded after product-quality.css). */
+@media (max-width: 600px) {
+  .workspace .workspace-metric-head,
+  .workspace .workspace-metric-hint { color: #4d5b72; font-size: 12px; }
+}

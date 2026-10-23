@@ -18,6 +18,8 @@
 - **Track applications:** save roles, organize applications, and update their status.
 - **Build your profile:** keep education, projects, employment, skills, and career preferences together.
 
+For design decisions and remaining verification work, see the [workspace UX redesign audit](docs/workspace-ux-redesign.md).
+
 ## One connected workflow
 
 **Browse → Compare → Prepare → Track.**

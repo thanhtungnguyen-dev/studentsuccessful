@@ -59,8 +59,26 @@ for (const width of [1440, 390]) {
       const firstJob = page.locator(".job-card .job-result-select").first();
       await firstJob.click();
       await page.locator(".job-detail").first().waitFor({ state: "visible", timeout: 15000 });
-      console.log("PASS " + width + "px job selection and detail view");
+      const advanced = page.locator(".job-advanced-analysis").first();
+      await advanced.locator("summary").click();
+      await advanced.getByRole("link", { name: "View skill gap analysis" }).waitFor({ state: "visible" });
+      const fitLink = page.getByRole("link", { name: "View fit analysis" }).first();
+      await fitLink.click();
+      await page.getByRole("navigation", { name: "Compare this job" }).waitFor({ state: "visible" });
+      if (!await page.getByRole("link", { name: "Resume coverage" }).isVisible()) {
+        failures.push(width + "px: analysis navigation missing");
+      }
+      console.log("PASS " + width + "px job selection, progressive tools and analysis navigation");
     } catch (error) { failures.push(width + "px job interaction: " + error.message); }
+
+    try {
+      await page.goto(new URL("/resumes", origin).toString(), { waitUntil: "domcontentloaded" });
+      const more = page.locator(".resume-version .resume-more-menu").first();
+      await more.locator("summary").waitFor({ state: "visible", timeout: 15000 });
+      await more.locator("summary").click();
+      await more.getByRole("button", { name: /Check evidence|Retry check/ }).waitFor({ state: "visible" });
+      console.log("PASS " + width + "px resume version advanced controls");
+    } catch (error) { failures.push(width + "px resume advanced controls: " + error.message); }
 
     try {
       await page.goto(new URL("/candidate", origin).toString(), { waitUntil: "domcontentloaded" });
@@ -82,6 +100,10 @@ for (const width of [1440, 390]) {
       const before = await select.inputValue();
       const after = before === "INTERVIEW" ? "APPLIED" : "INTERVIEW";
       await select.selectOption(after);
+      const beforeSave = await page.locator(".application-card .application-status").first().textContent();
+      if (beforeSave?.trim().toUpperCase() !== before) {
+        failures.push(width + "px application status changed before the Save action");
+      }
       await page.getByRole("button", { name: "Save status" }).first().click();
       await page.waitForFunction(expected => {
         const element = document.querySelector('select[aria-label^="Update status for"]');
