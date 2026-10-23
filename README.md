@@ -108,7 +108,7 @@ scripts/         Development and verification tools
 .github/         CI workflows
 ```
 
-For technical implementation details, see [engineering documentation](docs/) and the [engineering history](docs/engineering-history.md).
+For technical implementation details, see [engineering documentation](docs/) and the [engineering history](docs/engineering-history.md). The [UX/content review](docs/ux-content-audit.md) records the design decisions and remaining manual checks.
 
 ### Screenshot maintenance
 
