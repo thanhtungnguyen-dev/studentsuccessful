@@ -123,3 +123,13 @@
   .workspace .role-analysis-steps { flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; }
   .workspace .role-analysis-step { flex: 0 0 auto; font-size: 12px; }
 }
+
+/* Resume management: one primary action per collection/version; advanced actions disclosed on demand. */
+.workspace .resume-more-menu { display: inline-block; position: relative; }
+.workspace .resume-more-menu > summary { display: inline-flex; align-items: center; min-height: 44px; padding: 10px 13px; border: 1px solid #d9dfed; border-radius: 9px; background: #fff; color: #46536d; cursor: pointer; font-size: 13px; font-weight: 700; list-style: none; }
+.workspace .resume-more-menu > summary::-webkit-details-marker { display:none; }
+.workspace .resume-more-menu > summary::after { content: "⌄"; margin-left: 10px; }
+.workspace .resume-more-menu[open] > summary { border-color: #a9a2e8; color: #4137a3; }
+.workspace .resume-more-menu-actions { display: flex; flex-wrap: wrap; gap: 9px; padding-top: 10px; }
+.workspace .resume-version-actions { align-items: center; }
+.workspace .resume-version-actions .resume-more-menu { flex: 0 0 auto; }
