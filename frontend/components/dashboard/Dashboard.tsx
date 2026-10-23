@@ -1,5 +1,6 @@
 "use client";
 
+import { WorkspaceMetrics } from "./WorkspaceMetrics";
 import {SkillsSummary,ProjectsSummary} from "../portfolio/PortfolioSummaries";
 import {ArtifactSummary} from "../artifacts/ArtifactList";
 import {ResumeSummary} from "../resumes/ResumesPage";
@@ -43,6 +44,7 @@ const count = (n: number, singular: string, plural = `${singular}s`) => `${n} ${
 
 export function Dashboard() {
   return <div className="dashboard-overview">
+    <WorkspaceMetrics />
     <Reveal as="section" className="career-section dashboard-wide" aria-labelledby="career-title">
       <div className="section-heading"><h2 id="career-title">Your next steps</h2><p>From preparation to opportunity.</p></div>
       <div className="career-actions">

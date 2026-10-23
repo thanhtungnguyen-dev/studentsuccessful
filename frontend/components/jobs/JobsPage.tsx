@@ -1,5 +1,7 @@
 "use client";
 import { PageHeader } from "../ui/PageHeader";
+import { CompanyLogo } from "./CompanyLogo";
+import { ArrowUpRight, Bookmark, EyeOff, MapPin } from "lucide-react";
 import { LoadingState } from "../ui/LoadingState";
 
 import Link from "next/link";
@@ -263,8 +265,8 @@ function JobActions({ job, onDetails, onSave, onHide, pending = false, tracked, 
   return (
     <div className="job-actions">
       {application ? (
-        <a className="primary" href={application} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">
-          Apply
+        <a className="primary job-apply-link" href={application} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">
+          Apply on company site <ArrowUpRight size={16} aria-hidden="true" />
         </a>
       ) : null}
       <MarkAsApplied canonicalJobId={job.id} jobTitle={job.title} tracked={tracked} onTracked={onTracked} />
@@ -308,18 +310,26 @@ export function JobDetail({
   }
   return (
     <section className="auth-card dashboard-card job-detail" aria-label="Selected job details" tabIndex={0} aria-live="polite">
-      <h2>{job.title}</h2>
-      <JobMeta job={job} />
-      <JobFreshness job={job} />
+      <div className="job-detail-hero">
+        <CompanyLogo company={job.company_name} size="large" />
+        <div className="job-detail-identity">
+          <p className="job-detail-employer">{job.company_name}</p>
+          <h2>{job.title}</h2>
+          <p className="job-detail-subtitle"><MapPin size={14} aria-hidden="true" />{job.locations.length ? job.locations.join(", ") : "Location not specified"}</p>
+          <div className="job-detail-tags">
+            {job.work_mode && <span>{displayChoice(job.work_mode)}</span>}
+            {job.employment_type && <span>{displayChoice(job.employment_type)}</span>}
+            {job.saved && <span className="job-detail-saved"><Bookmark size={12} aria-hidden="true" /> Saved</span>}
+          </div>
+        </div>
+      </div>
       <MatchedFilters filters={job.matched_filters ?? []} />
-      <dl>
-        <div><dt>Official source</dt><dd>{job.source_name}</dd></div>
-        <div><dt>Locations</dt><dd>{job.locations.length ? job.locations.join(", ") : "Not provided"}</dd></div>
-        <div><dt>Posted</dt><dd>{job.posted_at ? formatJobDate(job.posted_at) : "Not provided"}</dd></div>
-        <div><dt>First seen</dt><dd>{formatJobDate(job.first_seen_at)}</dd></div>
-        <div><dt>Last verified</dt><dd>{formatJobDate(job.last_verified_at)}</dd></div>
-      </dl>
       <JobActions job={job} onSave={onSave} onHide={onHide} pending={pending} tracked={tracked} onTracked={onTracked} />
+      <div className="job-detail-facts" aria-label="Posting information">
+        <div><span>Source</span><strong>{job.source_name}</strong></div>
+        <div><span>Posted</span><strong>{job.posted_at ? formatJobDate(job.posted_at) : "Not provided"}</strong></div>
+        <div><span>Last verified</span><strong>{formatJobDate(job.last_verified_at)}</strong></div>
+      </div>
       <h3>About the role</h3>
       <p className="job-description">{job.description || "No description provided."}</p>
       <RequirementList
@@ -485,6 +495,7 @@ function JobPagination({ result, changePage }: { result: PublicJobSearch; change
 export type JobsContentProps = {
   result: PublicJobSearch | null;
   error: string;
+  isUpdating?: boolean;
   search: JobDiscoverySearch;
   selected: string | null;
   detail: PublicJobDetail | null;
@@ -505,6 +516,7 @@ export type JobsContentProps = {
 export function JobsContent({
   result,
   error,
+  isUpdating = false,
   search,
   selected,
   detail,
@@ -527,7 +539,7 @@ export function JobsContent({
         <p role="alert" className="auth-error">Could not load jobs. {error}</p>
         <button className="secondary" onClick={retryJobs}>Retry jobs</button>
       </section>
-    ) : <div className="jobs-loading" role="status"><p>Loading jobs…</p>{[1, 2, 3].map((key) => <Skeleton key={key} className="job-result-skeleton" />)}</div>;
+    ) : <div className="jobs-loading" role="status"><div className="jobs-loading-header"><Skeleton className="skeleton-short" /></div>{[1, 2, 3, 4].map((key) => <Skeleton key={key} className="job-result-skeleton" />)}</div>;
   }
   if (!result.items.length) {
     const filtered = hasFilters(search);
@@ -541,16 +553,37 @@ export function JobsContent({
   const selectedDetail = detail?.id === selected ? detail : null;
   const selectedDetailError = detailError?.jobId === selected ? detailError.message : "";
   return (
-    <div className="jobs-layout">
+    <div className="jobs-layout" aria-busy={isUpdating}>
+      {isUpdating && <div className="jobs-refresh-bar" aria-label="Updating jobs" role="progressbar" />}
       <section className="jobs-results-pane" aria-label="Job results" tabIndex={0}>
         <h2>{search.view === "all" ? "Newest matching jobs" : displayChoice(search.view) + " jobs"}</h2>
         <ul className="jobs-list">
           {result.items.map((job) => (
             <li key={job.id}>
               <article className="job-card" data-selected={selected === job.id}>
-                <button className="job-result-select" type="button" aria-pressed={selected === job.id} onClick={() => selectJob(job.id)}><strong>{job.title}</strong><span className="job-result-company">{job.company_name}</span><span className="job-result-meta">{[job.work_mode ? displayChoice(job.work_mode) : null, job.employment_type ? displayChoice(job.employment_type) : null].filter(Boolean).join(" · ")}</span></button>
-                <JobFreshness job={job} />
-                <div className="job-actions"><button className="secondary" type="button" disabled={pendingJobIds.has(job.id)} onClick={() => toggleSave(job)}>{job.saved ? "Unsave" : "Save"}</button><button className="secondary" type="button" disabled={pendingJobIds.has(job.id)} onClick={() => toggleHide(job)}>{job.hidden ? "Unhide" : "Hide"}</button></div>
+                <button className="job-result-select" type="button" aria-pressed={selected === job.id} onClick={() => selectJob(job.id)}>
+                  <CompanyLogo company={job.company_name} />
+                  <span className="job-result-content">
+                    <span className="job-result-company">{job.company_name}</span>
+                    <strong>{job.title}</strong>
+                    <span className="job-result-meta">
+                      {selectedDetail?.id === job.id && selectedDetail.locations.length > 0 ? (
+                        <><MapPin size={13} aria-hidden="true" />{selectedDetail.locations[0]}</>
+                      ) : job.role_name}
+                    </span>
+                    <span className="job-result-labels">
+                      {job.work_mode && <span>{displayChoice(job.work_mode)}</span>}
+                      {job.employment_type && <span>{displayChoice(job.employment_type)}</span>}
+                    </span>
+                  </span>
+                </button>
+                <div className="job-result-footer">
+                  <JobFreshness job={job} />
+                  <div className="job-actions">
+                    <button className="job-card-icon-action" aria-label={job.saved ? `Remove ${job.title} from saved jobs` : `Save ${job.title}`} title={job.saved ? "Unsave job" : "Save job"} aria-pressed={job.saved} type="button" disabled={pendingJobIds.has(job.id)} onClick={() => toggleSave(job)}><Bookmark size={17} fill={job.saved ? "currentColor" : "none"} aria-hidden="true" /></button>
+                    <button className="job-card-icon-action" aria-label={job.hidden ? `Show ${job.title}` : `Hide ${job.title}`} title={job.hidden ? "Show job" : "Hide job"} type="button" disabled={pendingJobIds.has(job.id)} onClick={() => toggleHide(job)}><EyeOff size={17} aria-hidden="true" /></button>
+                  </div>
+                </div>
               </article>
             </li>
           ))}
@@ -558,7 +591,7 @@ export function JobsContent({
         <JobPagination result={result} changePage={changePage} />
       </section>
       {selected && !selectedDetail ? (
-        selectedDetailError ? <JobDetailFailure message={selectedDetailError} retry={retryDetail} /> : <section className="auth-card dashboard-card" role="status"><p>Loading job details…</p><Skeleton className="job-result-skeleton" /><Skeleton className="job-result-skeleton" /></section>
+        selectedDetailError ? <JobDetailFailure message={selectedDetailError} retry={retryDetail} /> : <section className="auth-card dashboard-card job-detail-placeholder" role="status"><div className="job-detail-placeholder-head"><Skeleton /><div><Skeleton /><Skeleton className="skeleton-short" /></div></div><Skeleton className="job-detail-placeholder-row" /><Skeleton className="job-detail-placeholder-row" /><Skeleton className="job-detail-placeholder-row" /></section>
       ) : (
         <JobDetail
           job={selectedDetail}
@@ -578,6 +611,9 @@ export function JobsPage() {
   const [search, setSearch] = useState<JobDiscoverySearch>(browserSearch);
   const [draft, setDraft] = useState<JobDiscoveryDraft>(() => toDraft(browserSearch()));
   const [result, setResult] = useState<PublicJobSearch | null>(null);
+  const [updatingResults, setUpdatingResults] = useState(false);
+  const searchCache = useRef(new Map<string, PublicJobSearch>());
+  const detailCache = useRef(new Map<string, PublicJobDetail>());
   const [selected, setSelected] = useState<string | null>(null);
   const [detail, setDetail] = useState<PublicJobDetail | null>(null);
   const [error, setError] = useState("");
@@ -622,7 +658,8 @@ export function JobsPage() {
   }
 
   function selectJob(jobId: string) {
-    setDetail(null);
+    if (selected === jobId && detail?.id === jobId) return;
+    setDetail(detailCache.current.get(jobId) ?? null);
     setDetailError(null);
     setSelected(jobId);
     setDetailAttempt((value) => value + 1);
@@ -643,6 +680,9 @@ export function JobsPage() {
   }
 
   function applyUserState(state: JobUserState) {
+    searchCache.current.clear();
+    const cached = detailCache.current.get(state.job_id);
+    if (cached) detailCache.current.set(state.job_id, { ...cached, ...state });
     setResult((current) => current === null ? null : {
       ...current,
       items: current.items.map((job) => job.id === state.job_id ? { ...job, ...state } : job),
@@ -665,6 +705,7 @@ export function JobsPage() {
           items: current.items.filter((item) => item.id !== job.id),
         });
         if (selected === job.id) resetSelection();
+        searchCache.current.clear();
         setAttempt((value) => value + 1);
       }
     } catch (reason) {
@@ -797,17 +838,22 @@ export function JobsPage() {
   useEffect(() => {
     if (!user) return;
     let active = true;
-    setResult(null);
+    const key = serializeJobDiscoverySearch(search);
+    const cached = searchCache.current.get(key);
+    if (cached) setResult(cached);
+    setUpdatingResults(true);
     setError("");
     apiClient.listJobs(toJobSearchParams(search))
       .then((data) => {
         if (!active) return;
+        searchCache.current.set(key, data);
         setResult(data);
-        setSelected((current) => current && data.items.some((job) => job.id === current) ? current : null);
+        setSelected((current) => current && data.items.some((job) => job.id === current) ? current : data.items[0]?.id ?? null);
       })
       .catch((reason) => {
         if (active) fail(reason);
-      });
+      })
+      .finally(() => { if (active) setUpdatingResults(false); });
     return () => {
       active = false;
     };
@@ -820,11 +866,12 @@ export function JobsPage() {
       return;
     }
     let active = true;
-    setDetail(null);
+    setDetail(detailCache.current.get(selected) ?? null);
     setDetailError(null);
     apiClient.getJob(selected)
       .then((data) => {
         if (!active) return;
+        detailCache.current.set(data.id, data);
         setDetail(data);
         if (!data.unseen) return;
         apiClient.updateJobState(data.id, { viewed: true })
@@ -890,6 +937,7 @@ export function JobsPage() {
                 <JobsContent
                   result={result}
                   error={error}
+                  isUpdating={updatingResults}
                   search={search}
                   selected={selected}
                   detail={detail}

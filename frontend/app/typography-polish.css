@@ -1,0 +1,584 @@
+/* StudentSuccessful Typography System — Manrope Display + Inter UI & Prose
+ * Calibrated scale, optical tracking, and legible metadata tokens inspired by
+ * Linear, Intern Insider, Framer, and Vercel.
+ */
+
+:root {
+  --ss-type-display: var(--font-ssi-manrope, "Manrope", "Inter", system-ui, -apple-system, sans-serif);
+  --ss-type-body: var(--font-ssi-inter, "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  --ss-type-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  /* Reusable Typography Scale & Tracking Tokens */
+  --ss-tracking-hero: -0.038em;
+  --ss-tracking-section: -0.033em;
+  --ss-tracking-card-title: -0.024em;
+  --ss-tracking-ui: -0.011em;
+  --ss-tracking-body: -0.008em;
+  --ss-tracking-kicker: 0.11em;
+}
+
+body,
+button,
+input,
+select,
+textarea {
+  font-family: var(--ss-type-body);
+}
+
+body {
+  font-feature-settings: "cv11" 1, "ss01" 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:where(.workspace, .auth-layout, .ss-demo-shell) :is(h1, h2, h3, .workspace-brand, .profile-title) {
+  font-family: var(--ss-type-display);
+  letter-spacing: -0.03em;
+}
+
+:where(.workspace, .auth-layout, .ss-demo-shell) :is(button, input, select, textarea) {
+  letter-spacing: -0.008em;
+}
+
+.ssi-page {
+  --ssi-font-body: var(--ss-type-body);
+  --ssi-font-display: var(--ss-type-display);
+  font-family: var(--ssi-font-body);
+  font-size: 15.5px;
+  line-height: 1.62;
+  letter-spacing: var(--ss-tracking-body);
+  font-feature-settings: "cv11" 1, "ss01" 1;
+  font-optical-sizing: auto;
+  text-rendering: optimizeLegibility;
+}
+
+.ssi-page :is(h1, h2, h3, h4, .ssi-brand, .ssi-browser-greeting strong) {
+  font-family: var(--ssi-font-display);
+  font-optical-sizing: auto;
+}
+
+.ssi-page .ssi-brand {
+  font-size: 17px;
+  font-weight: 740;
+  letter-spacing: -0.035em;
+}
+
+.ssi-page .ssi-nav-links a,
+.ssi-page .ssi-login {
+  font-size: 14px;
+  font-weight: 580;
+  letter-spacing: var(--ss-tracking-ui);
+}
+
+.ssi-page .ssi-button {
+  font-size: 14px;
+  font-weight: 640;
+  letter-spacing: var(--ss-tracking-ui);
+}
+
+.ssi-page .ssi-kicker,
+.ssi-page .ssi-chapter {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: var(--ss-tracking-kicker);
+}
+
+.ssi-page .ssi-hero h1 {
+  font-size: clamp(44px, 4.55vw, 68px);
+  font-weight: 760;
+  line-height: 1.07;
+  letter-spacing: var(--ss-tracking-hero);
+  text-wrap: balance;
+}
+
+.ssi-page .ssi-hero-copy > p {
+  font-size: clamp(16.5px, 1.28vw, 18.5px);
+  line-height: 1.66;
+  letter-spacing: -0.011em;
+}
+
+.ssi-page .ssi-story h2 {
+  font-size: clamp(34px, 3.45vw, 52px);
+  font-weight: 740;
+  line-height: 1.12;
+  letter-spacing: var(--ss-tracking-section);
+  text-wrap: balance;
+}
+
+.ssi-page .ssi-story-intro > p {
+  font-size: 16px;
+  line-height: 1.72;
+  letter-spacing: -0.008em;
+}
+
+.ssi-page .ssi-story-points span {
+  font-size: 14.5px;
+  font-weight: 580;
+  letter-spacing: -0.01em;
+}
+
+.ssi-page .ssi-text-link {
+  font-size: 14px;
+  font-weight: 660;
+  letter-spacing: -0.01em;
+}
+
+.ssi-page .ssi-demo-head h3 {
+  font-family: var(--ssi-font-display);
+  font-size: 23px;
+  font-weight: 730;
+  letter-spacing: var(--ss-tracking-card-title);
+  line-height: 1.22;
+}
+
+.ssi-page .ssi-demo-eyebrow,
+.ssi-page .ssi-control-label {
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  font-weight: 680;
+}
+
+.ssi-page .ssi-searchbar input {
+  font-size: 14px;
+  letter-spacing: -0.008em;
+}
+
+.ssi-page .ssi-filterbar label {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ssi-page .ssi-filterbar select {
+  font-size: 13.5px;
+  font-weight: 560;
+}
+
+.ssi-page .ssi-result-count {
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ssi-page .ssi-demo-context {
+  font-size: 13.5px;
+}
+
+.ssi-page .ssi-browser-greeting strong {
+  font-size: 23px;
+  font-weight: 730;
+  letter-spacing: -0.03em;
+}
+
+.ssi-page .ssi-browser-quick b {
+  font-size: 12.5px;
+  font-weight: 650;
+  letter-spacing: -0.012em;
+}
+
+.ssi-page .ssi-browser-quick small {
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  font-weight: 680;
+}
+
+.ssi-page .ssi-browser-row strong {
+  font-size: 13.5px;
+  font-weight: 650;
+  letter-spacing: -0.012em;
+}
+
+.ssi-page .ssi-browser-row span:not(.ssi-mark) {
+  font-size: 12px;
+}
+
+.ssi-page .ssi-job-intro {
+  font-size: 12.5px;
+  font-weight: 580;
+}
+
+.ssi-page .ssi-job-main b {
+  font-family: var(--ssi-font-display);
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 1.38;
+  letter-spacing: -0.016em;
+}
+
+.ssi-page .ssi-job-main small {
+  font-size: 12.5px;
+  line-height: 1.48;
+}
+
+.ssi-page .ssi-job-term {
+  font-size: 11.5px;
+  letter-spacing: 0.005em;
+  font-weight: 620;
+  font-variant-numeric: tabular-nums;
+}
+
+.ssi-page .ssi-detail-top strong {
+  font-family: var(--ssi-font-display);
+  font-size: 17px;
+  font-weight: 730;
+  letter-spacing: -0.022em;
+}
+
+.ssi-page .ssi-detail-top span,
+.ssi-page .ssi-detail-preview > p,
+.ssi-page .ssi-job-meta {
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.ssi-page .ssi-detail-preview small {
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  font-weight: 700;
+}
+
+.ssi-page .ssi-chip-row span {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ssi-page .ssi-external-apply,
+.ssi-page .ssi-mark-applied {
+  font-size: 13px;
+  font-weight: 640;
+}
+
+.ssi-page .ssi-demo-footer {
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ssi-page .ssi-track-summary > div {
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ssi-page .ssi-track-summary b {
+  font-family: var(--ssi-font-display);
+  font-size: 28px;
+  font-weight: 760;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+}
+
+.ssi-page .ssi-app-ident strong {
+  font-size: 13.5px;
+  font-weight: 640;
+  letter-spacing: -0.01em;
+}
+
+.ssi-page .ssi-app-ident small {
+  font-size: 12px;
+}
+
+.ssi-page .ssi-app-row select {
+  font-size: 12.5px;
+  font-weight: 620;
+}
+
+.ssi-page .ssi-final h2 {
+  font-size: clamp(38px, 4.4vw, 62px);
+  font-weight: 750;
+  line-height: 1.1;
+  letter-spacing: -0.036em;
+  text-wrap: balance;
+}
+
+.ssi-page .ssi-final p {
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.ssi-page .ssi-footer p,
+.ssi-page .ssi-footer-links {
+  font-size: 13.5px;
+}
+
+.ssi-page .ssi-footer small {
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.ssi-page .ssi-pip-tip p {
+  font-size: 13px;
+  line-height: 1.52;
+}
+
+.ssi-page .ssi-pip-launcher {
+  font-size: 12.5px;
+}
+
+@media (max-width: 850px) {
+  .ssi-page .ssi-hero h1 {
+    font-size: clamp(40px, 6.4vw, 58px);
+  }
+  .ssi-page .ssi-story h2 {
+    font-size: clamp(32px, 5vw, 46px);
+  }
+}
+
+@media (max-width: 570px) {
+  .ssi-page {
+    font-size: 14.5px;
+  }
+  .ssi-page .ssi-brand {
+    font-size: 15px;
+    font-weight: 740;
+  }
+  .ssi-page .ssi-login {
+    font-size: 13px;
+  }
+  .ssi-page .ssi-hero h1 {
+    font-size: clamp(36px, 9.2vw, 48px);
+    line-height: 1.09;
+    letter-spacing: -0.034em;
+  }
+  .ssi-page .ssi-hero-copy > p {
+    font-size: 15.5px;
+    line-height: 1.65;
+  }
+  .ssi-page .ssi-story h2 {
+    font-size: clamp(30px, 8vw, 40px);
+    line-height: 1.14;
+  }
+  .ssi-page .ssi-story-intro > p {
+    font-size: 15px;
+    line-height: 1.68;
+  }
+  .ssi-page .ssi-story-points span {
+    font-size: 13.5px;
+  }
+  .ssi-page .ssi-demo-head h3 {
+    font-size: 20px;
+    letter-spacing: -0.025em;
+  }
+  .ssi-page .ssi-filterbar label {
+    font-size: 11.5px;
+  }
+  .ssi-page .ssi-filterbar select {
+    font-size: 12.5px;
+  }
+  .ssi-page .ssi-job-main b {
+    font-size: 13.5px;
+    line-height: 1.38;
+  }
+  .ssi-page .ssi-job-main small {
+    font-size: 11.5px;
+  }
+  .ssi-page .ssi-job-term {
+    font-size: 11px;
+  }
+  .ssi-page .ssi-job-intro {
+    font-size: 11.5px;
+  }
+  .ssi-page .ssi-detail-top strong {
+    font-size: 15px;
+  }
+  .ssi-page .ssi-external-apply,
+  .ssi-page .ssi-mark-applied {
+    font-size: 12.5px;
+  }
+  .ssi-page .ssi-final h2 {
+    font-size: clamp(32px, 8.6vw, 44px);
+  }
+  .ssi-page .ssi-final p {
+    font-size: 15.5px;
+  }
+}
+
+/* Brand lockup for signed-in workspace and auth forms. */
+.workspace-brand .ss-horizontal-wordmark {
+  display: block;
+  width: 190px;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.workspace-brand {
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .workspace-brand .ss-horizontal-wordmark {
+    width: 168px;
+  }
+}
+
+
+/* ============================================================================
+ * StudentSuccessful Authenticated Workspace & Demo Mode Visual Polish
+ * ============================================================================ */
+
+.workspace-brand .workspace-brand-logo {
+  display: block;
+  width: 194px;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .workspace-brand .workspace-brand-logo {
+    width: 168px;
+  }
+}
+
+/* Discreet Sidebar Environment & Sample Records Disclosure */
+.ss-env-disclosure {
+  margin-bottom: 12px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  font-size: 12px;
+  color: #475569;
+}
+
+.ss-env-summary {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 11px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  transition: color 140ms ease;
+}
+
+.ss-env-summary::-webkit-details-marker {
+  display: none;
+}
+
+.ss-env-summary:hover {
+  color: #0f172a;
+}
+
+.ss-env-panel {
+  padding: 0 11px 11px;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 9px;
+  line-height: 1.5;
+}
+
+.ss-env-panel p {
+  margin: 0 0 9px;
+  font-size: 11.5px;
+  color: #64748b;
+}
+
+.ss-env-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ss-env-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 28px;
+  padding: 4px 9px;
+  border-radius: 7px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+.ss-env-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+/* Subtle Sample Workspace Access on Auth Form */
+.auth-sample-access {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.auth-sample-btn {
+  width: 100%;
+  justify-content: center;
+  font-size: 13px;
+}
+
+/* Elevated Workspace Surfaces & SaaS Refinement */
+.workspace {
+  background:
+    radial-gradient(circle at 80% 0%, rgba(224, 231, 255, 0.34) 0%, transparent 48%),
+    var(--canvas);
+}
+
+.desktop-sidebar {
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  box-shadow:
+    1px 0 0 var(--border-subtle),
+    4px 0 24px rgba(15, 23, 42, 0.025);
+}
+
+.workspace-nav .nav-group a {
+  border-radius: 10px;
+  font-weight: 560;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease,
+    transform 120ms ease;
+}
+
+.workspace-nav .nav-group a[aria-current="page"] {
+  background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
+  color: #3730a3;
+  font-weight: 650;
+  box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.22);
+}
+
+.auth-card,
+.ui-card,
+.application-card {
+  border-color: rgba(226, 232, 240, 0.92);
+  box-shadow:
+    0 1px 3px rgba(15, 23, 42, 0.03),
+    0 8px 24px rgba(15, 23, 42, 0.028);
+  border-radius: 16px;
+}
+
+.career-actions .ui-card {
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+.career-actions .ui-card:hover {
+  transform: translateY(-2px);
+  border-color: #a5b4fc;
+  box-shadow:
+    0 4px 12px rgba(79, 70, 229, 0.06),
+    0 14px 28px rgba(15, 23, 42, 0.05);
+}
+
+.jobs-shell .jobs-layout {
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.04);
+}
+
+.fit-group,
+.alignment-group,
+.gap-group,
+.plan-group,
+.draft-group {
+  border-top: 3px solid var(--brand);
+}

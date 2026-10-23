@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { ApiError, apiClient, authErrorMessage, type Resume, type ResumeEvidence, type ResumeExtractedText, type ResumeVersion } from "../../lib/api/client";
 import { useAuth } from "../auth/AuthProvider";
 import { PortfolioPage } from "../portfolio/PortfolioPage";
+import { isDemoModeEnabled } from "../../lib/demo/config";
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
 function displayDate(value: string): string { return new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(new Date(value)); }
@@ -57,6 +58,9 @@ function ResumeContent() {
   const [deletingVersion, setDeletingVersion] = useState<string | null>(null);
   const [uploadingFor, setUploadingFor] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
+  const [previewVersion, setPreviewVersion] = useState<string | null>(null);
+  const [previewText, setPreviewText] = useState<string>("");
+  const [previewLoading, setPreviewLoading] = useState(false);
   const [analysis, setAnalysis] = useState<Record<string, Analysis>>({});
   const [parsing, setParsing] = useState<Record<string, boolean>>({});
   const [parseErrors, setParseErrors] = useState<Record<string, string>>({});
@@ -91,6 +95,21 @@ function ResumeContent() {
       if (active) setAnalysis(existing => ({ ...existing, [versionId]: { state: "ready", evidence, text } }));
     } catch {
       if (active) setAnalysis(existing => ({ ...existing, [versionId]: { state: "error", evidence: existing[versionId]?.evidence ?? [], text: existing[versionId]?.text ?? null } }));
+    }
+  }
+
+  async function previewResume(version: ResumeVersion) {
+    if (previewVersion === version.id) { setPreviewVersion(null); return; }
+    setPreviewVersion(version.id);
+    setPreviewText("");
+    setPreviewLoading(true);
+    try {
+      const extracted = await apiClient.getResumeExtractedText(version.id);
+      setPreviewText(extracted.raw_extracted_text || "No extracted text is available for this version.");
+    } catch (reason) {
+      setPreviewText(authErrorMessage(reason));
+    } finally {
+      setPreviewLoading(false);
     }
   }
 
@@ -182,7 +201,11 @@ function ResumeContent() {
           {deletingFamily === resume.id && <section className="education-confirm"><p>Delete {resume.title} and every managed uploaded version? Career Artifacts and all other profile data will remain unchanged.</p><div className="auth-actions"><button className="secondary" disabled={busy} onClick={() => void removeFamily()}>{busy ? "Deleting…" : "Confirm delete family"}</button><button className="secondary" disabled={busy} onClick={() => setDeletingFamily(null)}>Cancel</button></div></section>}
           <section className="resume-history" aria-labelledby={`versions-${resume.id}`}><h3 id={`versions-${resume.id}`}>Version history</h3>{!(versions[resume.id] ?? []).length ? <p className="muted">No uploaded versions yet.</p> : <ul>{(versions[resume.id] ?? []).map(version => <li key={version.id} className="resume-version"><div><strong>Version {version.version_number}</strong>{version.is_primary_active && <span className="resume-primary"> Primary</span>}<p className="muted">{version.file_format} · {displayBytes(version.file_size_bytes)} · uploaded {displayDate(version.created_at)} · Parse status: {version.parse_status}</p></div>
             {parseErrors[version.id] && <p role="alert" className="auth-error">{parseErrors[version.id]}</p>}
-            {deletingVersion === version.id ? <div className="auth-actions"><span>Delete this version? A primary version is not replaced automatically.</span><button className="secondary" disabled={busy} onClick={() => void removeVersion()}>{busy ? "Deleting…" : "Confirm delete"}</button><button className="secondary" disabled={busy} onClick={() => setDeletingVersion(null)}>Cancel</button></div> : !editing && !deletingFamily && !deletingVersion && !uploadingFor && <div className="auth-actions"><a className="secondary" href={apiClient.resumeVersionFileUrl(version.id)} target="_blank" rel="noopener noreferrer">Open file</a><button className="secondary" disabled={busy || parsing[version.id]} onClick={() => void parse(version)}>{parsing[version.id] ? "Parsing…" : version.parse_status === "PARSE_FAILED" || parseErrors[version.id] ? "Retry parse" : "Parse"}</button>{!version.is_primary_active && <button className="secondary" disabled={busy} onClick={() => void makePrimary(resume, version)}>Make primary</button>}<button className="secondary" disabled={busy} onClick={() => setDeletingVersion(version.id)}>Delete version</button></div>}
+            {deletingVersion === version.id ? <div className="auth-actions"><span>Delete this version? A primary version is not replaced automatically.</span><button className="secondary" disabled={busy} onClick={() => void removeVersion()}>{busy ? "Deleting…" : "Confirm delete"}</button><button className="secondary" disabled={busy} onClick={() => setDeletingVersion(null)}>Cancel</button></div> : !editing && !deletingFamily && !deletingVersion && !uploadingFor && <div className="auth-actions">{isDemoModeEnabled() ? <button className="secondary" type="button" aria-expanded={previewVersion === version.id} onClick={() => void previewResume(version)}>{previewVersion === version.id ? "Close preview" : "Read resume text"}</button> : <a className="secondary" href={apiClient.resumeVersionFileUrl(version.id)} target="_blank" rel="noopener noreferrer">Open file</a>}<button className="secondary" disabled={busy || parsing[version.id]} onClick={() => void parse(version)}>{parsing[version.id] ? "Parsing…" : version.parse_status === "PARSE_FAILED" || parseErrors[version.id] ? "Retry parse" : "Parse"}</button>{!version.is_primary_active && <button className="secondary" disabled={busy} onClick={() => void makePrimary(resume, version)}>Make primary</button>}<button className="secondary" disabled={busy} onClick={() => setDeletingVersion(version.id)}>Delete version</button></div>}
+            {previewVersion === version.id && <section className="resume-inline-preview" aria-label={`Resume version ${version.version_number} text`}>
+              <div className="resume-inline-preview-head"><h4>Resume text · Version {version.version_number}</h4><button className="secondary" type="button" onClick={() => setPreviewVersion(null)}>Close</button></div>
+              {previewLoading ? <LoadingState label="Loading resume text…" /> : <pre>{previewText}</pre>}
+            </section>}
             {version.parse_status === "PARSE_FAILED" && !parseErrors[version.id] && <p className="muted">The last parse failed. Retry parsing when you are ready.</p>}
             {(version.parse_status === "PARSED_SUCCESS" || (version.parse_status === "PARSE_FAILED" && analysis[version.id])) && <EvidencePanel analysis={analysis[version.id] ?? { state: "loading", evidence: [], text: null }} />}</li>)}</ul>}</section>
         </article>)}

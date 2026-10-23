@@ -4,6 +4,8 @@
 
 import type { paths } from "./schema";
 import { readCsrfCookie } from "../auth/cookies";
+import { isDemoModeEnabled } from "../demo/config";
+import { demoStore } from "../demo/demo-store";
 
 export type RegisterRequest = paths["/api/v1/auth/register"]["post"]["requestBody"]["content"]["application/json"];
 export type LoginRequest = paths["/api/v1/auth/login"]["post"]["requestBody"]["content"]["application/json"];
@@ -115,14 +117,17 @@ export class ApiClient {
   }
 
   register(payload: RegisterRequest): Promise<RegisterResponse> {
+    if (isDemoModeEnabled()) return demoStore.register(payload);
     return this.authRequest("register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
   }
 
   login(payload: LoginRequest): Promise<LoginResponse> {
+    if (isDemoModeEnabled()) return demoStore.login(payload);
     return this.authRequest("login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
   }
 
   async getCurrentUser(): Promise<CurrentUser | null> {
+    if (isDemoModeEnabled()) return demoStore.getCurrentUser();
     try { return await this.authRequest<CurrentUser>("me", { method: "GET" }); }
     catch (error) {
       if (error instanceof ApiError && error.status === 401) return null;
@@ -131,12 +136,14 @@ export class ApiClient {
   }
 
   completeOnboarding(): Promise<CurrentUser> {
+    if (isDemoModeEnabled()) return demoStore.completeOnboarding();
     const csrf = readCsrfCookie();
     if (!csrf) return Promise.reject(new ApiError(403, "Your security cookie is missing. Please log in again before completing onboarding."));
     return this.authRequest("onboarding/complete", { method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-Token": csrf }, body: "{}" });
   }
 
   logout(): Promise<LogoutResponse> {
+    if (isDemoModeEnabled()) return demoStore.logout();
     const csrf = readCsrfCookie();
     if (!csrf) return Promise.reject(new ApiError(403, "Could not log out securely. Please log in again, then retry logout."));
     return this.authRequest("logout", { method: "POST", headers: { "X-CSRF-Token": csrf } });
@@ -153,10 +160,10 @@ export class ApiClient {
     if(response.status===204)return undefined as T;
     try{return await response.json() as T;}catch{throw new ApiError(response.status,"Unexpected response. Reload to check your saved Resume links.");}
   }
-  listArtifacts():Promise<Artifact[]>{return this.artifactRequest("GET");}
-  createArtifact(value:ArtifactCreate):Promise<Artifact>{return this.artifactRequest("POST",undefined,value);}
-  updateArtifact(id:string,value:ArtifactUpdate):Promise<Artifact>{return this.artifactRequest("PATCH",id,value);}
-  deleteArtifact(id:string):Promise<void>{return this.artifactRequest("DELETE",id);}
+  listArtifacts():Promise<Artifact[]>{if (isDemoModeEnabled()) return demoStore.listArtifacts(); return this.artifactRequest("GET");}
+  createArtifact(value:ArtifactCreate):Promise<Artifact>{if (isDemoModeEnabled()) return demoStore.createArtifact(value); return this.artifactRequest("POST",undefined,value);}
+  updateArtifact(id:string,value:ArtifactUpdate):Promise<Artifact>{if (isDemoModeEnabled()) return demoStore.updateArtifact(id, value); return this.artifactRequest("PATCH",id,value);}
+  deleteArtifact(id:string):Promise<void>{if (isDemoModeEnabled()) return demoStore.deleteArtifact(id); return this.artifactRequest("DELETE",id);}
 
   private async resumeRequest<T>(path: string, method: "GET" | "POST" | "PATCH" | "PUT" | "DELETE", payload?: ResumeCreate | ResumeUpdate | ResumePrimaryVersionUpdate | FormData): Promise<T> {
     const headers: Record<string, string> = {};
@@ -188,23 +195,25 @@ export class ApiClient {
     catch { throw new ApiError(response.status, "Unexpected response. Reload your resumes to check the saved information."); }
   }
 
-  listResumes(): Promise<Resume[]> { return this.resumeRequest("resumes", "GET"); }
-  createResume(payload: ResumeCreate): Promise<Resume> { return this.resumeRequest("resumes", "POST", payload); }
-  updateResume(id: string, payload: ResumeUpdate): Promise<Resume> { return this.resumeRequest(`resumes/${encodeURIComponent(id)}`, "PATCH", payload); }
-  deleteResume(id: string): Promise<void> { return this.resumeRequest(`resumes/${encodeURIComponent(id)}`, "DELETE"); }
-  listResumeVersions(resumeId: string): Promise<ResumeVersion[]> { return this.resumeRequest(`resumes/${encodeURIComponent(resumeId)}/versions`, "GET"); }
+  listResumes(): Promise<Resume[]> { if (isDemoModeEnabled()) return demoStore.listResumes(); return this.resumeRequest("resumes", "GET"); }
+  createResume(payload: ResumeCreate): Promise<Resume> { if (isDemoModeEnabled()) return demoStore.createResume(payload); return this.resumeRequest("resumes", "POST", payload); }
+  updateResume(id: string, payload: ResumeUpdate): Promise<Resume> { if (isDemoModeEnabled()) return demoStore.updateResume(id, payload); return this.resumeRequest(`resumes/${encodeURIComponent(id)}`, "PATCH", payload); }
+  deleteResume(id: string): Promise<void> { if (isDemoModeEnabled()) return demoStore.deleteResume(id); return this.resumeRequest(`resumes/${encodeURIComponent(id)}`, "DELETE"); }
+  listResumeVersions(resumeId: string): Promise<ResumeVersion[]> { if (isDemoModeEnabled()) return demoStore.listResumeVersions(resumeId); return this.resumeRequest(`resumes/${encodeURIComponent(resumeId)}/versions`, "GET"); }
   uploadResumeVersion(resumeId: string, file: File): Promise<ResumeVersion> {
+    if (isDemoModeEnabled()) return demoStore.uploadResumeVersion(resumeId, file);
     const form = new FormData(); form.append("file", file, file.name);
     return this.resumeRequest(`resumes/${encodeURIComponent(resumeId)}/versions`, "POST", form);
   }
   setResumePrimaryVersion(resumeId: string, payload: ResumePrimaryVersionUpdate): Promise<ResumeVersion> {
+    if (isDemoModeEnabled()) return demoStore.setResumePrimaryVersion(resumeId, payload);
     return this.resumeRequest(`resumes/${encodeURIComponent(resumeId)}/primary-version`, "PUT", payload);
   }
-  deleteResumeVersion(id: string): Promise<void> { return this.resumeRequest(`resume-versions/${encodeURIComponent(id)}`, "DELETE"); }
-  resumeVersionFileUrl(id: string): string { return `/api/v1/resume-versions/${encodeURIComponent(id)}/file`; }
-  parseResumeVersion(id: string): Promise<ResumeVersion> { return this.resumeRequest(`resume-versions/${encodeURIComponent(id)}/parse`, "POST"); }
-  listResumeEvidence(id: string): Promise<ResumeEvidence[]> { return this.resumeRequest(`resume-versions/${encodeURIComponent(id)}/evidence`, "GET"); }
-  getResumeExtractedText(id: string): Promise<ResumeExtractedText> { return this.resumeRequest(`resume-versions/${encodeURIComponent(id)}/extracted-text`, "GET"); }
+  deleteResumeVersion(id: string): Promise<void> { if (isDemoModeEnabled()) return demoStore.deleteResumeVersion(id); return this.resumeRequest(`resume-versions/${encodeURIComponent(id)}`, "DELETE"); }
+  resumeVersionFileUrl(id: string): string { if (isDemoModeEnabled()) return demoStore.resumeVersionFileUrl(id); return `/api/v1/resume-versions/${encodeURIComponent(id)}/file`; }
+  parseResumeVersion(id: string): Promise<ResumeVersion> { if (isDemoModeEnabled()) return demoStore.parseResumeVersion(id); return this.resumeRequest(`resume-versions/${encodeURIComponent(id)}/parse`, "POST"); }
+  listResumeEvidence(id: string): Promise<ResumeEvidence[]> { if (isDemoModeEnabled()) return demoStore.listResumeEvidence(id); return this.resumeRequest(`resume-versions/${encodeURIComponent(id)}/evidence`, "GET"); }
+  getResumeExtractedText(id: string): Promise<ResumeExtractedText> { if (isDemoModeEnabled()) return demoStore.getResumeExtractedText(id); return this.resumeRequest(`resume-versions/${encodeURIComponent(id)}/extracted-text`, "GET"); }
 
   private async portfolioRequest<T>(path: string, method = "GET", payload?: SkillSelection | ProjectCreate | ProjectUpdate): Promise<T> {
     const headers: Record<string,string> = {};
@@ -221,12 +230,12 @@ export class ApiClient {
     if(response.status===204)return undefined as T;
     try{return await response.json() as T;}catch{throw new ApiError(response.status,"Unexpected response. Reload to check your saved information.");}
   }
-  getSkills(): Promise<SkillSelection> {return this.portfolioRequest("skills");}
-  replaceSkills(values: SkillSelection): Promise<SkillSelection> {return this.portfolioRequest("skills","PUT",values);}
-  listProjects(): Promise<Project[]> {return this.portfolioRequest("projects");}
-  createProject(values: ProjectCreate): Promise<Project> {return this.portfolioRequest("projects","POST",values);}
-  updateProject(id: string, values: ProjectUpdate): Promise<Project> {return this.portfolioRequest(`projects/${encodeURIComponent(id)}`,"PATCH",values);}
-  deleteProject(id: string): Promise<void> {return this.portfolioRequest(`projects/${encodeURIComponent(id)}`,"DELETE");}
+  getSkills(): Promise<SkillSelection> {if (isDemoModeEnabled()) return demoStore.getSkills(); return this.portfolioRequest("skills");}
+  replaceSkills(values: SkillSelection): Promise<SkillSelection> {if (isDemoModeEnabled()) return demoStore.replaceSkills(values); return this.portfolioRequest("skills","PUT",values);}
+  listProjects(): Promise<Project[]> {if (isDemoModeEnabled()) return demoStore.listProjects(); return this.portfolioRequest("projects");}
+  createProject(values: ProjectCreate): Promise<Project> {if (isDemoModeEnabled()) return demoStore.createProject(values); return this.portfolioRequest("projects","POST",values);}
+  updateProject(id: string, values: ProjectUpdate): Promise<Project> {if (isDemoModeEnabled()) return demoStore.updateProject(id, values); return this.portfolioRequest(`projects/${encodeURIComponent(id)}`,"PATCH",values);}
+  deleteProject(id: string): Promise<void> {if (isDemoModeEnabled()) return demoStore.deleteProject(id); return this.portfolioRequest(`projects/${encodeURIComponent(id)}`,"DELETE");}
 
   private async profileRequest<T>(options: RequestInit): Promise<T> {
     let response: Response;
@@ -249,16 +258,19 @@ export class ApiClient {
   }
 
   getProfile(): Promise<Profile | null> {
+    if (isDemoModeEnabled()) return demoStore.getProfile();
     return this.profileRequest({ method: "GET" });
   }
 
   updateProfile(payload: ProfileUpdate): Promise<Profile> {
+    if (isDemoModeEnabled()) return demoStore.updateProfile(payload);
     const csrf = readCsrfCookie();
     if (!csrf) return Promise.reject(new ApiError(403, "Your security cookie is missing. Please log in again before saving."));
     return this.profileRequest({ method: "PATCH", headers: { "Content-Type": "application/json", "X-CSRF-Token": csrf }, body: JSON.stringify(payload) });
   }
 
   async getCandidateProfile(): Promise<CandidateProfile> {
+    if (isDemoModeEnabled()) return demoStore.getCandidateProfile();
     let response: Response;
     try {
       response = await fetch("/api/v1/profile/candidate", {
@@ -316,6 +328,7 @@ export class ApiClient {
     catch { throw new ApiError(response.status, "Unexpected response. Reload the review to check its saved state."); }
   }
   listJobs(params: JobSearchParams = {}): Promise<PublicJobSearch> {
+    if (isDemoModeEnabled()) return demoStore.listJobs(params);
     const query = new URLSearchParams();
     for (const [key, value] of Object.entries(params)) {
       if (value === undefined || value === null || value === "") continue;
@@ -325,8 +338,9 @@ export class ApiClient {
     }
     return this.jobsRequest(query.size ? `?${query}` : "");
   }
-  getJob(id: string): Promise<PublicJobDetail> { return this.jobsRequest(`/${encodeURIComponent(id)}`); }
+  getJob(id: string): Promise<PublicJobDetail> { if (isDemoModeEnabled()) return demoStore.getJob(id); return this.jobsRequest(`/${encodeURIComponent(id)}`); }
   async updateJobState(id: string, payload: JobUserStateUpdate): Promise<JobUserState> {
+    if (isDemoModeEnabled()) return demoStore.updateJobState(id, payload);
     const csrf = readCsrfCookie();
     if (!csrf) throw new ApiError(403, "Your security cookie is missing. Please log in again before changing this job.");
     let response: Response;
@@ -394,15 +408,19 @@ export class ApiClient {
   }
 
   listSavedSearches(): Promise<SavedJobSearch[]> {
+    if (isDemoModeEnabled()) return demoStore.listSavedSearches();
     return this.savedSearchRequest<SavedJobSearch[]>("GET");
   }
   createSavedSearch(payload: SavedJobSearchCreate): Promise<SavedJobSearch> {
+    if (isDemoModeEnabled()) return demoStore.createSavedSearch(payload);
     return this.savedSearchRequest<SavedJobSearch>("POST", "", payload);
   }
   updateSavedSearch(id: string, payload: SavedJobSearchUpdate): Promise<SavedJobSearch> {
+    if (isDemoModeEnabled()) return demoStore.updateSavedSearch(id, payload);
     return this.savedSearchRequest<SavedJobSearch>("PATCH", `/${encodeURIComponent(id)}`, payload);
   }
   deleteSavedSearch(id: string): Promise<void> {
+    if (isDemoModeEnabled()) return demoStore.deleteSavedSearch(id);
     return this.savedSearchRequest<void>("DELETE", `/${encodeURIComponent(id)}`);
   }
   private async alertRequest<T>(
@@ -442,39 +460,47 @@ export class ApiClient {
   }
 
   listAlerts(): Promise<JobAlertInbox> {
+    if (isDemoModeEnabled()) return demoStore.listAlerts();
     return this.alertRequest<JobAlertInbox>("GET");
   }
   markAlertRead(id: string): Promise<JobAlertReadState> {
+    if (isDemoModeEnabled()) return demoStore.markAlertRead(id);
     return this.alertRequest<JobAlertReadState>("PATCH", "/" + encodeURIComponent(id), { read: true });
   }
 
-  getJobFit(id: string): Promise<FitAnalysis> { return this.jobsRequest(`/${encodeURIComponent(id)}/fit`); }
+  getJobFit(id: string): Promise<FitAnalysis> { if (isDemoModeEnabled()) return demoStore.getJobFit(id); return this.jobsRequest(`/${encodeURIComponent(id)}/fit`); }
   getJobResumeAlignment(id: string, resumeVersionId: string): Promise<ResumeAlignment> {
+    if (isDemoModeEnabled()) return demoStore.getJobResumeAlignment(id, resumeVersionId);
     return this.jobsRequest(
       `/${encodeURIComponent(id)}/resume-alignment?resume_version_id=${encodeURIComponent(resumeVersionId)}`,
     );
   }
   getJobSkillGaps(id: string, resumeVersionId: string): Promise<SkillGapAnalysis> {
+    if (isDemoModeEnabled()) return demoStore.getJobSkillGaps(id, resumeVersionId);
     return this.jobsRequest(
       `/${encodeURIComponent(id)}/gaps?resume_version_id=${encodeURIComponent(resumeVersionId)}`,
     );
   }
   getResumeImprovementPlan(id: string, resumeVersionId: string): Promise<ResumeImprovementPlan> {
+    if (isDemoModeEnabled()) return demoStore.getResumeImprovementPlan(id, resumeVersionId);
     return this.jobsRequest(
       `/${encodeURIComponent(id)}/resume-plan?resume_version_id=${encodeURIComponent(resumeVersionId)}`,
     );
   }
   getResumeTailoringDraft(id: string, resumeVersionId: string): Promise<ResumeTailoringDraft> {
+    if (isDemoModeEnabled()) return demoStore.getResumeTailoringDraft(id, resumeVersionId);
     return this.jobsRequest(
       `/${encodeURIComponent(id)}/resume-draft?resume_version_id=${encodeURIComponent(resumeVersionId)}`,
     );
   }
   getResumeTailoringReview(id: string, resumeVersionId: string): Promise<ResumeTailoringReview> {
+    if (isDemoModeEnabled()) return demoStore.getResumeTailoringReview(id, resumeVersionId);
     return this.jobsRequest(
       `/${encodeURIComponent(id)}/resume-reviews?resume_version_id=${encodeURIComponent(resumeVersionId)}`,
     );
   }
   createResumeTailoringReview(id: string, payload: ResumeTailoringReviewCreate): Promise<ResumeTailoringReview> {
+    if (isDemoModeEnabled()) return demoStore.createResumeTailoringReview(id, payload);
     return this.jobsMutation("POST", `/${encodeURIComponent(id)}/resume-reviews`, payload);
   }
   updateResumeTailoringReviewItem(
@@ -483,6 +509,7 @@ export class ApiClient {
     itemId: string,
     payload: ResumeTailoringReviewItemUpdate,
   ): Promise<ResumeTailoringReview> {
+    if (isDemoModeEnabled()) return demoStore.updateResumeTailoringReviewItem(id, reviewId, itemId, payload);
     return this.jobsMutation(
       "PATCH",
       `/${encodeURIComponent(id)}/resume-reviews/${encodeURIComponent(reviewId)}/items/${encodeURIComponent(itemId)}`,
@@ -490,6 +517,7 @@ export class ApiClient {
     );
   }
   finalizeResumeTailoringReview(id: string, reviewId: string): Promise<ResumeTailoringReview> {
+    if (isDemoModeEnabled()) return demoStore.finalizeResumeTailoringReview(id, reviewId);
     return this.jobsMutation(
       "POST",
       `/${encodeURIComponent(id)}/resume-reviews/${encodeURIComponent(reviewId)}/finalize`,
@@ -524,10 +552,10 @@ export class ApiClient {
     catch { throw new ApiError(response.status, "Unexpected response. Reload education to check whether the change was saved."); }
   }
 
-  listEducation(): Promise<Education[]> { return this.educationRequest("GET"); }
-  createEducation(payload: EducationCreate): Promise<Education> { return this.educationRequest("POST", undefined, payload); }
-  updateEducation(id: string, payload: EducationUpdate): Promise<Education> { return this.educationRequest("PATCH", id, payload); }
-  deleteEducation(id: string): Promise<void> { return this.educationRequest("DELETE", id); }
+  listEducation(): Promise<Education[]> { if (isDemoModeEnabled()) return demoStore.listEducation(); return this.educationRequest("GET"); }
+  createEducation(payload: EducationCreate): Promise<Education> { if (isDemoModeEnabled()) return demoStore.createEducation(payload); return this.educationRequest("POST", undefined, payload); }
+  updateEducation(id: string, payload: EducationUpdate): Promise<Education> { if (isDemoModeEnabled()) return demoStore.updateEducation(id, payload); return this.educationRequest("PATCH", id, payload); }
+  deleteEducation(id: string): Promise<void> { if (isDemoModeEnabled()) return demoStore.deleteEducation(id); return this.educationRequest("DELETE", id); }
 
   private async employmentRequest<T>(method: "GET" | "POST" | "PATCH" | "DELETE", id?: string, payload?: EmploymentCreate | EmploymentUpdate): Promise<T> {
     const headers: Record<string, string> = {};
@@ -557,10 +585,10 @@ export class ApiClient {
     catch { throw new ApiError(response.status, "Unexpected response. Reload employment to check whether the change was saved."); }
   }
 
-  listEmployment(): Promise<Employment[]> { return this.employmentRequest("GET"); }
-  createEmployment(payload: EmploymentCreate): Promise<Employment> { return this.employmentRequest("POST", undefined, payload); }
-  updateEmployment(id: string, payload: EmploymentUpdate): Promise<Employment> { return this.employmentRequest("PATCH", id, payload); }
-  deleteEmployment(id: string): Promise<void> { return this.employmentRequest("DELETE", id); }
+  listEmployment(): Promise<Employment[]> { if (isDemoModeEnabled()) return demoStore.listEmployment(); return this.employmentRequest("GET"); }
+  createEmployment(payload: EmploymentCreate): Promise<Employment> { if (isDemoModeEnabled()) return demoStore.createEmployment(payload); return this.employmentRequest("POST", undefined, payload); }
+  updateEmployment(id: string, payload: EmploymentUpdate): Promise<Employment> { if (isDemoModeEnabled()) return demoStore.updateEmployment(id, payload); return this.employmentRequest("PATCH", id, payload); }
+  deleteEmployment(id: string): Promise<void> { if (isDemoModeEnabled()) return demoStore.deleteEmployment(id); return this.employmentRequest("DELETE", id); }
 
   private async workAuthorizationRequest<T>(method: "GET" | "POST" | "PATCH" | "DELETE", id?: string, payload?: WorkAuthorizationCreate | WorkAuthorizationUpdate): Promise<T> {
     const headers: Record<string, string> = {};
@@ -591,10 +619,10 @@ export class ApiClient {
     catch { throw new ApiError(response.status, "Unexpected response. Reload work authorization to check whether the change was saved."); }
   }
 
-  listWorkAuthorizations(): Promise<WorkAuthorization[]> { return this.workAuthorizationRequest("GET"); }
-  createWorkAuthorization(payload: WorkAuthorizationCreate): Promise<WorkAuthorization> { return this.workAuthorizationRequest("POST", undefined, payload); }
-  updateWorkAuthorization(id: string, payload: WorkAuthorizationUpdate): Promise<WorkAuthorization> { return this.workAuthorizationRequest("PATCH", id, payload); }
-  deleteWorkAuthorization(id: string): Promise<void> { return this.workAuthorizationRequest("DELETE", id); }
+  listWorkAuthorizations(): Promise<WorkAuthorization[]> { if (isDemoModeEnabled()) return demoStore.listWorkAuthorizations(); return this.workAuthorizationRequest("GET"); }
+  createWorkAuthorization(payload: WorkAuthorizationCreate): Promise<WorkAuthorization> { if (isDemoModeEnabled()) return demoStore.createWorkAuthorization(payload); return this.workAuthorizationRequest("POST", undefined, payload); }
+  updateWorkAuthorization(id: string, payload: WorkAuthorizationUpdate): Promise<WorkAuthorization> { if (isDemoModeEnabled()) return demoStore.updateWorkAuthorization(id, payload); return this.workAuthorizationRequest("PATCH", id, payload); }
+  deleteWorkAuthorization(id: string): Promise<void> { if (isDemoModeEnabled()) return demoStore.deleteWorkAuthorization(id); return this.workAuthorizationRequest("DELETE", id); }
 
   private async preferenceRequest<T>(path: string, payload?: Preferences): Promise<T> {
     const headers: Record<string, string> = {};
@@ -614,25 +642,29 @@ export class ApiClient {
     try { return await response.json() as T; } catch { throw new ApiError(response.status, "Unexpected response. Reload to check saved preferences."); }
   }
 
-  getPreferences(): Promise<Preferences> { return this.preferenceRequest("preferences"); }
-  replacePreferences(payload: Preferences): Promise<Preferences> { return this.preferenceRequest("preferences", payload); }
+  getPreferences(): Promise<Preferences> { if (isDemoModeEnabled()) return demoStore.getPreferences(); return this.preferenceRequest("preferences"); }
+  replacePreferences(payload: Preferences): Promise<Preferences> { if (isDemoModeEnabled()) return demoStore.replacePreferences(payload); return this.preferenceRequest("preferences", payload); }
   listRoles(params: NonNullable<paths["/api/v1/catalog/roles"]["get"]["parameters"]["query"]> = {}): Promise<CatalogItem[]> {
+    if (isDemoModeEnabled()) return demoStore.listRoles();
     const query = new URLSearchParams(Object.entries(params).filter(([, value]) => value !== undefined && value !== null).map(([key, value]) => [key, String(value)]));
     return this.preferenceRequest(`catalog/roles${query.size ? `?${query}` : ""}`);
   }
   listSkills(params: NonNullable<paths["/api/v1/catalog/skills"]["get"]["parameters"]["query"]> = {}): Promise<CatalogItem[]> {
+    if (isDemoModeEnabled()) return demoStore.listSkills();
     const query = new URLSearchParams(Object.entries(params).filter(([, value]) => value !== undefined && value !== null).map(([key, value]) => [key, String(value)]));
     return this.preferenceRequest(`catalog/skills${query.size ? `?${query}` : ""}`);
   }
   listCompanies(params: NonNullable<paths["/api/v1/catalog/companies"]["get"]["parameters"]["query"]> = {}): Promise<CatalogItem[]> {
+    if (isDemoModeEnabled()) return demoStore.listCompanies();
     const query = new URLSearchParams(Object.entries(params).filter(([, value]) => value !== undefined && value !== null).map(([key, value]) => [key, String(value)]));
     return this.preferenceRequest(`catalog/companies${query.size ? `?${query}` : ""}`);
   }
   listLocations(params: NonNullable<paths["/api/v1/catalog/locations"]["get"]["parameters"]["query"]> = {}): Promise<CatalogLocation[]> {
+    if (isDemoModeEnabled()) return demoStore.listLocations();
     const query = new URLSearchParams(Object.entries(params).filter(([, value]) => value !== undefined && value !== null).map(([key, value]) => [key, String(value)]));
     return this.preferenceRequest(`catalog/locations${query.size ? `?${query}` : ""}`);
   }
-  listIndustries(): Promise<CatalogItem[]> { return this.preferenceRequest("catalog/industries"); }
+  listIndustries(): Promise<CatalogItem[]> { if (isDemoModeEnabled()) return demoStore.listIndustries(); return this.preferenceRequest("catalog/industries"); }
 
   private async applicationRequest<T>(
     method: "GET" | "POST" | "PATCH",
@@ -676,20 +708,25 @@ export class ApiClient {
   }
 
   listApplications(status?: ApplicationFilterStatus): Promise<Application[]> {
+    if (isDemoModeEnabled()) return demoStore.listApplications(status);
     const query = status && status !== "ALL" ? "?status=" + encodeURIComponent(status) : "";
     return this.applicationRequest<{ items: Application[] }>("GET", query).then((result) => result.items);
   }
   createApplication(payload: ApplicationCreate): Promise<Application> {
+    if (isDemoModeEnabled()) return demoStore.createApplication(payload);
     return this.applicationRequest<Application>("POST", "", payload);
   }
   getApplication(id: string): Promise<Application> {
+    if (isDemoModeEnabled()) return demoStore.getApplication(id);
     return this.applicationRequest<Application>("GET", "/" + encodeURIComponent(id));
   }
   updateApplication(id: string, payload: ApplicationUpdate): Promise<Application> {
+    if (isDemoModeEnabled()) return demoStore.updateApplication(id, payload);
     return this.applicationRequest<Application>("PATCH", "/" + encodeURIComponent(id), payload);
   }
 
   async getHealthLive(): Promise<HealthLiveResponse> {
+    if (isDemoModeEnabled()) return demoStore.getHealthLive();
     const res = await fetch(`${this.baseUrl}/health/live`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
@@ -702,6 +739,7 @@ export class ApiClient {
   }
 
   async getHealthReady(): Promise<HealthReadyResponse> {
+    if (isDemoModeEnabled()) return demoStore.getHealthReady();
     const res = await fetch(`${this.baseUrl}/health/ready`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },

@@ -1,5 +1,7 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { isDemoModeEnabled } from "../../lib/demo/config";
 import { AccountMenu } from "./AccountMenu";
 import { UserRound } from "lucide-react";
 import { useState } from "react";
@@ -7,6 +9,7 @@ import { apiClient, ApiError, authErrorMessage } from "../../lib/api/client";
 import { useAuth } from "./AuthProvider";
 export function AccountControls({ desktopMenu = false }: { desktopMenu?: boolean }) {
   const { user, refresh } = useAuth();
+  const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   async function logout() {
@@ -15,6 +18,7 @@ export function AccountControls({ desktopMenu = false }: { desktopMenu?: boolean
       try { await apiClient.logout(); }
       catch (error) { if (!(error instanceof ApiError && error.status === 401)) throw error; }
       await refresh();
+      if (isDemoModeEnabled()) router.replace("/");
     } catch (error) { setError(authErrorMessage(error)); }
     finally { setBusy(false); }
   }

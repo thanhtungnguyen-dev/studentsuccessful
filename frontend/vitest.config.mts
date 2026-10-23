@@ -1,3 +1,11 @@
 import { defineConfig } from "vitest/config";
 
-export default defineConfig({ oxc: { jsx: { runtime: "automatic" } }, test: { include: ["lib/**/*.test.ts", "next.config.test.ts"] } });
+export default defineConfig({
+  oxc: { jsx: { runtime: "automatic" } },
+  test: {
+    include: ["lib/**/*.test.ts", "next.config.test.ts"],
+    env: {
+      NEXT_PUBLIC_DEMO_MODE: "false",
+    },
+  },
+});

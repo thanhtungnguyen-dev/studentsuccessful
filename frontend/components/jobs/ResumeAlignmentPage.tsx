@@ -1,5 +1,6 @@
 "use client";
 import { PageHeader } from "../ui/PageHeader";
+import { CompanyLogo } from "./CompanyLogo";
 import { LoadingState } from "../ui/LoadingState";
 
 import Link from "next/link";
@@ -98,7 +99,7 @@ export function ResumeAlignmentContent({ alignment }: { alignment: ResumeAlignme
     <>
       <section className="auth-card dashboard-card alignment-introduction">
         <PageHeader title="Resume alignment" />
-        <p className="fit-job">{alignment.job_title}{alignment.company_name ? ` · ${alignment.company_name}` : ""}</p>
+        <div className="analysis-job-identity"><CompanyLogo company={alignment.company_name || "Employer"} size="large" /><div><p className="analysis-job-company">{alignment.company_name || "Employer"}</p><p className="fit-job">{alignment.job_title}</p></div></div>
         <p className="alignment-version"><strong>Selected resume:</strong> {alignment.resume_title}, version {alignment.resume_version_number}</p>
         <p className="muted">This view compares one resume version with explicit job requirements. It records where evidence appears; it does not assess ability, predict hiring outcomes, or recommend claims to add.</p>
       </section>

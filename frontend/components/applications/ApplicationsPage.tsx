@@ -3,6 +3,7 @@ import { LoadingState } from "../ui/LoadingState";
 
 import Link from "next/link";
 import { PageHeader } from "../ui/PageHeader";
+import { CompanyLogo } from "../jobs/CompanyLogo";
 import { useEffect, useState } from "react";
 
 import {
@@ -60,11 +61,14 @@ export function ApplicationCard({
   return (
     <article className="application-card">
       <header>
-        <div>
-          <h2>{application.job_title}</h2>
-          <p className="muted">{application.company_name}</p>
+        <div className="application-identity">
+          <CompanyLogo company={application.company_name} />
+          <div>
+            <h2>{application.job_title}</h2>
+            <p className="muted">{application.company_name}</p>
+          </div>
         </div>
-        <p className="application-status" data-status={application.current_status}>Status: {readableStatus(application.current_status)}</p>
+        <p className="application-status" data-status={application.current_status}>{readableStatus(application.current_status)}</p>
       </header>
       <dl>
         <div><dt>Applied</dt><dd>{dateLabel(application.applied_at)}</dd></div>
@@ -124,6 +128,7 @@ export function ApplicationsPage() {
   const { user, error: sessionError, refresh } = useAuth();
   const [filter, setFilter] = useState<StatusFilter>("ALL");
   const [items, setItems] = useState<Application[] | null>(null);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [attempt, setAttempt] = useState(0);
   const [pendingIds, setPendingIds] = useState<Set<string>>(() => new Set());
@@ -181,7 +186,7 @@ export function ApplicationsPage() {
   useEffect(() => {
     if (!user) return;
     let active = true;
-    setItems(null);
+    setLoading(true);
     setError("");
     apiClient.listApplications(filter)
       .then((next) => {
@@ -189,7 +194,8 @@ export function ApplicationsPage() {
       })
       .catch((reason) => {
         if (active) handleError(reason);
-      });
+      })
+      .finally(() => { if (active) setLoading(false); });
     return () => {
       active = false;
     };
@@ -217,6 +223,7 @@ export function ApplicationsPage() {
                     </button>
                   ))}
                 </nav>
+                {loading && items !== null && <div className="applications-refresh" role="status"><span className="sr-only">Updating applications</span></div>}
                 {error && items !== null ? <p role="alert" className="auth-error">{error}</p> : null}
                 {items === null ? (
                   error ? (
@@ -232,7 +239,7 @@ export function ApplicationsPage() {
                     <Link className="secondary" href="/jobs">Browse jobs</Link>
                   </section>
                 ) : (
-                  <section className="applications-list">
+                  <section className="applications-list" aria-busy={loading} style={{ opacity: loading ? 0.68 : 1, transition: "opacity 140ms ease" }}>
                     {items.map((application) => (
                       <ApplicationCard
                         key={application.id}

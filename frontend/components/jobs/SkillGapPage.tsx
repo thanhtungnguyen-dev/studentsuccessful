@@ -1,5 +1,6 @@
 "use client";
 import { PageHeader } from "../ui/PageHeader";
+import { CompanyLogo } from "./CompanyLogo";
 import { LoadingState } from "../ui/LoadingState";
 
 import Link from "next/link";
@@ -114,7 +115,7 @@ export function SkillGapContent({ analysis }: { analysis: SkillGapAnalysis }) {
     <>
       <section className="auth-card dashboard-card gap-introduction">
         <PageHeader title="Skill gap analysis" />
-        <p className="fit-job">{analysis.job_title}{analysis.company_name ? ` · ${analysis.company_name}` : ""}</p>
+        <div className="analysis-job-identity"><CompanyLogo company={analysis.company_name || "Employer"} size="large" /><div><p className="analysis-job-company">{analysis.company_name || "Employer"}</p><p className="fit-job">{analysis.job_title}</p></div></div>
         <p className="gap-version"><strong>Selected resume:</strong> {analysis.resume_title}, version {analysis.resume_version_number}</p>
         <p className="muted">This view groups explicit job requirements by recorded evidence. It does not assess ability, predict hiring outcomes, or recommend changes.</p>
       </section>

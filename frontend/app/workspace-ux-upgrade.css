@@ -1,0 +1,232 @@
+/* StudentSuccessful product system refinement. Workspace only: landing styles stay untouched. */
+.workspace {
+  --ux-text: #1b2540;
+  --ux-soft: #f7f8fc;
+  --ux-accent: #5849da;
+  --ux-outline: #e4e8f1;
+  background: #f6f8fc;
+  color: var(--ux-text);
+}
+.workspace .desktop-sidebar {
+  width: 252px;
+  padding: 16px 12px 12px;
+  box-shadow: 3px 0 26px rgb(16 24 40 / .025);
+}
+.workspace .workspace-brand { display: flex; align-items: center; padding-inline: 5px; margin-bottom: 8px; }
+.workspace .workspace-brand-logo { max-width: 100%; }
+.workspace .desktop-sidebar .workspace-nav {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 2px 24px 0;
+  margin-top: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: #d9deeb transparent;
+}
+.workspace .workspace-nav-refined .nav-caption {
+  font-size: 10px;
+  font-weight: 800;
+  color: #8b94a9;
+  margin: 4px 0 7px;
+  padding: 10px 12px 5px;
+  letter-spacing: .12em;
+  border: 0;
+}
+.workspace .workspace-nav-refined .nav-group { display: grid; gap: 3px; }
+.workspace .workspace-nav-refined a {
+  display: flex; align-items: center;
+  gap: 11px;
+  min-width: 0;
+  min-height: 42px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 9px 12px;
+  border-radius: 10px;
+}
+.workspace .workspace-nav-refined a:focus-visible,
+.workspace .nav-section-trigger:focus-visible { outline: 2px solid #776cf0; outline-offset: -2px; }
+.workspace .workspace-nav-refined a[aria-current="page"] { background: #f0efff; color: #4635c9; font-weight: 800; }
+.workspace .nav-section { border-top: 1px solid #edf0f6; margin-top: 10px; padding-top: 8px; }
+.workspace .nav-section-trigger {
+  display: flex; align-items: center; justify-content: space-between;
+  min-height: 37px;
+  padding: 9px 12px;
+  color: #748098;
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 11px;
+  letter-spacing: .075em;
+  text-transform: uppercase;
+  font-weight: 800;
+  list-style: none;
+  user-select: none;
+}
+.workspace .nav-section-trigger::-webkit-details-marker { display:none; }
+.workspace .nav-section-trigger:hover { background: #f5f6fc; color: #4c3ed4; }
+.workspace .nav-section-trigger svg { transition: transform .18s ease; }
+.workspace .nav-section[open] > .nav-section-trigger svg { transform: rotate(180deg); }
+.workspace .nav-section > .nav-group, .workspace .nav-section > .nav-utilities { padding: 3px 0 4px; }
+.workspace .nav-utilities { margin: 0; padding: 0; border: 0; }
+.workspace .sidebar-account { border-top: 1px solid #eef0f6; padding-top: 10px; margin-top: auto; background: #fff; }
+.workspace .workspace-content { margin-left: 252px; padding: clamp(24px, 2.8vw, 42px) clamp(21px, 4vw, 64px) 85px; }
+.workspace .workspace-content > main { max-width: 1520px; }
+.workspace .page-header { margin-bottom: 26px; }
+.workspace .page-header .profile-title { font-size: clamp(28px, 2.45vw, 38px); line-height: 1.17; }
+.workspace .page-header .muted { max-width: 68ch; }
+.workspace .auth-card, .workspace .ui-card, .workspace .application-card {
+  border-color: var(--ux-outline);
+  border-radius: 16px;
+  box-shadow: 0 2px 5px rgb(20 27 51 / .025), 0 14px 35px rgb(20 27 51 / .035);
+}
+.workspace .dashboard-shell :where(p, li, dd) { line-height: 1.55; }
+.workspace :where(a, button, summary, input, textarea, select):focus-visible {
+  outline: 2px solid #8174f4;
+  outline-offset: 3px;
+}
+.workspace :where(input, textarea, select):disabled, .workspace button:disabled { cursor: not-allowed; }
+.workspace .loading-state { border-radius: 14px; min-height: 100px; background: white; }
+.workspace .application-card, .workspace .resume-card { min-width: 0; }
+.workspace .jobs-shell .jobs-layout { gap: 20px; }
+.workspace .jobs-shell .jobs-results-pane { max-height: none; overflow: visible; }
+.workspace .jobs-shell .job-card:hover { background: #fbfbff; }
+.workspace .job-detail, .workspace .jobs-layout > .auth-card { border-radius: 16px; }
+/* Candidate Profile: a compact overview instead of tall duplicated lists. */
+.workspace .candidate-shell { width: 100%; }
+.workspace .candidate-overview { display: grid; gap: 28px; }
+.workspace .candidate-top-grid { display: grid; grid-template-columns: minmax(300px,.85fr) minmax(420px,1.15fr); gap: 20px; align-items: stretch; }
+.workspace .candidate-record-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); align-items: stretch; gap: 18px; }
+.workspace .candidate-panel { padding: 22px 24px; min-width: 0; }
+.workspace .candidate-panel-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 19px; padding-bottom: 15px; border-bottom: 1px solid #edf0f6; }
+.workspace .candidate-panel-heading { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.workspace .candidate-panel-heading h2 { margin: 0; font-size: 16px; font-weight: 800; letter-spacing: -.025em; }
+.workspace .candidate-panel-icon { display: grid; place-items: center; flex: 0 0 36px; width: 36px; height: 36px; background: #f0eeff; color: #6352d9; border-radius: 10px; }
+.workspace .candidate-count { display: inline-grid; place-items: center; flex: 0 0 auto; padding: 3px 9px; color: #584bcf; background: #f0eeff; border: 1px solid #e6e3fd; border-radius: 20px; font-size: 11px; font-weight: 800; }
+.workspace .candidate-edit-link { display: inline-flex; align-items: center; gap: 3px; color: #6353cb; font-weight: 800; font-size: 12px; text-decoration: none; white-space: nowrap; }
+.workspace .candidate-edit-link:hover { color: #31229d; text-decoration: underline; }
+.workspace .candidate-field-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px 24px; margin: 0; }
+.workspace .candidate-field-list > div { display: grid; gap: 4px; min-width: 0; }
+.workspace .candidate-field-list dt { color: #8791a6; font-size: 11px; font-weight: 700; line-height: 1.4; }
+.workspace .candidate-field-list dd { margin: 0; text-align: left; font-weight: 750; font-size: 13px; color: #27314a; overflow-wrap: anywhere; }
+.workspace .candidate-skills-panel { display: flex; flex-direction: column; }
+.workspace .candidate-skill-search { display: flex; align-items: center; gap: 10px; max-width: 300px; color: #8892a7; margin-bottom: 15px; padding: 0 11px; border: 1px solid #e0e5f0; border-radius: 10px; }
+.workspace .candidate-skill-search input { border: 0 !important; box-shadow: none !important; outline: none !important; width: 100%; min-height: 38px; font-size: 12px; }
+.workspace .candidate-skill-grid { display: flex; flex-wrap: wrap; list-style: none; gap: 9px; padding: 0; margin: 0; }
+.workspace .candidate-skill-chip { display: inline-flex; align-items: center; gap: 9px; padding: 6px 12px 6px 6px; border: 1px solid #e7eaf3; background: #fafbfe; border-radius: 11px; color: #33415b; font-size: 12px; font-weight: 750; white-space: nowrap; }
+.workspace .candidate-skill-chip:hover { background: #f1efff; border-color: #d9d3ff; }
+.workspace .candidate-tech-mark { display: grid; place-items: center; flex: 0 0 30px; width: 30px; height: 30px; border-radius: 8px; font-size: 11px; font-weight: 900; font-family: var(--font-ssi-inter),sans-serif; background:#e9effa; color:#365b9c; }
+.workspace .candidate-tech-mark--python { background: #f4f8ff; }
+.workspace .candidate-tech-mark--javascript { background:#f8df58; color:#171717; }
+.workspace .candidate-tech-mark--typescript { background:#327cc6; color:#fff; }
+.workspace .candidate-tech-mark--react { background:#e8faff; color:#009cc4; font-size:23px; }
+.workspace .candidate-tech-mark--cpp { background:#eaf0ff; color:#245aa3; font-size:10px; }
+.workspace .candidate-tech-mark--postgres { background:#dfeef8; color:#275a83; }
+.workspace .candidate-tech-mark--git { background:#fff0eb; color:#ef593e; }
+.workspace .candidate-tech-mark--linux { background:#fff5dc; color:#4d4e53; }
+.workspace .candidate-tech-mark--docker { background:#e5f4ff; color:#1684bd; }
+.workspace .candidate-tech-mark--next { background:#242424; color:#fff; }
+.workspace .candidate-tech-mark--node { background:#eff8df; color:#508d2b; }
+.workspace .candidate-tech-mark--fastapi { background:#e3f5ef; color:#16866d; }
+.workspace .candidate-tech-mark--java { background:#fff1ea; color:#be5d34; }
+.workspace .candidate-show-more { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; align-self: flex-start; padding: 6px 0; border: 0; background: none; color:#5a4bc7; font-size:12px; font-weight:800; }
+.workspace .candidate-show-more:hover { text-decoration: underline; }
+.workspace .candidate-chevron-up { transform: rotate(180deg); }
+.workspace .candidate-empty { color:#7a859b; font-size: 13px; padding: 6px 0; }
+.workspace .candidate-section-heading h2 { font-size:18px; font-weight:800; letter-spacing:-.035em; margin:0 0 4px; }
+.workspace .candidate-section-heading p { color:#7b869c; font-size:12px; margin:0; }
+.workspace .candidate-overview > .candidate-section-heading { margin-bottom:-11px; }
+.workspace .candidate-record-list { list-style:none; padding:0; margin:0; display:grid; gap:0; }
+.workspace .candidate-record-list li { padding:11px 0; border-bottom:1px solid #f0f2f6; }
+.workspace .candidate-record-list li:last-child { border:0; }
+.workspace .candidate-record-list strong { display:block; font-size:13px; font-weight:800; overflow-wrap:anywhere; }
+.workspace .candidate-record-list p { color:#7c879e; font-size:12px; margin:4px 0 0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.workspace .candidate-list-more { display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:800; color:#5849cc; margin-top:13px; }
+.workspace .candidate-more-grid { display:grid; gap:12px; }
+.workspace .candidate-disclosure { overflow:hidden; }
+.workspace .candidate-disclosure > summary { list-style:none; display:flex; align-items:center; justify-content:space-between; padding:17px 23px; cursor:pointer; gap:16px; }
+.workspace .candidate-disclosure > summary::-webkit-details-marker { display:none; }
+.workspace .candidate-disclosure > summary:hover { background:#fbfbff; }
+.workspace .candidate-disclosure-title { display:grid; gap:2px; font-size:14px; font-weight:800; }
+.workspace .candidate-disclosure-title small { display:block; color:#8b95a8; font-size:12px; font-weight:500; }
+.workspace .candidate-chevron { color:#8b92a6; transition:transform .18s ease; }
+.workspace .candidate-disclosure[open] .candidate-chevron { transform:rotate(180deg); }
+.workspace .candidate-disclosure-content { padding:4px 25px 24px; border-top:1px solid #f1f2f7; }
+.workspace .candidate-disclosure-content .candidate-field-list { margin-top:18px; }
+.workspace .candidate-help { color:#8190a6; font-size:12px; margin:12px 0; }
+.workspace .candidate-evidence-list { list-style:none; margin:0; padding:0; display:grid; }
+.workspace .candidate-evidence-list > li { padding:13px 0; border-bottom:1px solid #eff1f6; }
+.workspace .candidate-evidence-list > li:last-child { border:0; }
+.workspace .candidate-evidence-list strong { font-size:13px; }
+.workspace .candidate-evidence-list p { color:#67748d; font-size:12px; line-height:1.65; margin:4px 0; }
+.workspace .candidate-source-tags { display:flex; flex-wrap:wrap; gap:6px; padding:0; margin:8px 0 0; list-style:none; }
+.workspace .candidate-source-tags :where(li,span) { display:inline-flex; font-size:11px; background:#f2f3f9; border-radius:7px; padding:3px 8px; color:#63708b; }
+@media (max-width: 1199px) {
+  .workspace .candidate-top-grid { grid-template-columns: 1fr; }
+  .workspace .candidate-field-list { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 900px) {
+  .workspace .desktop-sidebar { display:none; }
+  .workspace .workspace-content { margin-left:0; padding: 24px 22px 60px; }
+  .workspace .navigation-sheet .workspace-nav { overflow:visible; }
+}
+@media (max-width: 650px) {
+  .workspace .candidate-record-grid { grid-template-columns:1fr; }
+  .workspace .candidate-field-list { grid-template-columns:1fr 1fr; gap:12px; }
+  .workspace .candidate-panel { padding:19px 17px; }
+  .workspace .candidate-panel-heading h2 { font-size:14px; }
+  .workspace .candidate-disclosure > summary { padding:16px; }
+  .workspace .candidate-disclosure-content { padding:6px 17px 18px; }
+  .workspace .candidate-skill-grid { gap:7px; }
+  .workspace .candidate-skill-chip { font-size:11px; }
+}
+@media (max-width: 380px) {
+  .workspace .candidate-field-list { grid-template-columns:1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .workspace .candidate-chevron, .workspace .nav-section-trigger svg { transition:none; }
+}
+/* Resume file actions are never dead links: in browser-only sessions the stored
+   extracted text opens as an accessible inline document instead. */
+.workspace .resume-inline-preview { width:100%; margin:14px 0; padding:18px; border:1px solid #e2e5f1; border-radius:12px; background:#fbfcff; }
+.workspace .resume-inline-preview-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.workspace .resume-inline-preview-head h4 { margin:0; font-size:13px; font-weight:800; }
+.workspace .resume-inline-preview-head .secondary { min-height:32px; font-size:11px; padding:6px 11px; }
+.workspace .resume-inline-preview pre { font-family:var(--font-ssi-inter),system-ui,sans-serif; white-space:pre-wrap; overflow-wrap:anywhere; font-size:13px; color:#3e4a62; line-height:1.8; max-height:380px; overflow:auto; }
+.workspace .resume-version { align-items:flex-start; }
+.workspace .resume-version > div:first-child { min-width:0; }
+.workspace .resume-card .auth-actions { gap:8px; }
+/* Skills editing: selected options are visible first; long catalogs can be searched. */
+.workspace .skill-choices-refined { min-width:0; }
+.workspace .skill-choices-refined legend { font-size:17px; font-weight:800; padding-bottom:11px; }
+.workspace .skill-choices-toolbar { display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin:4px 0 18px; }
+.workspace .skill-selection-count { font-size:12px; color:#6053c8; font-weight:800; background:#f1efff; border-radius:20px; padding:7px 12px; }
+.workspace .skill-choices-search { margin:0 !important; display:flex; align-items:center; gap:9px; border:1px solid #e0e5f0; border-radius:10px; padding:0 11px; background:#fff; color:#8390a5; flex:1 1 190px; max-width:370px; }
+.workspace .skill-choices-search input { border:none !important; box-shadow:none !important; outline:none !important; background:transparent; width:100%; min-height:38px; margin:0; font-size:13px; }
+.workspace .skill-choices-options { display:grid; grid-template-columns:repeat(auto-fill,minmax(178px,1fr)); gap:10px; margin-bottom:0; }
+.workspace .skill-choices-options label { margin:0; display:flex; align-items:center; gap:8px; padding:7px 11px; min-height:48px; background:#fafbfe; border:1px solid #e6eaf2; border-radius:12px; cursor:pointer; color:#44516a; font-size:12px; font-weight:700; line-height:1.4; }
+.workspace .skill-choices-options label:hover { background:#f7f6ff; border-color:#d7d1fb; }
+.workspace .skill-choices-options label.skill-option-is-selected { border-color:#bbb4fb; background:#f4f2ff; }
+.workspace .skill-choices-options input { width:16px; height:16px; margin:0 2px 0 0; accent-color:#6254dc; flex-shrink:0; }
+.workspace .skill-choices-options .candidate-tech-mark { width:26px; height:26px; flex-basis:26px; font-size:9px; border-radius:7px; }
+.workspace .skill-choices-options .candidate-tech-mark img { width:21px; height:21px; }
+.workspace .skill-custom-entry { display:grid; gap:7px; margin-top:22px; }
+.workspace .skill-custom-entry > label { margin:0; font-size:13px; font-weight:750; }
+.workspace .skill-custom-entry > div { display:flex; gap:9px; max-width:490px; }
+.workspace .skill-custom-entry input { min-width:0; flex:1; }
+.workspace .skill-custom-chips { display:flex; flex-wrap:wrap; gap:9px; margin:14px 0 4px; }
+.workspace .skill-custom-chip { display:inline-flex; align-items:center; gap:8px; border:1px solid #e5e8f2; border-radius:10px; padding:5px 5px 5px 7px; font-size:12px; font-weight:700; }
+.workspace .skill-custom-chip .candidate-tech-mark { width:24px; height:24px; flex-basis:24px; font-size:9px; }
+.workspace .skill-custom-chip button { min-width:25px; min-height:26px; display:grid; place-items:center; border:0; border-radius:7px; background:transparent; color:#8792a5; }
+.workspace .skill-custom-chip button:hover { color:#b91c1c; background:#fef2f2; }
+.workspace .skill-review-list { display:flex; gap:8px; flex-wrap:wrap; list-style:none; padding:0; margin:0; }
+.workspace .skill-review-list li { display:inline-flex; align-items:center; gap:7px; border-radius:9px; background:#f5f7fc; border:1px solid #e8ebf2; padding:5px 11px 5px 5px; font-size:12px; font-weight:700; }
+.workspace .skill-review-list .candidate-tech-mark { width:23px; height:23px; flex-basis:23px; font-size:9px; }
+@media (max-width:650px) { .workspace .skill-choices-options { grid-template-columns:repeat(2,minmax(0,1fr)); } .workspace .skill-choices-options label { padding:7px; } }
+@media (max-width:420px) { .workspace .skill-choices-options { grid-template-columns:1fr; } }
+/* Readable editorial measure for forms, without reintroducing large empty page gutters. */
+.workspace .portfolio-content { max-width: 1020px; }
+.workspace :where(.profile-form,.education-form,.employment-form,.work-authorization-form,.preferences-form,.artifact-form,.project-form) { max-width: 940px; }
+.workspace .portfolio-content .auth-card { min-width:0; }
+.workspace .page-header { padding-bottom:20px; }
+.workspace .page-header h1 { margin-top:0; }
+.workspace .dashboard-card :where(dt, dd) { min-width:0; }
+/* Avoid giant whitespace caused by 2-column row placement in data-heavy cards. */
+.workspace .candidate-top-grid > .candidate-panel { align-self:stretch; }

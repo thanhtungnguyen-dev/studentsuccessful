@@ -1,18 +1,35 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useRef, type ReactNode } from "react";
-import { House, BriefcaseBusiness, ClipboardList, ContactRound, UserRound, GraduationCap, Building2, Globe2, SlidersHorizontal, ListChecks, FolderOpen, Files, Link2, Menu, X, ArrowUpRight } from "lucide-react";
+import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  House,
+  BriefcaseBusiness,
+  ClipboardList,
+  ContactRound,
+  UserRound,
+  GraduationCap,
+  Building2,
+  Globe2,
+  SlidersHorizontal,
+  ListChecks,
+  FolderOpen,
+  Files,
+  Link2,
+  Menu,
+  X,
+  ArrowUpRight,
+  RotateCcw,
+  Info,
+  ChevronDown,
+} from "lucide-react";
 import { AccountControls } from "../auth/AccountControls";
 import { useAuth } from "../auth/AuthProvider";
+import { isDemoModeEnabled } from "../../lib/demo/config";
+import { endDemoSession, resetDemoApiState } from "../../lib/demo/demo-store";
 
-const primary = [
-  { href: "/", label: "Home", icon: House },
-  { href: "/jobs", label: "Jobs", icon: BriefcaseBusiness },
-  { href: "/applications", label: "Applications", icon: ClipboardList },
-  { href: "/candidate", label: "Candidate Profile", icon: ContactRound },
-];
 const profile = [
   { href: "/profile", label: "Personal Information", icon: UserRound },
   { href: "/education", label: "Education", icon: GraduationCap },
@@ -25,40 +42,226 @@ const profile = [
   { href: "/artifacts", label: "Career Artifacts", icon: Link2 },
 ];
 
-export function WorkspaceNavigation({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
-  const links = (items: typeof primary) => items.map(({ href, label, icon: Icon }) => {
-    const active = href === "/" ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
-    return <Link key={href} href={href} aria-current={active ? "page" : undefined} onClick={onNavigate}><Icon size={18} aria-hidden="true" /><span>{label}</span></Link>;
-  });
-  return <nav aria-label="Workspace" className="workspace-nav">
-    <p className="nav-caption">Main</p><div className="nav-group">{links(primary)}</div>
-    <p className="nav-caption">Profile</p>
-    <div className="nav-group">{links(profile.slice(0,5))}</div><p className="nav-caption">Portfolio</p><div className="nav-group">{links(profile.slice(5))}</div>
-    <p className="nav-caption">Job Tools</p><div className="nav-utilities"><Link href="/jobs?view=saved" onClick={onNavigate}>Saved Searches<ArrowUpRight size={14} aria-hidden="true" /></Link><Link href="/alerts" aria-current={pathname === "/alerts" ? "page" : undefined} onClick={onNavigate}>Alerts<ArrowUpRight size={14} aria-hidden="true" /></Link></div>
-  </nav>;
+export function WorkspaceNavigation({
+  pathname,
+  onNavigate,
+}: {
+  pathname: string;
+  onNavigate?: () => void;
+}) {
+  const demoEnabled = isDemoModeEnabled();
+  const homeHref = demoEnabled ? "/demo" : "/";
+  const primary = [
+    { href: homeHref, label: "Home", icon: House },
+    { href: "/jobs", label: "Jobs", icon: BriefcaseBusiness },
+    { href: "/applications", label: "Applications", icon: ClipboardList },
+    { href: "/candidate", label: "Candidate Profile", icon: ContactRound },
+  ];
+
+  const links = (items: typeof primary) =>
+    items.map(({ href, label, icon: Icon }) => {
+      const active = label === "Home"
+        ? pathname === "/" || pathname === "/demo"
+        : pathname === href || pathname.startsWith(`${href}/`);
+      return (
+        <Link key={href} href={href} aria-current={active ? "page" : undefined} onClick={onNavigate}>
+          <Icon size={18} aria-hidden="true" />
+          <span>{label}</span>
+        </Link>
+      );
+    });
+
+  const profileOpen = profile.slice(0, 5).some(item => pathname === item.href);
+  const portfolioOpen = profile.slice(5).some(item => pathname === item.href);
+
+  return (
+    <nav aria-label="Workspace" className="workspace-nav workspace-nav-refined">
+      <p className="nav-caption">Workspace</p>
+      <div className="nav-group">{links(primary)}</div>
+      <details className="nav-section" open={profileOpen ? true : undefined} key={`profile-${profileOpen}`}>
+        <summary className="nav-section-trigger">Profile <ChevronDown size={15} aria-hidden="true" /></summary>
+        <div className="nav-group">{links(profile.slice(0, 5))}</div>
+      </details>
+      <details className="nav-section" open={portfolioOpen ? true : undefined} key={`portfolio-${portfolioOpen}`}>
+        <summary className="nav-section-trigger">Portfolio <ChevronDown size={15} aria-hidden="true" /></summary>
+        <div className="nav-group">{links(profile.slice(5))}</div>
+      </details>
+      <details className="nav-section" open={pathname === "/alerts" ? true : undefined} key={`tools-${pathname === "/alerts"}`}>
+        <summary className="nav-section-trigger">Job tools <ChevronDown size={15} aria-hidden="true" /></summary>
+        <div className="nav-utilities">
+          <Link href="/jobs?view=saved" onClick={onNavigate}>Saved jobs <ArrowUpRight size={14} aria-hidden="true" /></Link>
+          <Link href="/alerts" aria-current={pathname === "/alerts" ? "page" : undefined} onClick={onNavigate}>Alerts <ArrowUpRight size={14} aria-hidden="true" /></Link>
+        </div>
+      </details>
+    </nav>
+  );
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const { user, error } = useAuth();
+  const { user, error, refresh } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
-  const close = () => { dialog.current?.close(); trigger.current?.focus(); };
-  if (!user || error || pathname === "/login" || pathname === "/register") return children;
-  const brand = <Link className="workspace-brand" href="/"><span className="brand-monogram" aria-hidden="true">S</span>StudentSuccessful</Link>;
-  return <div className="workspace">
-    <a className="skip-link" href="#workspace-content">Skip to content</a>
-    <aside className="desktop-sidebar">{brand}<WorkspaceNavigation pathname={pathname} /><div className="sidebar-account"><AccountControls desktopMenu /></div></aside>
-    <header className="mobile-topbar">{brand}<button ref={trigger} className="icon-button" aria-label="Open navigation" aria-haspopup="dialog" onClick={() => dialog.current?.showModal()}><Menu size={22} aria-hidden="true" /></button></header>
-    <dialog ref={dialog} className="navigation-sheet" aria-labelledby="navigation-title" onClose={() => trigger.current?.focus()} onClick={event => { if (event.target === event.currentTarget) close(); }} onKeyDown={event => {
-      if (event.key !== "Tab") return;
-      const controls = event.currentTarget.querySelectorAll<HTMLElement>('a[href], button:not(:disabled)');
-      const first = controls[0], last = controls[controls.length - 1];
-      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
-      if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
-    }}>
-      <div className="sheet-content"><div className="sheet-heading"><h2 id="navigation-title">Navigation</h2><button className="icon-button" aria-label="Close navigation" onClick={close}><X size={22} aria-hidden="true" /></button></div><WorkspaceNavigation pathname={pathname} onNavigate={close} /></div>
-    </dialog>
-    <div key={pathname} id="workspace-content" className="workspace-content" tabIndex={-1}>{children}</div>
-  </div>;
+  const [resetMessage, setResetMessage] = useState(false);
+  const demoEnabled = isDemoModeEnabled();
+
+  // Keep anonymous visitors on the public landing rather than exposing a
+  // half-mounted workspace when they open a deep link or log out.
+  useEffect(() => {
+    if (
+      demoEnabled &&
+      user === null &&
+      !["/", "/demo", "/login", "/register"].includes(pathname)
+    ) {
+      router.replace("/");
+    }
+  }, [demoEnabled, pathname, router, user]);
+
+  const close = () => {
+    dialog.current?.close();
+    trigger.current?.focus();
+  };
+
+  // Keep the root landing page (/ in Demo Mode) and auth pages outside the sidebar shell
+  if (
+    !user ||
+    error ||
+    pathname === "/login" ||
+    pathname === "/register" ||
+    (demoEnabled && pathname === "/")
+  ) {
+    return children;
+  }
+
+  const brand = (
+    <Link className="workspace-brand" href={demoEnabled ? "/demo" : "/"}>
+      <Image
+        src="/brand/studentsuccessful-horizontal-transparent.png"
+        alt="StudentSuccessful"
+        width={194}
+        height={64}
+        className="workspace-brand-logo"
+        unoptimized
+      />
+    </Link>
+  );
+
+  async function handleResetSampleRecords() {
+    resetDemoApiState();
+    setResetMessage(true);
+    window.location.assign("/demo");
+  }
+
+  async function handleReturnToLanding() {
+    endDemoSession();
+    await refresh();
+    router.push("/");
+  }
+
+  return (
+    <div className="workspace">
+      <a className="skip-link" href="#workspace-content">
+        Skip to content
+      </a>
+      <aside className="desktop-sidebar">
+        {brand}
+        <WorkspaceNavigation pathname={pathname} />
+        <div className="sidebar-account">
+          {demoEnabled && (
+            <details className="ss-env-disclosure">
+              <summary className="ss-env-summary">
+                <Info size={14} aria-hidden="true" />
+                <span>Workspace information</span>
+              </summary>
+              <div className="ss-env-panel">
+                <p>
+                  This preview uses illustrative student and 2027 internship
+                  records stored locally in your browser. External job links
+                  open official employer career portals and do not submit
+                  applications automatically.
+                </p>
+                <div className="ss-env-actions">
+                  <button
+                    type="button"
+                    className="ss-env-btn"
+                    onClick={handleResetSampleRecords}
+                  >
+                    <RotateCcw size={12} aria-hidden="true" />
+                    {resetMessage ? "Records reset" : "Reset sample records"}
+                  </button>
+                  <button
+                    type="button"
+                    className="ss-env-btn"
+                    onClick={handleReturnToLanding}
+                  >
+                    Public landing page
+                  </button>
+                </div>
+              </div>
+            </details>
+          )}
+          <AccountControls desktopMenu />
+        </div>
+      </aside>
+      <header className="mobile-topbar">
+        {brand}
+        <button
+          ref={trigger}
+          className="icon-button"
+          aria-label="Open navigation"
+          aria-haspopup="dialog"
+          onClick={() => dialog.current?.showModal()}
+        >
+          <Menu size={22} aria-hidden="true" />
+        </button>
+      </header>
+      <dialog
+        ref={dialog}
+        className="navigation-sheet"
+        aria-labelledby="navigation-title"
+        onClose={() => trigger.current?.focus()}
+        onClick={(event) => {
+          if (event.target === event.currentTarget) close();
+        }}
+        onKeyDown={(event) => {
+          if (event.key !== "Tab") return;
+          const controls = event.currentTarget.querySelectorAll<HTMLElement>(
+            "a[href], button:not(:disabled)"
+          );
+          const first = controls[0],
+            last = controls[controls.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last?.focus();
+          }
+          if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first?.focus();
+          }
+        }}
+      >
+        <div className="sheet-content">
+          <div className="sheet-heading">
+            <h2 id="navigation-title">Navigation</h2>
+            <button
+              className="icon-button"
+              aria-label="Close navigation"
+              onClick={close}
+            >
+              <X size={22} aria-hidden="true" />
+            </button>
+          </div>
+          <WorkspaceNavigation pathname={pathname} onNavigate={close} />
+        </div>
+      </dialog>
+      <div
+        id="workspace-content"
+        className="workspace-content"
+        tabIndex={-1}
+      >
+        {children}
+      </div>
+    </div>
+  );
 }

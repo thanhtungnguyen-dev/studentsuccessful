@@ -1,5 +1,6 @@
 "use client";
 import { PageHeader } from "../ui/PageHeader";
+import { CompanyLogo } from "./CompanyLogo";
 import { LoadingState } from "../ui/LoadingState";
 
 import Link from "next/link";
@@ -75,7 +76,7 @@ export function FitAnalysisContent({ analysis }: { analysis: FitAnalysis }) {
     <>
       <section className="auth-card dashboard-card fit-introduction">
         <PageHeader title="Fit analysis" />
-        <p className="fit-job">{analysis.job_title}{analysis.company_name ? ` · ${analysis.company_name}` : ""}</p>
+        <div className="analysis-job-identity"><CompanyLogo company={analysis.company_name || "Employer"} size="large" /><div><p className="analysis-job-company">{analysis.company_name || "Employer"}</p><p className="fit-job">{analysis.job_title}</p></div></div>
         <p className="muted">This view compares stated job requirements with recorded candidate information. It does not assess ability, predict hiring outcomes, or make a recommendation.</p>
       </section>
       <div className="fit-layout">
