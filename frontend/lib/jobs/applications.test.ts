@@ -57,7 +57,7 @@ it("renders private manual status history and a closed listing without changing 
   for (const text of [
     "Software Engineer Intern",
     "Example Co",
-    "Status: Interview",
+    'data-status="INTERVIEW">Interview',
     "Internship Resume · v3",
     "Closed listing; tracking remains active.",
     "Applied → Interview",

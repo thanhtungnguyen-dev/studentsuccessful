@@ -93,7 +93,7 @@ it("uses the generated selected-version gap endpoint with an encoded no-store GE
 it("renders all four classifications and provenance without an ability claim", () => {
   const html = render(h(SkillGapContent, { analysis }));
   for (const value of [
-    "Skill gap analysis", "Platform Engineer · Example Co", "Selected resume:", "Software resume, version 1",
+    "Skill gap analysis", "analysis-job-identity", "Platform Engineer", "Example Co", "Selected resume:", "Software resume, version 1",
     "Covered", "Resume presentation gaps", "Candidate evidence gaps", "Unknown / unassessed",
     "Python", "Docker", "Terraform", "AWS", "BS", "Software resume, version 1, evidence item 3",
     "Confirmed by you", "Software resume, version 2, evidence item 1",

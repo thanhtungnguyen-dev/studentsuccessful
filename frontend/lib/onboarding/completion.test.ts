@@ -8,6 +8,7 @@ import { AuthStatus } from "../../components/auth/AuthStatus";
 
 const state = vi.hoisted(() => ({user: null as CurrentUser | null}));
 vi.mock("../../components/auth/AuthProvider", () => ({ useAuth: () => ({user: state.user, error: "", refresh: vi.fn()}) }));
+vi.mock("next/navigation", () => ({ usePathname: () => "/", useRouter: () => ({ push: vi.fn(), replace: vi.fn(), refresh: vi.fn() }) }));
 afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); state.user = null; });
 const user = { id: "owner", email: "owner@example.com", is_active: true, created_at: "2026-09-07T00:00:00Z", onboarding_completed_at: "2026-09-07T12:00:00Z" } satisfies CurrentUser;
 

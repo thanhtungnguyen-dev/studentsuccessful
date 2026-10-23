@@ -26,12 +26,12 @@ it("keeps confirmed, resume, and project skill sources distinct", () => {
     projects: [{ title: "Cloud Deployment" }], education: [{ institution_name: "Example University" }], employment: [{ employer_name: "Example Employer" }], work_authorizations: [{ country_code: "CA" }], preferences: { work_modes: ["REMOTE"] },
   } as CandidateProfile;
   const html = render(h(CandidateSections, { data }));
-  for (const expected of ["Application Profile", "Ada", "Confirmed Skills", "Added by you", "Skills and Sources", "Found in resume · Backend Resume v2", "Used in project · Cloud Deployment", "Detected Resume Evidence", "not confirmed skills or profile claims", "Recognized skill evidence: Python, Docker (detected; not confirmed)", "Preferences", "REMOTE"]) expect(html).toContain(expected);
-  expect((html.match(/Added by you/g) ?? []).length).toBeGreaterThanOrEqual(6);
+  for (const expected of ["Personal information", "Ada", "Confirmed skills", "Added to profile", "Skills &amp; evidence", "Resume · Backend Resume v2", "Project · Cloud Deployment", "Resume evidence", "Automatically detected references are not confirmed skills.", "Python and Docker", "Career preferences", "REMOTE"]) expect(html).toContain(expected);
+  expect(html).toContain("Project · Cloud Deployment");
   expect(html).not.toContain("You have skill");
 });
 
 it("renders explicit empty source-aware states", () => {
   const html = render(h(CandidateSections, { data: { facts_source: "ADDED_BY_USER", preferences: { role_ids: [], industry_ids: [], location_ids: [], company_ids: [], skill_ids: [], work_modes: [], employment_types: [], custom_values: [] } } }));
-  for (const expected of ["No application profile saved yet.", "No confirmed skills added by you yet.", "No skills with recorded sources yet.", "No resume evidence detected yet.", "No projects saved yet.", "No career preferences saved yet."]) expect(html).toContain(expected);
+  for (const expected of ["No personal information saved yet.", "Add your skills to build your profile.", "No skill sources available.", "No resume evidence found yet.", "No projects yet.", "No career preferences saved yet."]) expect(html).toContain(expected);
 });

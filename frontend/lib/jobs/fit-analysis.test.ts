@@ -67,7 +67,7 @@ it("uses the generated fit endpoint with safe authenticated GET options", async 
 it("renders explanations, all evidence sections, provenance, and source limitations", () => {
   const html = render(h(FitAnalysisContent, { analysis }));
   for (const value of [
-    "Fit analysis", "Platform Engineer · Example Co", "Recorded evidence", "No recorded evidence", "Unknown",
+    "Fit analysis", "analysis-job-identity", "Platform Engineer", "Example Co", "Recorded evidence", "No recorded evidence", "Unknown",
     "Python", "AWS", "Bachelor&#x27;s degree", "Why this is listed:", "Limitation:", "Recorded sources",
     "Software resume, version 3, evidence item 8", "historical version", "No recorded sources.", "Analysis limitations",
   ]) expect(html).toContain(value);

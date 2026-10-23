@@ -13,7 +13,8 @@ it("preserves workspace and profile routes without duplicate selected pages", ()
 
 it("labels the profile navigation and selects Home only for the home route", () => {
   const html = renderToStaticMarkup(createElement(WorkspaceNavigation, { pathname: "/" }));
-  for (const group of ["Main", "Profile", "Portfolio", "Job Tools"]) expect(html).toContain(`>${group}</p>`);
+  expect(html).toContain('class="nav-caption">Workspace</p>');
+  for (const group of ["Profile", "Portfolio", "Job tools"]) expect(html).toContain(`>${group} `);
   expect(html).toContain('aria-label="Workspace"');
   expect(html.match(/aria-current="page"/g)).toHaveLength(1);
 });

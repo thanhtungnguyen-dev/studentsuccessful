@@ -10,6 +10,7 @@ import { postAuthDestination } from "../onboarding/routing";
 
 const state=vi.hoisted(() => ({user:undefined as CurrentUser | null | undefined,error:""}));
 vi.mock("../../components/auth/AuthProvider", () => ({useAuth:() => ({...state,refresh:vi.fn()})}));
+vi.mock("next/navigation", () => ({ usePathname: () => "/", useRouter: () => ({ push: vi.fn(), replace: vi.fn(), refresh: vi.fn() }) }));
 afterEach(() => {vi.restoreAllMocks();state.user=undefined;state.error="";});
 const user:CurrentUser={id:"owner",email:"owner@example.com",is_active:true,created_at:"2026-01-01T00:00:00Z",onboarding_completed_at:"2026-09-08T00:00:00Z"};
 const metadata={id:"row",created_at:"2026-01-01T00:00:00Z",updated_at:"2026-01-01T00:00:00Z"};

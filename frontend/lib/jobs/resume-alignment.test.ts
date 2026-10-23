@@ -86,7 +86,7 @@ it("uses the generated exact-version endpoint with an encoded no-store GET", asy
 it("renders selected-version identity, four outcomes, and source labels", () => {
   const html = render(h(ResumeAlignmentContent, { alignment }));
   for (const value of [
-    "Resume alignment", "Platform Engineer · Example Co", "Selected resume:", "Software resume, version 1",
+    "Resume alignment", "analysis-job-identity", "Platform Engineer", "Example Co", "Selected resume:", "Software resume, version 1",
     "Shown on this resume", "Candidate evidence not shown", "No recorded evidence", "Unknown / unassessed",
     "Python", "Docker", "AWS", "Terraform", "BS", "Software resume, version 1, evidence item 3",
     "Confirmed by you", "Cloud lab", "Recorded candidate evidence exists, but it is not shown in this resume version.",

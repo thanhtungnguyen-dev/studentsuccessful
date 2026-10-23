@@ -554,7 +554,7 @@ export function JobsContent({
         <p role="alert" className="auth-error">Could not load jobs. {error}</p>
         <button className="secondary" onClick={retryJobs}>Retry jobs</button>
       </section>
-    ) : <div className="jobs-loading" role="status"><div className="jobs-loading-header"><Skeleton className="skeleton-short" /></div>{[1, 2, 3, 4].map((key) => <Skeleton key={key} className="job-result-skeleton" />)}</div>;
+    ) : <div className="jobs-loading" role="status"><span className="sr-only">Loading jobs…</span><div className="jobs-loading-header"><Skeleton className="skeleton-short" /></div>{[1, 2, 3, 4].map((key) => <Skeleton key={key} className="job-result-skeleton" />)}</div>;
   }
   if (!result.items.length) {
     const filtered = hasFilters(search);
