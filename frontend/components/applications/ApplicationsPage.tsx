@@ -53,6 +53,8 @@ export function ApplicationCard({
   onSaveNotes: (notes: string) => void;
 }) {
   const [transitionNote, setTransitionNote] = useState("");
+  const [nextStatus, setNextStatus] = useState<ApplicationStatus>(application.current_status);
+  useEffect(() => { setNextStatus(application.current_status); setTransitionNote(""); }, [application.current_status]);
   const [notes, setNotes] = useState(application.notes ?? "");
   const apply = application.application_url
     ? safeApplicationUrl(application.application_url)
@@ -80,12 +82,9 @@ export function ApplicationCard({
           Update status
           <select
             aria-label={"Update status for " + application.job_title}
-            value={application.current_status}
+            value={nextStatus}
             disabled={pending}
-            onChange={(event) => {
-              const next = event.currentTarget.value as ApplicationStatus;
-              if (next !== application.current_status) onStatus(next, transitionNote);
-            }}
+            onChange={(event) => setNextStatus(event.currentTarget.value as ApplicationStatus)}
           >
             {filters.filter((option) => option.value !== "ALL").map((option) => (
               <option key={option.value} value={option.value}>{option.label}</option>
@@ -94,12 +93,14 @@ export function ApplicationCard({
         </label>
         <label>
           Transition note (optional)
-          <input value={transitionNote} maxLength={2000} disabled={pending} onChange={(event) => setTransitionNote(event.currentTarget.value)} />
+          <input value={transitionNote} maxLength={2000} disabled={pending} placeholder="Add context for this update" onChange={(event) => setTransitionNote(event.currentTarget.value)} />
         </label>
-        <Link className="secondary" href="/jobs">View Jobs</Link>
-        {apply ? <a className="secondary" href={apply} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">Apply</a> : null}
+        <button className="primary application-status-save" type="button" disabled={pending || nextStatus === application.current_status} onClick={() => onStatus(nextStatus, transitionNote)}>
+          {pending ? "Saving…" : "Save status"}
+        </button>
+        {apply ? <a className="secondary" href={apply} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer">View original listing</a> : null}
       </div>
-      <details className="application-disclosure"><summary>Private notes &amp; status history</summary>
+      <details className="application-disclosure"><summary>Notes and status history</summary>
       <label className="application-notes">
         Private note
         <textarea value={notes} maxLength={2000} disabled={pending} onChange={(event) => setNotes(event.currentTarget.value)} />
@@ -139,7 +140,10 @@ export function ApplicationsPage() {
   }
 
   function replace(application: Application) {
-    setItems((current) => current?.map((item) => item.id === application.id ? application : item) ?? current);
+    setItems((current) => current?.flatMap((item) =>
+      item.id !== application.id ? [item]
+        : filter === "ALL" || filter === application.current_status ? [application] : []
+    ) ?? current);
   }
 
   async function updateStatus(application: Application, status: ApplicationStatus, statusNote: string) {
@@ -234,9 +238,9 @@ export function ApplicationsPage() {
                   ) : <LoadingState label="Loading applications…" />
                 ) : !items.length ? (
                   <section className="auth-card dashboard-card">
-                    <h2>No tracked applications</h2>
-                    <p className="muted">After you submit externally, use Mark as Applied from a job or alert.</p>
-                    <Link className="secondary" href="/jobs">Browse jobs</Link>
+                    <h2>{filter === "ALL" ? "No applications yet" : "No applications at this stage"}</h2>
+                    <p className="muted">{filter === "ALL" ? "After applying on an employer's site, add the role to your tracker." : "Choose another status above to see your other applications."}</p>
+                    {filter === "ALL" && <Link className="secondary" href="/jobs">Browse jobs</Link>}
                   </section>
                 ) : (
                   <section className="applications-list" aria-busy={loading} style={{ opacity: loading ? 0.68 : 1, transition: "opacity 140ms ease" }}>

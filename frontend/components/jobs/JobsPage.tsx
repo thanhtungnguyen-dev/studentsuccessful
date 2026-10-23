@@ -366,13 +366,25 @@ export function JobDetail({
           [item.requirement_type, item.value, item.description].filter(Boolean).join(" · "),
         )}
       />
-      <div className="job-detail-links">
-        <Link className="secondary" href={"/jobs/" + encodeURIComponent(job.id) + "/fit"}>View fit analysis</Link>
-        <Link className="secondary" href={"/jobs/" + encodeURIComponent(job.id) + "/resume-alignment"}>View resume alignment</Link>
-        <Link className="secondary" href={"/jobs/" + encodeURIComponent(job.id) + "/gaps"}>View skill gap analysis</Link>
-        <Link className="secondary" href={"/jobs/" + encodeURIComponent(job.id) + "/resume-plan"}>View resume improvement plan</Link>
-        <Link className="secondary" href={"/jobs/" + encodeURIComponent(job.id) + "/resume-draft"}>View resume tailoring draft</Link>
-      </div>
+      <section className="job-insights" aria-label="Compare this role">
+        <div className="job-insights-heading">
+          <h3>Compare this role</h3>
+          <p>See what your saved experience and selected resume already cover.</p>
+        </div>
+        <div className="job-detail-links job-detail-links-primary">
+          <Link className="primary" href={"/jobs/" + encodeURIComponent(job.id) + "/fit"}>View fit analysis</Link>
+          <Link className="secondary" href={"/jobs/" + encodeURIComponent(job.id) + "/resume-alignment"}>View resume alignment</Link>
+        </div>
+        <details className="job-advanced-analysis">
+          <summary>More ways to review this role</summary>
+          <p className="muted">Explore missing evidence or prepare changes to an existing resume.</p>
+          <div className="job-detail-links">
+            <Link className="secondary" href={"/jobs/" + encodeURIComponent(job.id) + "/gaps"}>View skill gap analysis</Link>
+            <Link className="secondary" href={"/jobs/" + encodeURIComponent(job.id) + "/resume-plan"}>View resume improvement plan</Link>
+            <Link className="secondary" href={"/jobs/" + encodeURIComponent(job.id) + "/resume-draft"}>View resume tailoring draft</Link>
+          </div>
+        </details>
+      </section>
     </section>
   );
 }

@@ -82,6 +82,7 @@ for (const width of [1440, 390]) {
       const before = await select.inputValue();
       const after = before === "INTERVIEW" ? "APPLIED" : "INTERVIEW";
       await select.selectOption(after);
+      await page.getByRole("button", { name: "Save status" }).first().click();
       await page.waitForFunction(expected => {
         const element = document.querySelector('select[aria-label^="Update status for"]');
         return element && element.value === expected;

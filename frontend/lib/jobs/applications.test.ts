@@ -58,6 +58,7 @@ it("renders private manual status history and a closed listing without changing 
     "Software Engineer Intern",
     "Example Co",
     'data-status="INTERVIEW">Interview',
+    'Save status',
     "Internship Resume · v3",
     "Listing closed · still in your tracker.",
     "Applied → Interview",
