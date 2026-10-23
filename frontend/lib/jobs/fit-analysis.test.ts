@@ -71,8 +71,8 @@ it("renders explanations, all evidence sections, provenance, and source limitati
     "Python", "AWS", "Bachelor&#x27;s degree", "Why this is listed:", "Limitation:", "Recorded sources",
     "Software resume, version 3, evidence item 8", "historical version", "No recorded sources.", "Analysis limitations",
   ]) expect(html).toContain(value);
-  expect(html).toContain("does not assess ability, predict hiring outcomes, or make a recommendation");
-  expect(html).toContain("This does not mean you lack the capability.");
+  expect(html).toContain("This checks recorded evidence, not hiring chances.");
+  expect(html).toContain("Nothing in your saved records supports these requirements yet.");
 });
 
 it("renders loading, retryable error, and signed-out states", () => {

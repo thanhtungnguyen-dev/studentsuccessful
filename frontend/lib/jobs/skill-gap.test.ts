@@ -99,7 +99,7 @@ it("renders all four classifications and provenance without an ability claim", (
     "Confirmed by you", "Software resume, version 2, evidence item 1",
     "on another resume version; it is not shown on the selected version.",
     "Recorded candidate evidence exists, but it is not shown on this resume.",
-    "No recorded supporting evidence.", "Analysis limitations",
+    "No supporting evidence in your saved records.", "Analysis limitations",
   ]) expect(html).toContain(value);
   expect(html).toContain("does not assess ability, predict hiring outcomes, or recommend changes");
   expect(html).not.toMatch(/you don.t know|unqualified|need to learn/i);

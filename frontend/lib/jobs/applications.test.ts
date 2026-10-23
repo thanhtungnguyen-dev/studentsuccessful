@@ -59,7 +59,7 @@ it("renders private manual status history and a closed listing without changing 
     "Example Co",
     'data-status="INTERVIEW">Interview',
     "Internship Resume · v3",
-    "Closed listing; tracking remains active.",
+    "Listing closed · still in your tracker.",
     "Applied → Interview",
     "Recruiter screen Sep 18",
     "Apply",

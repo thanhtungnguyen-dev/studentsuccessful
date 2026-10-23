@@ -92,8 +92,8 @@ it("renders selected-version identity, four outcomes, and source labels", () => 
     "Confirmed by you", "Cloud lab", "Recorded candidate evidence exists, but it is not shown in this resume version.",
     "Alignment limitations",
   ]) expect(html).toContain(value);
-  expect(html).toContain("does not assess ability, predict hiring outcomes, or recommend claims to add");
-  expect(html).toContain("This does not mean you lack the capability.");
+  expect(html).toContain("Missing evidence does not mean you lack the skill.");
+  expect(html).toContain("No supporting record was found in the selected resume or your saved profile.");
 });
 
 it("renders loading, retryable error, and signed-out states without private alignment", () => {
