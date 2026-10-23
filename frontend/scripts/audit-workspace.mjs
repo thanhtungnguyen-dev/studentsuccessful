@@ -56,6 +56,13 @@ for (const width of [1440, 390]) {
     try {
       await page.goto(new URL("/jobs", origin).toString(), { waitUntil: "domcontentloaded" });
       await page.locator(".job-card").first().waitFor({ state: "visible", timeout: 15000 });
+      if (width === 390) {
+        await page.getByRole("button", { name: /^Filter jobs/ }).click();
+        await page.locator(".job-filter-toolbar.filters-open").waitFor({ state: "visible" });
+        await page.getByRole("button", { name: "Apply filters" }).click();
+        await page.locator(".job-filter-toolbar:not(.filters-open)").waitFor({ state: "attached" });
+        console.log("PASS mobile job filter toggle and Apply flow");
+      }
       const firstJob = page.locator(".job-card .job-result-select").first();
       await firstJob.click();
       await page.locator(".job-detail").first().waitFor({ state: "visible", timeout: 15000 });
