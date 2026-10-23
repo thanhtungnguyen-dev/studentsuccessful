@@ -255,7 +255,7 @@ it("renders compact selectable results and preserves detail actions", () => {
   const html = renderJobsContent();
   for (const value of [
     "Recent opportunities", "Backend Software Engineer Intern", "Example Co", "Hybrid", "Internship",
-    "Unseen", "New", "Matched your filters: Role: Backend · Country: CA · Job type: Internship",
+    "Unseen", "New", "Search filters: Role: Backend · Country: CA · Job type: Internship",
     "Apply", "Save", "Hide",
   ]) expect(html).toContain(value);
   expect(html).not.toMatch(/source adapter|external id|source url|snapshot|hash|recommendation/i);

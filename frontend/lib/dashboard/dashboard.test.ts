@@ -21,7 +21,7 @@ const preferences:DashboardPreferences={preferences:{},labelsUnavailable:false,c
 
 it("completed Home renders a dashboard with account context and five sections", () => {
  state.user=user;const html=render(h(AuthStatus));expect(html).toContain('>Home</h1>');expect(html).toContain(user.email);expect(html).toContain('dashboard-overview');expect(html).not.toContain('Continue onboarding');
- for(const title of ['Personal Information','Education','Employment','Work Authorization','Career Preferences'])expect(html).toContain('Edit '+title);expect(html).toContain('href="/candidate"');expect(html).toContain('View Candidate Profile');expect(html).toContain('href="/jobs"');expect(html).toContain('Browse Jobs');
+ for(const title of ['Personal Information','Education','Employment','Work Authorization','Career Preferences'])expect(html).toContain('Edit '+title);expect(html).toContain('href="/candidate"');expect(html).toContain('Review profile');expect(html).toContain('href="/jobs"');expect(html).toContain('Browse internships');
 });
 it("renders saved profile facts with existing field labels", () => {
  const html=render(h(ProfileSummary,{data:{legal_first_name:"Ada",legal_last_name:"Lovelace",preferred_name:"A",address_city:"Calgary"}}));
@@ -97,11 +97,10 @@ it("does not render dashboard data for anonymous, unknown or failed sessions", (
  state.user=null;expect(render(h(AuthStatus))).toContain('href="/login"');state.user=user;state.error='Session unavailable';const html=render(h(AuthStatus));expect(html).not.toContain('dashboard-overview');expect(html).toContain('Session unavailable');
 });
 
-it("gives each career destination one semantic link without nested controls", () => {
- const html=render(h(Dashboard));
- const cards=html.slice(html.indexOf('class="career-actions"'),html.indexOf('aria-labelledby="profile-overview-title"'));
- expect(cards.match(/<a /g)).toHaveLength(3);
- expect(cards).not.toContain('<button');
- for(const label of ['Browse Jobs','View Candidate Profile','View Applications'])expect(cards).toContain(`aria-label="${label}"`);
- expect(cards.match(/class="action-link"/g)).toHaveLength(3);
+it("keeps quick actions semantic, distinct and keyboard-accessible", () => {
+ const html = render(h(Dashboard));
+ const shortcuts = html.slice(html.indexOf('class="focus-shortcuts"'), html.indexOf('aria-labelledby="profile-overview-title"'));
+ for (const href of ['/jobs', '/resumes', '/candidate']) expect(shortcuts).toContain('href="' + href + '"');
+ expect(shortcuts.match(/<a /g)).toHaveLength(3);
+ expect(shortcuts).not.toContain('<button');
 });
