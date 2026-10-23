@@ -44,7 +44,7 @@ Screenshots are captured from the running Next.js application at desktop and mob
 ![StudentSuccessful mobile workspace](docs/screenshots/mobile-workspace.jpg)
 
 
-The [workspace screenshot collection](docs/screenshots/) includes Applications, Resumes, Projects, Skills, role analysis, and mobile views of Jobs, Applications, and Resumes. Job Discovery uses expandable filters on smaller screens. The Projects view uses a two-column gallery on desktop that becomes a single column on mobile.
+The [workspace screenshot collection](docs/screenshots/) includes Applications, Resumes, Projects, Skills, role analysis, and mobile views of Jobs, Applications, and Resumes. Job Discovery uses expandable filters on smaller screens; all application stages remain visible without sideways scrolling. The Projects view uses a two-column gallery on desktop that becomes a single column on mobile.
 
 ## Try it online
 

@@ -102,6 +102,18 @@ for (const width of [1440, 390]) {
 
     try {
       await page.goto(new URL("/applications", origin).toString(), { waitUntil: "domcontentloaded" });
+      if (width === 390) {
+        // All six status filters must fit the mobile viewport without sideways-only controls.
+        const filtersVisible = await page.locator(".application-filters").evaluate(nav => {
+          const buttons = [...nav.querySelectorAll("button")];
+          return buttons.length === 6 && buttons.every(button => {
+            const bounds = button.getBoundingClientRect();
+            return bounds.width >= 24 && bounds.left >= -1 && bounds.right <= window.innerWidth + 1;
+          });
+        });
+        if (!filtersVisible) failures.push("390px: application status controls overflow the viewport");
+        else console.log("PASS mobile application status filter visibility");
+      }
       const search = page.getByRole("searchbox", { name: "Find an application" });
       await search.fill("NVIDIA");
       await page.locator(".application-card").first().waitFor({ state: "visible", timeout: 15000 });
