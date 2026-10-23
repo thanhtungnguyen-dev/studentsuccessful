@@ -145,3 +145,18 @@
 .workspace .project-external-links + .auth-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:17px; }
 .workspace .project-external-links + .auth-actions button { min-height:44px; }
 .workspace .project-external-links + .auth-actions button[aria-label^="Delete"] { color:#8a3542; }
+
+/* Mobile job filtering — prioritize results, reveal advanced controls when asked. */
+.workspace .job-mobile-filter-toggle { display:none; }
+@media (max-width: 670px) {
+  .workspace .job-mobile-filter-toggle { display:inline-flex; align-items:center; justify-content:space-between; gap:20px; min-height:44px; margin-top:10px; padding:10px 14px; font-size:14px; border:1px solid #cbd3e4; border-radius:10px; background:#fff; color:#3c338f; font-weight:750; }
+  .workspace .job-discovery-controls .job-filter-toolbar:not(.filters-open) { display:none; }
+  .workspace .job-discovery-controls .job-filter-toolbar.filters-open { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; margin-top:10px; }
+  .workspace .job-discovery-controls .job-filter-popover { min-width:0; }
+  .workspace .job-discovery-controls .job-filter-trigger { width:100%; justify-content:space-between; min-height:44px; }
+  .workspace .job-discovery-controls .job-filter-actions { grid-column:1/-1; display:flex; gap:8px; flex-wrap:wrap; }
+  .workspace .job-discovery-controls .job-filter-actions button { min-height:44px; }
+  .workspace .job-discovery-controls .job-filter-help { display:none; }
+  .workspace .application-filters { display:flex; flex-wrap:nowrap; overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:thin; white-space:nowrap; gap:5px; padding-bottom:7px; }
+  .workspace .application-filters button { flex:0 0 auto; min-height:44px; }
+}

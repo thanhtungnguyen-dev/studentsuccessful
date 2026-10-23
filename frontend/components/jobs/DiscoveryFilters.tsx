@@ -30,6 +30,13 @@ export function DiscoveryFilters({ draft, roles, locations, onChange, onSubmit, 
   draft: JobDiscoveryDraft; roles: CatalogItem[]; locations: CatalogLocation[];
   onChange: (next: JobDiscoveryDraft) => void; onSubmit: () => void; onClear: () => void;
 }) {
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const filterId = useId();
+  const selectedFilterCount =
+    draft.roles.length + draft.countries.length + draft.regions.length +
+    draft.cities.length + draft.job_types.length + draft.work_modes.length +
+    Number(draft.recency !== "all") + Number(Boolean(draft.company.trim())) +
+    Number(Boolean(draft.requirement.trim()));
   const countries = [...new Set(locations.map((x) => x.country_code))].sort();
   const regions = [...new Set(locations.map((x) => x.state_province).filter((x): x is string => Boolean(x)))].sort();
   const cities = [...new Set(locations.map((x) => x.city))].sort();
@@ -37,9 +44,15 @@ export function DiscoveryFilters({ draft, roles, locations, onChange, onSubmit, 
     return options.length ? <div className="job-filter-options">{options.map(({ value, label }) => <label key={value}><input type="checkbox" checked={draft[field].includes(value)} onChange={(e) => onChange({ ...draft, [field]: e.target.checked ? [...draft[field], value] : draft[field].filter((x) => x !== value) })} />{label}</label>)}</div> : <p className="muted">{empty}</p>;
   }
   const options = (values: readonly string[], pretty = false) => values.map((value) => ({ value, label: pretty ? labelOf(value) : value }));
-  return <form className="job-discovery-controls" aria-label="Job filters" onSubmit={(e) => { e.preventDefault(); onSubmit(); }}>
+  return <form className="job-discovery-controls" aria-label="Job filters" onSubmit={(e) => { e.preventDefault(); onSubmit(); setMobileFiltersOpen(false); }}>
     <label className="job-keyword">Keywords<input type="search" value={draft.keyword} onChange={(e) => onChange({ ...draft, keyword: e.target.value })} placeholder="Search job titles, companies, descriptions…" /></label>
-    <div className="job-filter-toolbar">
+    <button className="job-mobile-filter-toggle secondary" type="button"
+      aria-expanded={mobileFiltersOpen} aria-controls={filterId}
+      onClick={() => setMobileFiltersOpen(open => !open)}>
+      {mobileFiltersOpen ? "Hide filters" : "Filter jobs"}{selectedFilterCount ? ` (${selectedFilterCount})` : ""}
+      <span aria-hidden="true">{mobileFiltersOpen ? "−" : "+"}</span>
+    </button>
+    <div id={filterId} className={`job-filter-toolbar${mobileFiltersOpen ? " filters-open" : ""}`}>
       <JobFilterPopover label="Role" count={draft.roles.length}>{choices("roles", roles.filter((r) => Boolean(r.slug)).map((r) => ({ value: r.slug!, label: r.name })), "No roles available for the current jobs.")}</JobFilterPopover>
       <JobFilterPopover label="Location" count={draft.countries.length}>{choices("countries", options(countries), "No locations available for the current jobs.")}</JobFilterPopover>
       <JobFilterPopover label="Job type" count={draft.job_types.length}>{choices("job_types", options(EMPLOYMENT_TYPES, true), "No job types available.")}</JobFilterPopover>
