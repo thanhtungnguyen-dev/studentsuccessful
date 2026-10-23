@@ -220,13 +220,28 @@ function displayChoice(value: string): string {
   return value.toLowerCase().replaceAll("_", " ").replace(/\b\w/g, (character) => character.toUpperCase());
 }
 
-function JobMeta({ job }: { job: PublicJob | PublicJobDetail }) {
+function JobMeta({
+  job,
+  location,
+}: {
+  job: PublicJob | PublicJobDetail;
+  location?: string;
+}) {
   return (
-    <p className="muted">
-      {[job.company_name, job.role_name, job.work_mode ? displayChoice(job.work_mode) : null, job.employment_type ? displayChoice(job.employment_type) : null]
-        .filter(Boolean)
-        .join(" · ")}
-    </p>
+    <>
+      <span className="job-result-meta">
+        {location ? (
+          <>
+            <MapPin size={13} aria-hidden="true" />
+            {location}
+          </>
+        ) : job.role_name}
+      </span>
+      <span className="job-result-labels">
+        {job.work_mode && <span>{displayChoice(job.work_mode)}</span>}
+        {job.employment_type && <span>{displayChoice(job.employment_type)}</span>}
+      </span>
+    </>
   );
 }
 
@@ -566,15 +581,10 @@ export function JobsContent({
                   <span className="job-result-content">
                     <span className="job-result-company">{job.company_name}</span>
                     <strong>{job.title}</strong>
-                    <span className="job-result-meta">
-                      {selectedDetail?.id === job.id && selectedDetail.locations.length > 0 ? (
-                        <><MapPin size={13} aria-hidden="true" />{selectedDetail.locations[0]}</>
-                      ) : job.role_name}
-                    </span>
-                    <span className="job-result-labels">
-                      {job.work_mode && <span>{displayChoice(job.work_mode)}</span>}
-                      {job.employment_type && <span>{displayChoice(job.employment_type)}</span>}
-                    </span>
+                    <JobMeta
+                      job={job}
+                      location={selectedDetail?.id === job.id ? selectedDetail.locations[0] : undefined}
+                    />
                   </span>
                 </button>
                 <div className="job-result-footer">
