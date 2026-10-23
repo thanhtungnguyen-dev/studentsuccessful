@@ -6,6 +6,10 @@ on:
     paths: [README.md]
   workflow_dispatch:
 
+concurrency:
+  group: readme-screenshots-main
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
@@ -64,7 +68,16 @@ jobs:
           if ! git diff --cached --quiet; then
             git commit -m 'docs: refresh screenshots from live frontend'
             # Do not overwrite changes pushed while Chrome was capturing.
-            git fetch origin main
-            git rebase origin/main
-            git push origin HEAD:main
+            for attempt in 1 2 3; do
+              git fetch origin main
+              # When screenshot binaries changed upstream, prefer this fresh capture.
+              # In a rebase, "theirs" is the screenshot commit being replayed.
+              git rebase -X theirs origin/main
+              if git push origin HEAD:main; then
+                exit 0
+              fi
+              echo "Remote advanced during screenshot upload; retrying ($attempt/3)"
+            done
+            echo "Could not update screenshots after three safe retries" >&2
+            exit 1
           fi
