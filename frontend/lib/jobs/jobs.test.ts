@@ -299,6 +299,14 @@ it("renders empty, loading, error, pagination, and retry states", () => {
   expect(paged).toContain("Next page");
 });
 
+it("expands country codes only for three-part job locations", () => {
+  const canada = render(h(JobDetail, { job: { ...job, locations: ["Markham, ON, CA"] } }));
+  expect(canada).toContain("Markham, ON, Canada");
+  const stateOnly = render(h(JobDetail, { job: { ...job, locations: ["San Francisco, CA"] } }));
+  expect(stateOnly).toContain("San Francisco, CA");
+  expect(stateOnly).not.toContain("San Francisco, Canada");
+});
+
 it("uses a safe direct application link and displays retryable detail failure", () => {
   const html = render(h(JobDetail, { job }));
   expect(html).toContain('href="https://example.com/apply"');
