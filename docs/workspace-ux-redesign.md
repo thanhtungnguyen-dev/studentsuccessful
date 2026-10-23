@@ -38,3 +38,10 @@ The repository's engineering workflow checks TypeScript, ESLint, Vitest, Next.js
 - Capture and review multiple sizes and interactive states beyond the screenshot set.
 
 A high design score should not be inferred solely from automated green checks or polished screenshots.
+
+## Follow-up polish
+
+- Shortened repetitive project Edit/Delete buttons while retaining per-project accessible labels.
+- Streamlined initial skill selection to keep saved skills in view while retaining search and an explicit full-catalog control.
+- Removed overlapping generic choices from the fresh *showcase seed only*; existing browser-saved selections and all real user records remain unchanged.
+- Expanded screenshot coverage to include role analysis and mobile Jobs/Applications.

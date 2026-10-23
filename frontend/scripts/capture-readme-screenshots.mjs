@@ -37,6 +37,12 @@ try {
   await capture("/", "landing", "h1");
   await capture("/demo", "dashboard", ".desktop-sidebar");
   await capture("/jobs", "jobs", 'h1:has-text("Jobs")');
+  // Capture an actual selected-role workflow, not a mocked analysis screenshot.
+  const fitHref = await page.locator('.job-detail-links-primary a[href$="/fit"]').first().getAttribute("href");
+  if (fitHref) {
+    await capture(fitHref, "fit-analysis", ".analysis-job-identity");
+    await capture(fitHref.replace(/\/fit$/, "/resume-alignment"), "resume-alignment", ".analysis-job-identity");
+  }
   await capture("/candidate", "candidate", 'h1:has-text("Candidate Profile")');
   // Additional workspace screens used for UX review (actual browser captures).
   await capture("/applications", "applications", 'h1:has-text("Applications")');
@@ -58,6 +64,14 @@ try {
     await mobilePage.waitForTimeout(1200);
     await mobilePage.screenshot({ path: path.join(output, "mobile-workspace.jpg"), type: "jpeg", quality: 86, fullPage: false });
     console.log("Captured mobile workspace");
+    for (const [route, name] of [["/jobs", "mobile-jobs"], ["/applications", "mobile-applications"]]) {
+      await mobilePage.goto(new URL(route, origin).toString(), { waitUntil: "domcontentloaded" });
+      await mobilePage.locator("h1").first().waitFor({ state: "visible", timeout: 30000 });
+      await mobilePage.evaluate(() => document.fonts.ready);
+      await mobilePage.waitForTimeout(1600);
+      await mobilePage.screenshot({ path: path.join(output, name + ".jpg"), type: "jpeg", quality: 86, fullPage: false });
+      console.log("Captured " + name);
+    }
   } finally {
     await mobile.close();
   }

@@ -44,7 +44,7 @@ Screenshots are captured from the running Next.js application at desktop and mob
 ![StudentSuccessful mobile workspace](docs/screenshots/mobile-workspace.jpg)
 
 
-The [workspace screenshot collection](docs/screenshots/) also includes Applications, Resumes, Projects, and Skills for a closer view of the product.\n\n## Try it online
+The [workspace screenshot collection](docs/screenshots/) also includes Applications, Resumes, Projects, Skills, role analysis, and mobile Jobs/Applications views.\n\n## Try it online
 
 1. Open **[studentsuccessful.vercel.app](https://studentsuccessful.vercel.app/)**.
 2. Choose **Try interactive demo** to enter the workspace without creating an account.
