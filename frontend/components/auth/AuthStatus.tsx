@@ -40,6 +40,11 @@ export function AuthStatus() {
         {completed && <p className="eyebrow">YOUR WORKSPACE</p>}
         <h1 id="home-title">{completed ? "Home" : "StudentSuccessful"}</h1>
         {completed && (
+          <Link href="/onboarding/review" className="home-review-link">
+            Review profile setup <ArrowRight size={16} aria-hidden="true" />
+          </Link>
+        )}
+        {completed && (
           <p className="muted">
             Review applications, resumes, and the experience you've saved.
           </p>
