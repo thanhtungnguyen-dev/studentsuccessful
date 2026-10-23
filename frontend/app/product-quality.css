@@ -80,3 +80,34 @@
 .workspace .candidate-top-grid > .candidate-personal-panel { align-self: start; }
 .workspace .candidate-skill-chip { min-height: 38px; }
 .workspace .candidate-show-more { min-height: 44px; }
+
+/* Clear action hierarchy and readable workspace metadata. */
+.workspace .workspace-metric-hint,
+.workspace .job-freshness,
+.workspace .application-card dt,
+.workspace .candidate-grid dt,
+.workspace .candidate-grid .candidate-sources li,
+.workspace .resume-version .muted,
+.workspace .job-detail-facts span { color: #536079; font-size: 12px; }
+.workspace .nav-caption { color: #4e5870; font-size: 12px; }
+.workspace .workspace-nav a { font-size: 14px; min-height: 44px; }
+.workspace .application-card dd, .workspace .candidate-grid dd { font-size: 14px; }
+.workspace .job-detail .job-description,
+.workspace .job-detail .job-requirements li { font-size: 14px; line-height: 1.65; }
+.workspace .job-result-labels > span { font-size: 12px; }
+.workspace .application-disclosure summary { font-size: 14px; min-height: 44px; }
+.workspace .application-status-save { white-space: nowrap; }
+.workspace .job-insights { margin-top: 24px; padding-top: 21px; border-top: 1px solid #e6eaf3; }
+.workspace .job-insights-heading h3 { margin: 0 0 5px; font-size: 18px; }
+.workspace .job-insights-heading p { margin: 0 0 15px; color: #52617a; font-size: 14px; line-height: 1.55; }
+.workspace .job-detail-links-primary { display: flex; flex-wrap: wrap; gap: 9px; }
+.workspace .job-advanced-analysis { margin-top: 16px; border: 1px solid #e1e6f0; border-radius: 12px; padding: 0 15px; }
+.workspace .job-advanced-analysis summary { cursor: pointer; padding: 15px 0; min-height: 48px; font-size: 14px; font-weight: 700; color: #443aa2; }
+.workspace .job-advanced-analysis > p { font-size: 13px; margin: 0 0 10px; }
+.workspace .job-advanced-analysis .job-detail-links { padding-bottom: 17px; }
+.workspace .project-external-links { display: flex; flex-wrap: wrap; gap: 9px; margin: 12px 0; }
+@media (max-width: 600px) {
+  .workspace .workspace-metric-hint, .workspace .workspace-metric-head { font-size: 12px; }
+  .workspace .job-detail-links-primary > a { flex: 1 1 170px; }
+  .workspace .application-actions { gap: 10px; }
+}

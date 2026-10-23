@@ -153,7 +153,7 @@ export function CandidateSections({ data }: { data: CandidateProfile }) {
   const profile = row(data);
   return <div className="candidate-overview">
     <div className="candidate-top-grid"><ApplicationProfile data={profile} /><ConfirmedSkills data={profile} /></div>
-    <div className="candidate-section-heading"><h2>Experience & qualifications</h2><p>Your information in one place, organized for quick review.</p></div>
+    <div className="candidate-section-heading"><h2>Experience & qualifications</h2></div>
     <div className="candidate-record-grid">
       <Records heading="Projects" data={profile} keys={["projects"]} empty="No projects yet." detail={item => text(item.description)} href="/projects" icon={<FolderGit2 size={19} />} />
       <Records heading="Education" data={profile} keys={["education"]} empty="No education records yet." detail={item => join(item, ["degree_level", "major", "institution_name"])} href="/education" icon={<GraduationCap size={19} />} />

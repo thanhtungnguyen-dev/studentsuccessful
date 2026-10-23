@@ -59,9 +59,6 @@ export function WorkspaceFocus() {
           <h2 id="focus-title">Continue where you left off</h2>
           <p>Applications, saved work, and your next move.</p>
         </div>
-        <Link href="/applications" className="focus-secondary-link">
-          View application tracker <ArrowUpRight size={16} aria-hidden="true" />
-        </Link>
       </div>
       <div className="focus-layout">
         <div className="focus-primary">

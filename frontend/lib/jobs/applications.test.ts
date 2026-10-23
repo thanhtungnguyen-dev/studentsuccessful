@@ -63,7 +63,7 @@ it("renders private manual status history and a closed listing without changing 
     "Listing closed · still in your tracker.",
     "Applied → Interview",
     "Recruiter screen Sep 18",
-    "Apply",
+    "View original listing",
   ]) {
     expect(html).toContain(text);
   }

@@ -5,6 +5,7 @@ import {apiClient,ApiError,authErrorMessage,type Project,type ProjectCreate} fro
 import {loadProjects,projectPayload} from "../../lib/portfolio/form";
 import {useAuth} from "../auth/AuthProvider";
 import {PortfolioPage} from "./PortfolioPage";
+import {safeApplicationUrl} from "../../lib/jobs/applicationUrl";
 import {SkillChoices,SkillList} from "./SkillChoices";
 const empty=():ProjectCreate=>({title:"",description:"",project_url:"",repository_url:"",technologies:{skill_ids:[],custom_values:[]}});
 export function ProjectsPage(){return <PortfolioPage title="Projects"><ProjectsContent/></PortfolioPage>;}
@@ -15,7 +16,7 @@ function ProjectsContent(){
  function failure(error:unknown){setError(error instanceof ApiError?authErrorMessage(error):error instanceof Error?error.message:"Please try again.");if(error instanceof ApiError&&error.status===401)void refresh().catch(()=>{});}
  async function save(){if(!data||!editing||pending.current)return;setError("");setSuccess("");let values:ProjectCreate;try{values=projectPayload(form);}catch(error){failure(error);return;}pending.current=true;setBusy(true);try{const row=editing==="new"?await apiClient.createProject(values):await apiClient.updateProject(editing.id,values);setData({...data,projects:editing==="new"?[...data.projects,row]:data.projects.map(x=>x.id===row.id?row:x)});setEditing(null);setSuccess("Project saved.");}catch(error){failure(error);}finally{pending.current=false;setBusy(false);}}
  async function remove(){if(!data||!deleting||pending.current)return;pending.current=true;setBusy(true);setError("");setSuccess("");try{await apiClient.deleteProject(deleting);setData({...data,projects:data.projects.filter(x=>x.id!==deleting)});setDeleting(null);setSuccess("Project deleted.");}catch(error){failure(error);}finally{pending.current=false;setBusy(false);}}
- return <><p className="muted">Projects you created. Technologies apply to each project and do not automatically become user-level Skills.</p>
+ return <><p className="muted">Show what you built, the tools you used, and links to your work. Add skills separately to your profile.</p>
  {error&&<p role="alert" className="auth-error">{error}</p>}{success&&<p role="status" className="profile-success">{success}</p>}
  {!data ? error ? <button className="secondary" onClick={()=>setAttempt(x=>x+1)}>Retry Projects</button> : <LoadingState label="Loading projects…" /> : <>
  {!editing&&!deleting&&<button className="primary education-add" onClick={()=>{setForm(empty());setEditing("new");setError("");setSuccess("");}}>Add project</button>}
@@ -27,7 +28,11 @@ function ProjectsContent(){
  <SkillChoices values={form.technologies??{}} catalog={data.catalog} onChange={technologies=>setForm({...form,technologies})}/>
  <div className="auth-actions"><button className="primary" type="submit">{busy?"Saving…":"Save project"}</button><button className="secondary" type="button" onClick={()=>setEditing(null)}>Cancel</button></div></fieldset></form>}
  <div className="education-list">{!data.projects.length&&<p className="muted">No projects saved.</p>}{data.projects.map(row=><article className="auth-card dashboard-card" key={row.id}><h2>{row.title}</h2><p className="project-description">{row.description||"No description provided."}</p><h3>Project technologies</h3><SkillList values={row.technologies??{}} catalog={data.catalog}/>
- <dl><div><dt>Project URL</dt><dd>{row.project_url||"Not provided"}</dd></div><div><dt>Repository URL</dt><dd>{row.repository_url||"Not provided"}</dd></div></dl>
+ <div className="project-external-links">
+  {safeApplicationUrl(row.project_url ?? "") && <a className="secondary" href={safeApplicationUrl(row.project_url ?? "")!} target="_blank" rel="noopener noreferrer">Open project ↗</a>}
+  {safeApplicationUrl(row.repository_url ?? "") && <a className="secondary" href={safeApplicationUrl(row.repository_url ?? "")!} target="_blank" rel="noopener noreferrer">View code ↗</a>}
+  {!safeApplicationUrl(row.project_url ?? "") && !safeApplicationUrl(row.repository_url ?? "") && <p className="muted">Add a link so others can explore your work.</p>}
+</div>
  {!editing&&!deleting&&<div className="auth-actions"><button className="secondary" onClick={()=>{setEditing(row);setForm({title:row.title,description:row.description,project_url:row.project_url,repository_url:row.repository_url,technologies:row.technologies});setError("");setSuccess("");}}>Edit {row.title}</button><button className="secondary" onClick={()=>setDeleting(row.id)}>Delete {row.title}</button></div>}
  {deleting===row.id&&<div><p>Delete this project? Your Skills and Preferences will remain unchanged.</p><button className="secondary" disabled={busy} onClick={()=>void remove()}>{busy?"Deleting…":"Confirm delete"}</button><button className="secondary" disabled={busy} onClick={()=>setDeleting(null)}>Cancel deletion</button></div>}
  </article>)}</div></>}

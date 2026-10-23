@@ -159,7 +159,7 @@ export function ResumeTailoringReviewContent({
             busy={busy}
             onUpdate={(payload) => onUpdate(item.id, payload)}
           />
-        )) : <p className="muted">This Phase 16 draft had no evidence-backed suggestions to review.</p>}
+        )) : <p className="muted">There are no supported draft suggestions to review.</p>}
       </section>
       {finalized ? (
         <section className="auth-card dashboard-card review-finalized">
