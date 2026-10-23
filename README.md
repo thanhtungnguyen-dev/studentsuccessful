@@ -48,6 +48,8 @@ Screenshots are captured from the running Next.js application at desktop and mob
 2. Choose **Try interactive demo** to enter the workspace without creating an account.
 3. Explore Jobs, Resumes, Candidate Profile, and Applications.
 
+On mobile, open the navigation menu to move between pages and access account controls.
+
 The public showcase uses illustrative student records stored in your browser. It does **not** submit real job applications or create real accounts. Employer links are external; check posting details on the employer's website.
 
 ## Run the frontend locally
