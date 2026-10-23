@@ -122,7 +122,7 @@ export function SkillGapContent({ analysis }: { analysis: SkillGapAnalysis }) {
       <div className="gap-layout">
         <SkillGapGroup
           title="Covered"
-          intro="Accepted exact catalog-skill evidence is shown on the selected resume version."
+          intro="These requirements appear in the selected resume."
           requirements={analysis.covered ?? []}
           empty="No job requirements are covered by accepted evidence on this resume version."
           selectedVersionId={analysis.resume_version_id}
@@ -136,14 +136,14 @@ export function SkillGapContent({ analysis }: { analysis: SkillGapAnalysis }) {
         />
         <SkillGapGroup
           title="Candidate evidence gaps"
-          intro="No recorded supporting evidence."
+          intro="No supporting evidence in your saved records."
           requirements={analysis.candidate_evidence_gaps ?? []}
           empty="No requirements are in this group."
           selectedVersionId={analysis.resume_version_id}
         />
         <SkillGapGroup
           title="Unknown / unassessed"
-          intro="Education and eligibility requirements are shown here because the available records do not support a deterministic evaluation."
+          intro="Review education and eligibility requirements yourself."
           requirements={analysis.unknown ?? []}
           empty="No requirements are unknown or unassessed."
           selectedVersionId={analysis.resume_version_id}

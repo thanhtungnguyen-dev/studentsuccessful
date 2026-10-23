@@ -6,6 +6,7 @@ import "./interactive-landing.css";
 import "./typography-polish.css";
 import "./workspace-polish.css";
 import "./workspace-ux-upgrade.css";
+import "./product-quality.css";
 import { AuthProvider } from "../components/auth/AuthProvider";
 import { AppShell } from "../components/shell/AppShell";
 

@@ -83,7 +83,7 @@ export function ResumeTailoringDraftAction({
         <p className="muted">{item.category}{item.importance ? ` · ${item.importance}` : ""}</p>
       </header>
       {item.description && <p className="draft-description">{item.description}</p>}
-      <p className="muted"><strong>Phase 15 action:</strong> {item.action}</p>
+      <p className="muted"><strong>Suggested change:</strong> {item.action}</p>
       <p><strong>Why:</strong> {item.reason}</p>
       <p><strong>Safety boundary:</strong> {item.limitation}</p>
       {item.draft_text && (
@@ -163,9 +163,9 @@ export function ResumeTailoringDraftContent({ draft }: { draft: ResumeTailoringD
         />
         <ResumeTailoringDraftGroup
           title="Evidence-Backed Draft Suggestions"
-          intro="Each visible draft fragment uses only its cited recorded candidate source."
+          intro="Each suggestion is based on a saved source you can review."
           items={draft.draft_suggestions ?? []}
-          empty="No evidence-backed draft fragments are available."
+          empty="No supported draft suggestions are available."
           selectedVersionId={draft.resume_version_id}
         />
         <ResumeTailoringDraftGroup

@@ -1,0 +1,77 @@
+/* Focused usability improvements. Keeps existing visual identity and layout. */
+.workspace .workspace-nav-refined a {
+  min-height: 44px;
+  font-size: 14px;
+}
+.workspace .workspace-nav-refined .nav-caption,
+.workspace .nav-section-trigger {
+  color: #536178;
+  font-size: 12px;
+  letter-spacing: .06em;
+}
+.workspace .nav-section-trigger { min-height: 44px; }
+.workspace .page-header .muted {
+  color: #4a5870;
+  font-size: 15px;
+  line-height: 1.6;
+  max-width: 66ch;
+}
+.workspace .candidate-field-list dt {
+  color: #59677e;
+  font-size: 12px;
+}
+.workspace .candidate-field-list dd { font-size: 14px; }
+.workspace .candidate-section-heading p,
+.workspace .candidate-record-list p {
+  color: #59677e;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.workspace .candidate-edit-link,
+.workspace .candidate-show-more,
+.workspace .candidate-list-more { font-size: 13px; }
+.workspace .candidate-show-more {
+  min-height: 42px;
+  padding-block: 10px;
+}
+.workspace .candidate-skill-chip { font-size: 13px; }
+.workspace .candidate-skill-search input {
+  min-height: 44px;
+  font-size: 14px;
+}
+.workspace .jobs-shell .job-result-company { font-size: 13px; }
+.workspace .jobs-shell .job-result-meta { font-size: 13px; color: #4e5d73; }
+.workspace .jobs-shell .job-result-select strong { font-size: 15px; line-height: 1.45; }
+.workspace .jobs-shell .job-detail-subtitle { font-size: 13px; color: #4e5d73; }
+.workspace .jobs-shell .job-detail-tags span { font-size: 12px; }
+.workspace .jobs-shell .job-detail-facts span { color: #59677e; font-size: 12px; }
+.workspace .jobs-shell .job-detail-facts strong { font-size: 13px; }
+.workspace .jobs-shell .job-detail .job-actions { flex-wrap: wrap; }
+.workspace .jobs-shell .job-detail :where(p, li) { line-height: 1.65; }
+.workspace .jobs-shell .job-detail a,
+.workspace .jobs-shell .job-detail button { min-height: 44px; }
+.workspace :where(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  font-size: 14px;
+  min-height: 44px;
+}
+.workspace :where(a, button, input, textarea, select, summary):focus-visible,
+.ssi-page :where(a, button, input, textarea, select, summary):focus-visible {
+  outline: 3px solid #5443cc;
+  outline-offset: 3px;
+}
+.workspace .auth-error, .auth-layout .auth-error { line-height: 1.55; }
+.workspace :where(h1,h2,h3), .ssi-page :where(h1,h2,h3) { overflow-wrap: break-word; }
+@media (max-width: 720px) {
+  .workspace .workspace-content { padding-inline: 16px; }
+  .workspace .candidate-top-grid,
+  .workspace .candidate-record-grid { grid-template-columns: minmax(0, 1fr); }
+  .workspace .candidate-panel { padding: 18px; }
+  .workspace .candidate-field-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .workspace .job-detail-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 390px) {
+  .workspace .candidate-field-list, .workspace .job-detail-facts { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .workspace :where(.ui-card, .auth-card, .application-card) { scroll-behavior: auto; }
+}

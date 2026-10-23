@@ -136,14 +136,14 @@ export function ResumeImprovementPlanContent({ plan }: { plan: ResumeImprovement
         />
         <ResumePlanGroup
           title="Do not claim without evidence"
-          intro="No recorded supporting evidence supports adding these requirements to this resume."
+          intro="Do not add these claims without supporting experience."
           actions={plan.do_not_claim_without_evidence ?? []}
           empty="No requirements are in this group."
           selectedVersionId={plan.resume_version_id}
         />
         <ResumePlanGroup
           title="Needs manual review"
-          intro="These requirements cannot be evaluated safely with existing deterministic evidence."
+          intro="These requirements need a manual check."
           actions={plan.manual_review ?? []}
           empty="No requirements need manual review."
           selectedVersionId={plan.resume_version_id}

@@ -77,24 +77,24 @@ export function FitAnalysisContent({ analysis }: { analysis: FitAnalysis }) {
       <section className="auth-card dashboard-card fit-introduction">
         <PageHeader title="Fit analysis" />
         <div className="analysis-job-identity"><CompanyLogo company={analysis.company_name || "Employer"} size="large" /><div><p className="analysis-job-company">{analysis.company_name || "Employer"}</p><p className="fit-job">{analysis.job_title}</p></div></div>
-        <p className="muted">This view compares stated job requirements with recorded candidate information. It does not assess ability, predict hiring outcomes, or make a recommendation.</p>
+        <p className="muted">Compare a role's requirements with your saved skills and experience. This checks recorded evidence, not hiring chances.</p>
       </section>
       <div className="fit-layout">
         <RequirementGroup
           title="Recorded evidence"
-          intro="These requirements have linked candidate records. Read each source and limitation before drawing conclusions."
+          intro="These requirements have supporting records in your profile or resumes."
           requirements={analysis.matched ?? []}
           empty="No job requirements have recorded candidate evidence."
         />
         <RequirementGroup
           title="No recorded evidence"
-          intro="No linked candidate record was found for these requirements. This does not mean you lack the capability."
+          intro="Nothing in your saved records supports these requirements yet."
           requirements={analysis.missing ?? []}
           empty="No requirements are in this group."
         />
         <RequirementGroup
           title="Unknown"
-          intro="The available records do not support a determination for these education or eligibility requirements."
+          intro="Review education and eligibility requirements yourself."
           requirements={analysis.unknown ?? []}
           empty="No requirements are unknown."
         />

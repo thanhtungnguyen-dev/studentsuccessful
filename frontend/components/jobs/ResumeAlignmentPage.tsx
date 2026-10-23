@@ -101,12 +101,12 @@ export function ResumeAlignmentContent({ alignment }: { alignment: ResumeAlignme
         <PageHeader title="Resume alignment" />
         <div className="analysis-job-identity"><CompanyLogo company={alignment.company_name || "Employer"} size="large" /><div><p className="analysis-job-company">{alignment.company_name || "Employer"}</p><p className="fit-job">{alignment.job_title}</p></div></div>
         <p className="alignment-version"><strong>Selected resume:</strong> {alignment.resume_title}, version {alignment.resume_version_number}</p>
-        <p className="muted">This view compares one resume version with explicit job requirements. It records where evidence appears; it does not assess ability, predict hiring outcomes, or recommend claims to add.</p>
+        <p className="muted">See which requirements are supported by the selected resume. Missing evidence does not mean you lack the skill.</p>
       </section>
       <div className="alignment-layout">
         <AlignmentGroup
           title="Shown on this resume"
-          intro="These exact catalog-skill requirements have accepted evidence on the selected resume version."
+          intro="These requirements have evidence in this resume version."
           requirements={alignment.shown_on_resume ?? []}
           empty="No job requirements have accepted evidence on this resume version."
         />
@@ -118,13 +118,13 @@ export function ResumeAlignmentContent({ alignment }: { alignment: ResumeAlignme
         />
         <AlignmentGroup
           title="No recorded evidence"
-          intro="No accepted selected-resume, confirmed-skill, or project-technology source was found. This does not mean you lack the capability."
+          intro="No supporting record was found in the selected resume or your saved profile."
           requirements={alignment.no_recorded_evidence ?? []}
           empty="No requirements are in this group."
         />
         <AlignmentGroup
           title="Unknown / unassessed"
-          intro="Education and eligibility requirements are shown here because the available records do not support a deterministic evaluation."
+          intro="Review education and eligibility requirements yourself."
           requirements={alignment.unknown_unassessed ?? []}
           empty="No requirements are unknown or unassessed."
         />
